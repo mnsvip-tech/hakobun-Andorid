@@ -23,14 +23,17 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY")
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
             ?: providers.gradleProperty("MAPS_API_KEY").orNull
             ?: providers.environmentVariable("MAPS_API_KEY").orNull
             ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -55,6 +58,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
     implementation("com.google.maps.android:maps-compose:6.12.0")
     debugImplementation("androidx.compose.ui:ui-tooling")

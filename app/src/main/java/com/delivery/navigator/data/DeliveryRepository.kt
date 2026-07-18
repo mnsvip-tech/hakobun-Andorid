@@ -139,7 +139,7 @@ fun createPackagesFromCourse(course: RegularCourse, existingCount: Int): List<De
     }
 }
 
-fun createDeliveryPackageFromRegistration(
+suspend fun createDeliveryPackageFromRegistration(
     result: PackageRegistrationResult,
     existingCount: Int
 ): DeliveryPackage {
@@ -148,6 +148,7 @@ fun createDeliveryPackageFromRegistration(
         .filter { it.isNotBlank() }
         .joinToString(" / ")
         .ifBlank { "登録画面から追加" }
+    val (lat, lng) = geocodeAddress(result.address)
 
     return DeliveryPackage(
         trackingCode = result.trackingNumber.ifBlank { "HB-${1000 + generatedNumber}" },
@@ -160,25 +161,95 @@ fun createDeliveryPackageFromRegistration(
         cod = false,
         hasLocker = result.hasLocker,
         memo = memo,
-        latitude = 35.66 + ((generatedNumber * 17) % 40) / 1000.0,
-        longitude = 139.70 + ((generatedNumber * 23) % 80) / 1000.0,
+        latitude = lat,
+        longitude = lng,
         status = result.status
     )
 }
 
-fun searchPostalCode(postalCode: String): AddressCandidate {
-    val knownAddresses = mapOf(
-        "1000005" to "東京都千代田区丸の内",
-        "1040061" to "東京都中央区銀座",
-        "1050011" to "東京都港区芝公園",
-        "1110032" to "東京都台東区浅草"
+private suspend fun geocodeAddress(address: String): Pair<Double, Double> {
+    return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val encoded = java.net.URLEncoder.encode(address, "UTF-8")
+            val apiKey = com.delivery.navigator.BuildConfig.MAPS_API_KEY
+            val url = java.net.URL(
+                "https://maps.googleapis.com/maps/api/geocode/json?address=$encoded&language=ja&region=JP&key=$apiKey"
+            )
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 8000
+            connection.readTimeout = 8000
+            val json = connection.inputStream.bufferedReader().readText()
+            connection.disconnect()
+            val root = org.json.JSONObject(json)
+            val results = root.optJSONArray("results")
+            if (results != null && results.length() > 0) {
+                val location = results.getJSONObject(0)
+                    .getJSONObject("geometry")
+                    .getJSONObject("location")
+                Pair(location.getDouble("lat"), location.getDouble("lng"))
+            } else {
+                prefectureFallback(address)
+            }
+        }.getOrElse { prefectureFallback(address) }
+    }
+}
+
+private fun prefectureFallback(address: String): Pair<Double, Double> {
+    val prefectureCoords = mapOf(
+        "北海道" to Pair(43.06, 141.35), "青森" to Pair(40.82, 140.74), "岩手" to Pair(39.70, 141.15),
+        "宮城" to Pair(38.27, 140.87), "秋田" to Pair(39.72, 140.10), "山形" to Pair(38.24, 140.36),
+        "福島" to Pair(37.75, 140.47), "茨城" to Pair(36.34, 140.45), "栃木" to Pair(36.57, 139.88),
+        "群馬" to Pair(36.39, 139.06), "埼玉" to Pair(35.86, 139.65), "千葉" to Pair(35.61, 140.12),
+        "東京" to Pair(35.69, 139.69), "神奈川" to Pair(35.45, 139.64), "新潟" to Pair(37.90, 139.02),
+        "富山" to Pair(36.70, 137.21), "石川" to Pair(36.59, 136.63), "福井" to Pair(36.07, 136.22),
+        "山梨" to Pair(35.66, 138.57), "長野" to Pair(36.65, 138.18), "岐阜" to Pair(35.39, 136.72),
+        "静岡" to Pair(34.98, 138.38), "愛知" to Pair(35.18, 136.91), "三重" to Pair(34.73, 136.51),
+        "滋賀" to Pair(35.00, 135.87), "京都" to Pair(35.02, 135.76), "大阪" to Pair(34.69, 135.50),
+        "兵庫" to Pair(34.69, 135.18), "奈良" to Pair(34.69, 135.83), "和歌山" to Pair(34.23, 135.17),
+        "鳥取" to Pair(35.50, 134.24), "島根" to Pair(35.47, 133.06), "岡山" to Pair(34.66, 133.93),
+        "広島" to Pair(34.40, 132.46), "山口" to Pair(34.19, 131.47), "徳島" to Pair(34.07, 134.56),
+        "香川" to Pair(34.34, 134.04), "愛媛" to Pair(33.84, 132.77), "高知" to Pair(33.56, 133.53),
+        "福岡" to Pair(33.61, 130.42), "佐賀" to Pair(33.25, 130.30), "長崎" to Pair(32.74, 129.87),
+        "熊本" to Pair(32.79, 130.74), "大分" to Pair(33.24, 131.61), "宮崎" to Pair(31.91, 131.42),
+        "鹿児島" to Pair(31.56, 130.56), "沖縄" to Pair(26.21, 127.68)
     )
-    return AddressCandidate(
-        sourceLabel = "郵便番号検索",
-        postalCode = postalCode,
-        address = knownAddresses[postalCode] ?: "住所候補が未登録です",
-        confidenceLabel = if (knownAddresses.containsKey(postalCode)) "一致" else "未確認"
-    )
+    return prefectureCoords.entries.firstOrNull { address.contains(it.key) }?.value
+        ?: Pair(35.69, 139.69)
+}
+
+suspend fun searchPostalCode(postalCode: String): AddressCandidate {
+    return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val url = java.net.URL("https://zipcloud.ibsnet.co.jp/api/search?zipcode=$postalCode")
+            val json = url.readText(Charsets.UTF_8)
+            val root = org.json.JSONObject(json)
+            val results = root.optJSONArray("results")
+            if (results != null && results.length() > 0) {
+                val item = results.getJSONObject(0)
+                val address = "${item.optString("address1")}${item.optString("address2")}${item.optString("address3")}"
+                AddressCandidate(
+                    sourceLabel = "郵便番号検索",
+                    postalCode = postalCode,
+                    address = address,
+                    confidenceLabel = "一致"
+                )
+            } else {
+                AddressCandidate(
+                    sourceLabel = "郵便番号検索",
+                    postalCode = postalCode,
+                    address = "該当する住所が見つかりません",
+                    confidenceLabel = "未確認"
+                )
+            }
+        }.getOrElse {
+            AddressCandidate(
+                sourceLabel = "郵便番号検索",
+                postalCode = postalCode,
+                address = "通信エラーが発生しました",
+                confidenceLabel = "エラー"
+            )
+        }
+    }
 }
 
 fun exportPackages(packages: List<DeliveryPackage>): String {

@@ -47,8 +47,8 @@ class LocalDeliveryStore(context: Context) {
             cod = optBoolean("cod"),
             hasLocker = optBoolean("hasLocker"),
             memo = optString("memo"),
-            latitude = optDouble("latitude"),
-            longitude = optDouble("longitude"),
+            latitude = optDouble("latitude", 0.0),
+            longitude = optDouble("longitude", 0.0),
             status = enumValueOrDefault(optString("status"), DeliveryStatus.Pending)
         )
     }

@@ -1,5 +1,7 @@
 package com.delivery.navigator.model
 
+import androidx.compose.runtime.Immutable
+
 enum class DeliveryStatus(val label: String) {
     Pending("未配達"),
     InProgress("配達中"),
@@ -62,6 +64,7 @@ enum class AccountMenuItem(val title: String, val description: String) {
     Terms("ご利用規約", "利用条件とプライバシー方針")
 }
 
+@Immutable
 data class DeliveryPackage(
     val trackingCode: String,
     val recipient: String,
@@ -78,6 +81,7 @@ data class DeliveryPackage(
     val status: DeliveryStatus
 )
 
+@Immutable
 data class AddressCandidate(
     val sourceLabel: String,
     val postalCode: String,
@@ -85,6 +89,7 @@ data class AddressCandidate(
     val confidenceLabel: String
 )
 
+@Immutable
 data class PackageRegistrationResult(
     val address: String,
     val hasLocker: Boolean,
@@ -101,23 +106,27 @@ data class PackageRegistrationResult(
     val size: PackageSizeOption
 )
 
+@Immutable
 data class RouteStop(
     val deliveryPackage: DeliveryPackage,
     val routeNumber: Int
 )
 
+@Immutable
 data class EndOfDaySummary(
     val deliveredStops: Int,
     val deliveredPackages: Int,
     val returnedPackages: Int
 )
 
+@Immutable
 data class RegularCourse(
     val code: String,
     val displayName: String,
     val addresses: List<CourseAddress>
 )
 
+@Immutable
 data class CourseAddress(
     val recipient: String,
     val address: String,
