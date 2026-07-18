@@ -1,0 +1,299 @@
+package com.delivery.navigator.data
+
+import android.content.Intent
+import android.provider.CalendarContract
+import com.delivery.navigator.model.AddressCandidate
+import com.delivery.navigator.model.CourseAddress
+import com.delivery.navigator.model.DeliveryPackage
+import com.delivery.navigator.model.DeliveryStatus
+import com.delivery.navigator.model.EndOfDaySummary
+import com.delivery.navigator.model.PackageRegistrationResult
+import com.delivery.navigator.model.RegularCourse
+import com.delivery.navigator.model.RegistrationTimeWindow
+import com.delivery.navigator.model.RouteStop
+import com.delivery.navigator.model.TimeWindow
+
+private const val CURRENT_LATITUDE = 35.681236
+private const val CURRENT_LONGITUDE = 139.767125
+
+fun currentRouteOrigin(): Pair<Double, Double> = CURRENT_LATITUDE to CURRENT_LONGITUDE
+
+fun samplePackages(): List<DeliveryPackage> = listOf(
+    DeliveryPackage(
+        trackingCode = "DA-1028",
+        recipient = "山田 太郎",
+        address = "東京都千代田区丸の内1-1-1",
+        timeWindow = TimeWindow.Morning,
+        size = "80",
+        colorLabel = "クラフト",
+        packageType = "小箱",
+        cod = false,
+        hasLocker = true,
+        memo = "宅配BOXあり。入口は建物右側。",
+        latitude = 35.6842,
+        longitude = 139.7629,
+        status = DeliveryStatus.Pending
+    ),
+    DeliveryPackage(
+        trackingCode = "DA-1041",
+        recipient = "佐藤 花子",
+        address = "東京都中央区銀座4-5-6",
+        timeWindow = TimeWindow.Afternoon,
+        size = "60",
+        colorLabel = "白",
+        packageType = "封筒",
+        cod = true,
+        hasLocker = false,
+        memo = "代引き。インターホン後、管理室側へ。",
+        latitude = 35.6717,
+        longitude = 139.7650,
+        status = DeliveryStatus.InProgress
+    ),
+    DeliveryPackage(
+        trackingCode = "DA-1077",
+        recipient = "鈴木 一郎",
+        address = "東京都港区芝公園4-2-8",
+        timeWindow = TimeWindow.Evening,
+        size = "100",
+        colorLabel = "冷蔵",
+        packageType = "冷蔵",
+        cod = false,
+        hasLocker = false,
+        memo = "不在時は会社へ持ち戻り。置き配不可。",
+        latitude = 35.6586,
+        longitude = 139.7454,
+        status = DeliveryStatus.Absent
+    ),
+    DeliveryPackage(
+        trackingCode = "DA-1099",
+        recipient = "田中 二郎",
+        address = "東京都台東区浅草2-3-1",
+        timeWindow = TimeWindow.Unspecified,
+        size = "80",
+        colorLabel = "不明",
+        packageType = "袋物",
+        cod = false,
+        hasLocker = false,
+        memo = "時間指定なし。地図の時間指定表示では非表示。",
+        latitude = 35.7148,
+        longitude = 139.7967,
+        status = DeliveryStatus.Pending
+    )
+)
+
+fun regularCourses(): List<RegularCourse> = listOf(
+    RegularCourse(
+        code = "A",
+        displayName = "Aコース",
+        addresses = listOf(
+            CourseAddress("A-01 佐々木", "東京都千代田区大手町1-1-1", TimeWindow.Morning, "午前指定が多いエリア", 35.6862, 139.7633),
+            CourseAddress("A-02 高橋", "東京都中央区日本橋2-2-2", TimeWindow.Afternoon, "宅配BOX確認", 35.6811, 139.7737),
+            CourseAddress("A-03 中村", "東京都港区新橋3-3-3", TimeWindow.Unspecified, "定期配送", 35.6663, 139.7580)
+        )
+    ),
+    RegularCourse(
+        code = "B",
+        displayName = "Bコース",
+        addresses = listOf(
+            CourseAddress("B-01 小林", "東京都目黒区目黒1-4-1", TimeWindow.Morning, "入口左", 35.6339, 139.7156),
+            CourseAddress("B-02 加藤", "東京都渋谷区恵比寿2-5-2", TimeWindow.Evening, "夜間指定", 35.6467, 139.7101)
+        )
+    ),
+    RegularCourse(
+        code = "C",
+        displayName = "Cコース",
+        addresses = listOf(
+            CourseAddress("C-01 吉田", "東京都新宿区西新宿3-6-3", TimeWindow.Afternoon, "高層階", 35.6896, 139.6921),
+            CourseAddress("C-02 山本", "東京都中野区中野4-7-4", TimeWindow.Unspecified, "管理室あり", 35.7074, 139.6658)
+        )
+    ),
+    RegularCourse(
+        code = "D",
+        displayName = "Dコース",
+        addresses = listOf(
+            CourseAddress("D-01 松本", "東京都杉並区高円寺5-8-5", TimeWindow.Morning, "明日想定コース", 35.7056, 139.6497),
+            CourseAddress("D-02 井上", "東京都練馬区豊玉6-9-6", TimeWindow.Evening, "再配達注意", 35.7356, 139.6517),
+            CourseAddress("D-03 木村", "東京都板橋区板橋7-10-7", TimeWindow.Afternoon, "置き配可", 35.7512, 139.7093)
+        )
+    )
+)
+
+fun createPackagesFromCourse(course: RegularCourse, existingCount: Int): List<DeliveryPackage> {
+    return course.addresses.mapIndexed { index, address ->
+        val generatedNumber = existingCount + index + 1
+        DeliveryPackage(
+            trackingCode = "COURSE-${course.code}-$generatedNumber",
+            recipient = address.recipient,
+            address = address.address,
+            timeWindow = address.timeWindow,
+            size = "80",
+            colorLabel = course.displayName,
+            packageType = "定期",
+            cod = false,
+            hasLocker = false,
+            memo = address.memo,
+            latitude = address.latitude,
+            longitude = address.longitude,
+            status = DeliveryStatus.Pending
+        )
+    }
+}
+
+fun createDeliveryPackageFromRegistration(
+    result: PackageRegistrationResult,
+    existingCount: Int
+): DeliveryPackage {
+    val generatedNumber = existingCount + 1
+    val memo = listOf(result.nameplate, result.deliveryMemo, result.packageMemo)
+        .filter { it.isNotBlank() }
+        .joinToString(" / ")
+        .ifBlank { "登録画面から追加" }
+
+    return DeliveryPackage(
+        trackingCode = result.trackingNumber.ifBlank { "HB-${1000 + generatedNumber}" },
+        recipient = result.recipientName.ifBlank { "届け先未入力" },
+        address = result.address,
+        timeWindow = result.timeWindow.toRouteTimeWindow(),
+        size = result.size.label,
+        colorLabel = result.colorType.label,
+        packageType = result.shape.label,
+        cod = false,
+        hasLocker = result.hasLocker,
+        memo = memo,
+        latitude = 35.66 + ((generatedNumber * 17) % 40) / 1000.0,
+        longitude = 139.70 + ((generatedNumber * 23) % 80) / 1000.0,
+        status = result.status
+    )
+}
+
+fun searchPostalCode(postalCode: String): AddressCandidate {
+    val knownAddresses = mapOf(
+        "1000005" to "東京都千代田区丸の内",
+        "1040061" to "東京都中央区銀座",
+        "1050011" to "東京都港区芝公園",
+        "1110032" to "東京都台東区浅草"
+    )
+    return AddressCandidate(
+        sourceLabel = "郵便番号検索",
+        postalCode = postalCode,
+        address = knownAddresses[postalCode] ?: "住所候補が未登録です",
+        confidenceLabel = if (knownAddresses.containsKey(postalCode)) "一致" else "未確認"
+    )
+}
+
+fun exportPackages(packages: List<DeliveryPackage>): String {
+    return packages.joinToString(separator = "\n") { item ->
+        listOf(
+            item.trackingCode,
+            item.recipient,
+            item.address,
+            item.timeWindow.label,
+            item.memo
+        ).joinToString(",") { value -> value.replace(",", " ") }
+    }
+}
+
+fun importPackages(source: String, existingCount: Int): List<DeliveryPackage> {
+    return source
+        .lineSequence()
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .mapIndexedNotNull { index, line ->
+            val parts = line.split(",").map { it.trim() }
+            if (parts.size < 3) {
+                null
+            } else {
+                val generatedNumber = existingCount + index + 1
+                DeliveryPackage(
+                    trackingCode = parts.getOrNull(0).orEmpty().ifBlank { "IMPORT-${1000 + generatedNumber}" },
+                    recipient = parts.getOrNull(1).orEmpty().ifBlank { "インポート先" },
+                    address = parts.getOrNull(2).orEmpty(),
+                    timeWindow = parseTimeWindow(parts.getOrNull(3).orEmpty()),
+                    size = "80",
+                    colorLabel = "インポート",
+                    packageType = "住所データ",
+                    cod = false,
+                    hasLocker = false,
+                    memo = parts.getOrNull(4).orEmpty(),
+                    latitude = 35.65 + ((generatedNumber * 19) % 60) / 1000.0,
+                    longitude = 139.70 + ((generatedNumber * 29) % 90) / 1000.0,
+                    status = DeliveryStatus.Pending
+                )
+            }
+        }
+        .toList()
+}
+
+fun calculateNearestRoute(packages: List<DeliveryPackage>): List<RouteStop> {
+    val remaining = packages.toMutableList()
+    val ordered = mutableListOf<RouteStop>()
+    var currentLatitude = CURRENT_LATITUDE
+    var currentLongitude = CURRENT_LONGITUDE
+
+    while (remaining.isNotEmpty()) {
+        val next = remaining.minBy { item ->
+            val latitudeDiff = item.latitude - currentLatitude
+            val longitudeDiff = item.longitude - currentLongitude
+            latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff
+        }
+        remaining.remove(next)
+        ordered.add(RouteStop(next, ordered.size + 1))
+        currentLatitude = next.latitude
+        currentLongitude = next.longitude
+    }
+
+    return ordered
+}
+
+fun calculateEndOfDaySummary(packages: List<DeliveryPackage>): EndOfDaySummary {
+    val delivered = packages.count { it.status == DeliveryStatus.Completed }
+    val returned = packages.count { it.status == DeliveryStatus.ReturnToCompany }
+    return EndOfDaySummary(
+        deliveredStops = delivered,
+        deliveredPackages = delivered,
+        returnedPackages = returned
+    )
+}
+
+fun createEndOfDayCalendarIntent(summary: EndOfDaySummary): Intent {
+    val description = """
+        配達件数: ${summary.deliveredStops}
+        配達個数: ${summary.deliveredPackages}
+        持ち戻り個数: ${summary.returnedPackages}
+    """.trimIndent()
+
+    return Intent(Intent.ACTION_INSERT).apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.Events.TITLE, "HAKOBUN 配送終了処理")
+        putExtra(CalendarContract.Events.DESCRIPTION, description)
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, System.currentTimeMillis())
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, System.currentTimeMillis())
+        putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+    }
+}
+
+fun DeliveryStatus.hidesMapPin(): Boolean {
+    return this == DeliveryStatus.Completed || this == DeliveryStatus.ReturnToCompany
+}
+
+private fun RegistrationTimeWindow.toRouteTimeWindow(): TimeWindow {
+    return when (this) {
+        RegistrationTimeWindow.None -> TimeWindow.Unspecified
+        RegistrationTimeWindow.Morning -> TimeWindow.Morning
+        RegistrationTimeWindow.Noon,
+        RegistrationTimeWindow.Afternoon,
+        RegistrationTimeWindow.LateAfternoon -> TimeWindow.Afternoon
+        RegistrationTimeWindow.Evening,
+        RegistrationTimeWindow.Night,
+        RegistrationTimeWindow.LateNight -> TimeWindow.Evening
+    }
+}
+
+private fun parseTimeWindow(value: String): TimeWindow {
+    return when (value) {
+        TimeWindow.Morning.label, "午前中" -> TimeWindow.Morning
+        TimeWindow.Afternoon.label, "12-14時", "14-16時", "16-18時" -> TimeWindow.Afternoon
+        TimeWindow.Evening.label, "18-20時", "19-21時", "20-21時" -> TimeWindow.Evening
+        else -> TimeWindow.Unspecified
+    }
+}
