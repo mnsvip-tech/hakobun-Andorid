@@ -53,11 +53,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.delivery.navigator.data.calculateEndOfDaySummary
 import com.delivery.navigator.data.calculateNearestRoute
+import com.delivery.navigator.data.createCourseAddressFromInput
 import com.delivery.navigator.data.createDeliveryPackageFromRegistration
 import com.delivery.navigator.data.createEndOfDayCalendarIntent
 import com.delivery.navigator.data.createPackagesFromCourse
 import com.delivery.navigator.data.currentRouteOrigin
 import com.delivery.navigator.data.exportPackages
+import com.delivery.navigator.data.fetchDrivingRoutePoints
 import com.delivery.navigator.data.hidesMapPin
 import com.delivery.navigator.data.importPackages
 import com.delivery.navigator.data.LocalDeliveryStore
@@ -102,6 +104,12 @@ fun HakobunApp() {
             addAll(savedPackages.ifEmpty { samplePackages() })
         }
     }
+    val regularCourseList = remember(deliveryStore) {
+        mutableStateListOf<RegularCourse>().apply {
+            val savedCourses = deliveryStore.loadRegularCourses()
+            addAll(savedCourses.ifEmpty { regularCourses() })
+        }
+    }
     var selectedWindow by remember { mutableStateOf(TimeWindow.All) }
     var selectedMapTimeWindow by remember { mutableStateOf(TimeWindow.All) }
     var selectedPackageCode by remember { mutableStateOf(packages.firstOrNull()?.trackingCode.orEmpty()) }
@@ -117,8 +125,12 @@ fun HakobunApp() {
     var importText by remember { mutableStateOf("") }
     var selectedSummaryFilter by remember { mutableStateOf<PackageSummaryFilter?>(null) }
     var redeliveryCandidateCode by remember { mutableStateOf<String?>(null) }
+    var isHomeMenuOpen by remember { mutableStateOf(false) }
+    var homePanel by remember { mutableStateOf<HomePanel?>(null) }
+    var showMapControls by remember { mutableStateOf(true) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     val persistPackages = { deliveryStore.savePackages(packages) }
+    val persistRegularCourses = { deliveryStore.saveRegularCourses(regularCourseList) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
@@ -274,9 +286,26 @@ fun HakobunApp() {
                 ?: "東京都千代田区丸の内1-1-1"
             PackageRegistrationScreen(
                 initialAddress = registrationAddress,
+                courses = regularCourseList,
                 onBack = { isRegisteringPackage = false },
                 onOpenMap = { addr -> context.startActivity(openMapIntent(addr)) },
                 onOpenNavigation = { addr -> context.startActivity(openNavigationIntent(addr)) },
+                onAddCourseAddress = { courseCode, address ->
+                    coroutineScope.launch {
+                        val newAddress = createCourseAddressFromInput(
+                            recipient = "",
+                            address = address,
+                            timeWindow = TimeWindow.Unspecified,
+                            memo = "荷物登録画面から追加"
+                        )
+                        val index = regularCourseList.indexOfFirst { it.code == courseCode }
+                        if (index >= 0) {
+                            val course = regularCourseList[index]
+                            regularCourseList[index] = course.copy(addresses = course.addresses + newAddress)
+                            persistRegularCourses()
+                        }
+                    }
+                },
                 onRegister = { results ->
                     coroutineScope.launch {
                         results.forEach { result ->
@@ -291,80 +320,9 @@ fun HakobunApp() {
             return@MaterialTheme
         }
 
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .statusBarsPadding()
-                    .navigationBarsPadding()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Header(
-                    packages = packages,
-                    selectedFilter = selectedSummaryFilter,
-                    onFilterSelected = { filter ->
-                        selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
-                    },
-                    isLoggedIn = isLoggedIn,
-                    onOpenMenu = { isSupportHubOpen = true },
-                    onRegisterPackage = { isRegisteringPackage = true }
-                )
-                if (selectedSummaryFilter != null) {
-                    SummaryFilteredPackagePanel(
-                        filter = selectedSummaryFilter,
-                        packages = summaryPackages,
-                        selectedCode = selectedPackage?.trackingCode,
-                        onSelect = onPackageSelected,
-                        onEdit = { editingPackageCode = it },
-                        onClear = { selectedSummaryFilter = null }
-                    )
-                }
-                RegularCoursePanel(
-                    courses = regularCourses(),
-                    onLoadCourse = { course ->
-                        packages.addAll(createPackagesFromCourse(course, packages.size))
-                        selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
-                        persistPackages()
-                    }
-                )
-                AddressBackupPanel(
-                    backupText = backupText,
-                    importText = importText,
-                    onExport = { backupText = exportPackages(packages) },
-                    onImportTextChange = { importText = it },
-                    onImport = {
-                        val importedPackages = importPackages(importText, packages.size)
-                        packages.addAll(importedPackages)
-                        selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
-                        persistPackages()
-                    }
-                )
-                AddressInputPanel(
-                    postalCode = postalCode,
-                    candidate = addressCandidate,
-                    onPostalCodeChange = { postalCode = it.filter(Char::isDigit).take(7) },
-                    onCameraScan = {
-                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            cameraOcrLauncher.launch(null)
-                        } else {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
-                    },
-                    onVoiceInput = {
-                        voiceInputLauncher.launch(createVoiceAddressIntent())
-                    },
-                    onPostalSearch = { coroutineScope.launch { addressCandidate = searchPostalCode(postalCode) } },
-                    onRegisterPackage = { isRegisteringPackage = true },
-                    onClear = {
-                        postalCode = ""
-                        addressCandidate = null
-                    }
-                )
-                TimeWindowFilters(selectedWindow) { selectedWindow = it }
-                MapTimeWindowFilters(selectedMapTimeWindow) { selectedMapTimeWindow = it }
-                DeliveryGoogleMap(
+        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFE9EEF3)) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                FullScreenDeliveryMap(
                     packages = visibleMapPackages,
                     fixedRouteNumbers = fixedRouteNumbers,
                     selectedCode = selectedPackage?.takeUnless { it.status.hidesMapPin() }?.trackingCode,
@@ -377,26 +335,103 @@ fun HakobunApp() {
                                 label = it.recipient
                             )
                         )
-                    }
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
-                selectedPackage?.let { packageItem ->
-                    PackageDetail(
-                        deliveryPackage = packageItem,
-                        onStatusChange = { status ->
-                            val index = packages.indexOfFirst { it.trackingCode == packageItem.trackingCode }
-                            if (index >= 0) {
-                                packages[index] = packageItem.copy(status = status)
-                                persistPackages()
+                MapHomeChrome(
+                    packages = packages,
+                    selectedFilter = selectedSummaryFilter,
+                    selectedMapTimeWindow = selectedMapTimeWindow,
+                    showMapControls = showMapControls,
+                    isLoggedIn = isLoggedIn,
+                    onOpenMenu = { isHomeMenuOpen = true },
+                    onOpenSupport = { isSupportHubOpen = true },
+                    onRegisterPackage = { isRegisteringPackage = true },
+                    onToggleMapControls = { showMapControls = !showMapControls },
+                    onFilterSelected = { filter ->
+                        selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
+                        homePanel = HomePanel.Packages
+                    },
+                    onMapTimeWindowSelected = { selectedMapTimeWindow = it },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                        .padding(start = 8.dp, top = 2.dp, end = 8.dp)
+                )
+                homePanel?.let { panel ->
+                    HomePanelSheet(
+                        panel = panel,
+                        packages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages,
+                        courses = regularCourseList,
+                        selectedCode = selectedPackage?.trackingCode,
+                        backupText = backupText,
+                        importText = importText,
+                        onClose = { homePanel = null },
+                        onSelectPackage = onPackageSelected,
+                        onEditPackage = { editingPackageCode = it },
+                        onExport = { backupText = exportPackages(packages) },
+                        onImportTextChange = { importText = it },
+                        onImport = {
+                            val importedPackages = importPackages(importText, packages.size)
+                            packages.addAll(importedPackages)
+                            selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
+                            persistPackages()
+                        },
+                        onAddCourseAddress = { courseCode, recipient, address, timeWindow, memo ->
+                            coroutineScope.launch {
+                                val newAddress = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                                val index = regularCourseList.indexOfFirst { it.code == courseCode }
+                                if (index >= 0) {
+                                    val course = regularCourseList[index]
+                                    regularCourseList[index] = course.copy(addresses = course.addresses + newAddress)
+                                    persistRegularCourses()
+                                }
                             }
-                        }
+                        },
+                        onLoadCourse = { course ->
+                            val coursePackages = createPackagesFromCourse(course, packages.size)
+                            packages.addAll(coursePackages)
+                            coursePackages.forEachIndexed { index, packageItem ->
+                                fixedRouteNumbers[packageItem.trackingCode] = index + 1
+                            }
+                            selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
+                            persistPackages()
+                            homePanel = null
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .padding(12.dp)
                     )
                 }
-                PackageList(
-                    packages = visiblePackages,
-                    selectedCode = selectedPackage?.trackingCode,
-                    onSelect = onPackageSelected,
-                    onEdit = { editingPackageCode = it }
-                )
+                if (isHomeMenuOpen) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0x88000000))
+                            .clickable { isHomeMenuOpen = false }
+                    )
+                    HomeSideMenu(
+                        isLoggedIn = isLoggedIn,
+                        onClose = { isHomeMenuOpen = false },
+                        onOpenPanel = {
+                            homePanel = it
+                            isHomeMenuOpen = false
+                        },
+                        onRegisterPackage = {
+                            isHomeMenuOpen = false
+                            isRegisteringPackage = true
+                        },
+                        onOpenSupport = {
+                            isHomeMenuOpen = false
+                            isSupportHubOpen = true
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight()
+                            .width(318.dp)
+                    )
+                }
             }
         }
     }
@@ -427,6 +462,368 @@ private enum class PackageSummaryFilter(val label: String) {
                 deliveryPackage.status == DeliveryStatus.Redelivery
             Completed -> deliveryPackage.status == DeliveryStatus.Completed
             Absent -> deliveryPackage.status == DeliveryStatus.Absent
+        }
+    }
+}
+
+private enum class HomePanel {
+    Packages,
+    Courses,
+    Backup
+}
+
+@Composable
+private fun MapHomeChrome(
+    packages: List<DeliveryPackage>,
+    selectedFilter: PackageSummaryFilter?,
+    selectedMapTimeWindow: TimeWindow,
+    showMapControls: Boolean,
+    isLoggedIn: Boolean,
+    onOpenMenu: () -> Unit,
+    onOpenSupport: () -> Unit,
+    onRegisterPackage: () -> Unit,
+    onToggleMapControls: () -> Unit,
+    onFilterSelected: (PackageSummaryFilter) -> Unit,
+    onMapTimeWindowSelected: (TimeWindow) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val completed = packages.count { it.status == DeliveryStatus.Completed }
+    val absent = packages.count { it.status == DeliveryStatus.Absent }
+    val remaining = packages.count { PackageSummaryFilter.Remaining.matches(it) }
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Card(colors = CardDefaults.cardColors(containerColor = Color(0xEEFFFFFF)), shape = RoundedCornerShape(22.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onOpenMenu) { Text("☰", style = MaterialTheme.typography.titleLarge) }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("配達プラン概要", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(if (isLoggedIn) "ログイン中" else "未ログイン", color = BrandBlue, style = MaterialTheme.typography.labelSmall)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = onOpenSupport) { Text("お知らせ") }
+                    Button(onClick = onRegisterPackage, modifier = Modifier.height(38.dp)) { Text("登録") }
+                }
+            }
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = onToggleMapControls, modifier = Modifier.height(36.dp)) {
+                Text(if (showMapControls) "集計を非表示" else "集計を表示")
+            }
+        }
+        if (showMapControls) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CompactMetricCard("残り", remaining.toString(), selectedFilter == PackageSummaryFilter.Remaining, Modifier.weight(1f)) {
+                    onFilterSelected(PackageSummaryFilter.Remaining)
+                }
+                CompactMetricCard("完了", completed.toString(), selectedFilter == PackageSummaryFilter.Completed, Modifier.weight(1f)) {
+                    onFilterSelected(PackageSummaryFilter.Completed)
+                }
+                CompactMetricCard("不在", absent.toString(), selectedFilter == PackageSummaryFilter.Absent, Modifier.weight(1f)) {
+                    onFilterSelected(PackageSummaryFilter.Absent)
+                }
+            }
+            Card(colors = CardDefaults.cardColors(containerColor = Color(0xEEFFFFFF)), shape = RoundedCornerShape(22.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    listOf(TimeWindow.All, TimeWindow.Unspecified, TimeWindow.Morning, TimeWindow.Afternoon, TimeWindow.Evening).forEach { window ->
+                        FilterChip(
+                            selected = selectedMapTimeWindow == window,
+                            onClick = { onMapTimeWindowSelected(window) },
+                            label = { Text(if (window == TimeWindow.All) "全て" else window.label) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactMetricCard(
+    label: String,
+    value: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier.clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = if (selected) BrandPurple else Color(0xEEFFFFFF)),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(label, color = if (selected) Color.White else MutedText, style = MaterialTheme.typography.labelMedium)
+            Text(value, color = if (selected) Color.White else Color(0xFF20242C), fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun HomeSideMenu(
+    isLoggedIn: Boolean,
+    onClose: () -> Unit,
+    onOpenPanel: (HomePanel) -> Unit,
+    onRegisterPackage: () -> Unit,
+    onOpenSupport: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(modifier = modifier, color = Color.White) {
+        Column(
+            modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onClose) { Text("×", style = MaterialTheme.typography.headlineSmall) }
+                Text("メニュー", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+            }
+            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFE7F6FF)), shape = RoundedCornerShape(18.dp)) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StorkMascot(modifier = Modifier.size(58.dp))
+                    Text("HAKOBUN", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                    Text(if (isLoggedIn) "配送員モード / ログイン中" else "ゲストモード", color = MutedText)
+                }
+            }
+            SideMenuCard("荷物登録", "住所・OCR・音声入力から荷物を追加", "＋") { onRegisterPackage() }
+            SideMenuCard("集荷 / 定期コース", "A〜Dコースを今日の配達へ読み込み", "◇") { onOpenPanel(HomePanel.Courses) }
+            SideMenuCard("配達リスト", "残り・完了・不在をカードで確認", "☷") { onOpenPanel(HomePanel.Packages) }
+            SideMenuCard("バックアップ", "住所データのコピー・共有・復元", "↻") { onOpenPanel(HomePanel.Backup) }
+            SideMenuCard("お知らせ / 終了処理", "サポートとカレンダー転記はこちら", "i") { onOpenSupport() }
+            Spacer(modifier = Modifier.weight(1f))
+            Text("地図は全画面表示。必要な操作だけ左メニューから呼び出します。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun SideMenuCard(title: String, description: String, mark: String, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.size(42.dp).clip(CircleShape).background(BrandPurple),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(mark, color = Color.White, fontWeight = FontWeight.Bold)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.Bold)
+                Text(description, color = MutedText, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomePanelSheet(
+    panel: HomePanel,
+    packages: List<DeliveryPackage>,
+    courses: List<RegularCourse>,
+    selectedCode: String?,
+    backupText: String,
+    importText: String,
+    onClose: () -> Unit,
+    onSelectPackage: (String) -> Unit,
+    onEditPackage: (String) -> Unit,
+    onExport: () -> Unit,
+    onImportTextChange: (String) -> Unit,
+    onImport: () -> Unit,
+    onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit,
+    onLoadCourse: (RegularCourse) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth().heightIn(max = 430.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xF7FFFFFF)),
+        shape = RoundedCornerShape(22.dp)
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    when (panel) {
+                        HomePanel.Packages -> "配達リスト"
+                        HomePanel.Courses -> "集荷 / 定期コース"
+                        HomePanel.Backup -> "バックアップ"
+                    },
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                TextButton(onClick = onClose) { Text("閉じる") }
+            }
+            when (panel) {
+                HomePanel.Packages -> PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
+                HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onAddCourseAddress)
+                HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport)
+            }
+        }
+    }
+}
+
+@Composable
+private fun FullScreenDeliveryMap(
+    packages: List<DeliveryPackage>,
+    fixedRouteNumbers: Map<String, Int>,
+    selectedCode: String?,
+    onSelect: (String) -> Unit,
+    onNavigate: (DeliveryPackage) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val routeStops = calculateNearestRoute(packages)
+    val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
+    val originPair = currentRouteOrigin()
+    val origin = LatLng(originPair.first, originPair.second)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(origin, 12.5f)
+    }
+    var mapLoaded by remember { mutableStateOf(false) }
+    var mapBearing by remember { mutableStateOf(0f) }
+    var drivingRoutePoints by remember { mutableStateOf<List<LatLng>>(emptyList()) }
+    val activeRouteDestination = selectedPackage ?: routeStops.firstOrNull()?.deliveryPackage
+    LaunchedEffect(selectedPackage?.trackingCode, mapLoaded) {
+        if (!mapLoaded) return@LaunchedEffect
+        selectedPackage?.let {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f))
+        }
+    }
+    LaunchedEffect(activeRouteDestination?.trackingCode) {
+        drivingRoutePoints = activeRouteDestination
+            ?.let {
+                fetchDrivingRoutePoints(
+                    origin = originPair,
+                    destination = it.latitude to it.longitude
+                ).map { point -> LatLng(point.first, point.second) }
+            }
+            .orEmpty()
+    }
+
+    Box(modifier = modifier) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = false),
+            uiSettings = MapUiSettings(
+                compassEnabled = true,
+                zoomControlsEnabled = false,
+                tiltGesturesEnabled = true,
+                rotationGesturesEnabled = true,
+                scrollGesturesEnabled = true,
+                zoomGesturesEnabled = true
+            ),
+            onMapLoaded = { mapLoaded = true }
+        ) {
+            Marker(
+                state = rememberUpdatedMarkerState(position = origin),
+                title = "現在地",
+                snippet = "ルート計算の基準点",
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+            )
+            if (drivingRoutePoints.isNotEmpty()) {
+                Polyline(
+                    points = drivingRoutePoints,
+                    color = BrandBlue,
+                    width = 9f
+                )
+            } else if (activeRouteDestination != null) {
+                Polyline(
+                    points = listOf(origin, LatLng(activeRouteDestination.latitude, activeRouteDestination.longitude)),
+                    color = Color(0x552457D6),
+                    width = 6f
+                )
+            }
+            routeStops.forEach { stop ->
+                val item = stop.deliveryPackage
+                val routeNumber = fixedRouteNumbers[item.trackingCode] ?: stop.routeNumber
+                Marker(
+                    state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
+                    title = "$routeNumber. ${item.recipient}",
+                    snippet = "${item.timeWindow.label} / ${item.address}",
+                    icon = deliveryMarkerIcon(routeNumber, item),
+                    anchor = Offset(0.5f, 1f),
+                    onClick = {
+                        onSelect(item.trackingCode)
+                        false
+                    }
+                )
+            }
+        }
+        Column(
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            FloatingMapButton("現在地") {
+                if (mapLoaded) cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(origin, 12.5f))
+            }
+            selectedPackage?.let { item ->
+                FloatingMapButton("ナビ") { onNavigate(item) }
+            }
+        }
+        MiniCompass(
+            onClick = {
+                if (mapLoaded) {
+                    mapBearing = 0f
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition.Builder(cameraPositionState.position)
+                                .bearing(mapBearing)
+                                .build()
+                        )
+                    )
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(end = 14.dp, bottom = 18.dp)
+        )
+    }
+}
+
+@Composable
+private fun FloatingMapButton(label: String, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.size(62.dp).clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = CircleShape
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(label, color = BrandBlue, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun MiniCompass(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .size(46.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color(0xEFFFFFFF)),
+        shape = CircleShape
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("▲", color = BrandPurple, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Text("N", color = Color(0xFF20242C), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -746,6 +1143,45 @@ private fun EndOfDayPanel(
         }
         Button(onClick = { onFinishDay(summary) }, modifier = Modifier.fillMaxWidth()) {
             Text("終了処理してカレンダー入力・リセット")
+        }
+    }
+}
+
+@Composable
+private fun RegularCoursePanel(
+    courses: List<RegularCourse>,
+    onLoadCourse: (RegularCourse) -> Unit,
+    onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit
+) {
+    var selectedCourseCode by remember { mutableStateOf(courses.firstOrNull()?.code ?: "A") }
+    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode } ?: courses.firstOrNull()
+    remember(onAddCourseAddress) { onAddCourseAddress }
+
+    WhiteCard {
+        Text("定期配送コース", fontWeight = FontWeight.Bold)
+        Text("住所追加は荷物登録画面でコースを選んで行います。", color = MutedText)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            courses.forEach { course ->
+                FilterChip(
+                    selected = selectedCourseCode == course.code,
+                    onClick = { selectedCourseCode = course.code },
+                    label = { Text("${course.code}コース") },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        selectedCourse?.let { course ->
+            Text("${course.displayName} / 登録住所 ${course.addresses.size}件", fontWeight = FontWeight.Bold)
+            Button(
+                onClick = { onLoadCourse(course) },
+                enabled = course.addresses.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("${course.code}コースを今日の配達へ読み込み")
+            }
+            course.addresses.takeLast(5).forEach { item ->
+                TextBox("${item.recipient}\n${item.address}\n${item.timeWindow.label} / ${item.memo}")
+            }
         }
     }
 }
@@ -1216,9 +1652,11 @@ private fun PackageEditScreen(
 @Composable
 private fun PackageRegistrationScreen(
     initialAddress: String,
+    courses: List<RegularCourse>,
     onBack: () -> Unit,
     onOpenMap: (String) -> Unit,
     onOpenNavigation: (String) -> Unit,
+    onAddCourseAddress: (String, String) -> Unit,
     onRegister: (List<PackageRegistrationResult>) -> Unit
 ) {
     val context = LocalContext.current
@@ -1232,6 +1670,8 @@ private fun PackageRegistrationScreen(
     var postalCode by remember { mutableStateOf("") }
     var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
     var manualInput by remember { mutableStateOf("") }
+    var targetCourseCode by remember { mutableStateOf<String?>(null) }
+    var courseSavedMessage by remember { mutableStateOf("") }
 
     val cameraOcrLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicturePreview()
@@ -1349,6 +1789,41 @@ private fun PackageRegistrationScreen(
                                 ) { Text("音声") }
                             }
                         }
+                        Text("登録先", fontWeight = FontWeight.Bold)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = targetCourseCode == null,
+                                onClick = {
+                                    targetCourseCode = null
+                                    courseSavedMessage = ""
+                                },
+                                label = { Text("通常荷物") }
+                            )
+                        }
+                        courses.chunked(2).forEach { rowCourses ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                rowCourses.forEach { course ->
+                                    FilterChip(
+                                        selected = targetCourseCode == course.code,
+                                        onClick = {
+                                            targetCourseCode = course.code
+                                            courseSavedMessage = ""
+                                        },
+                                        label = { Text("${course.code}コース") },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (rowCourses.size == 1) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                        Text(
+                            targetCourseCode?.let { "${it}コースを選ぶと、この住所は定期集荷グループに保存されます。" }
+                                ?: "通常荷物を選ぶと、今日の配達として地図に登録します。",
+                            color = MutedText,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                         // 郵便番号検索
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -1394,13 +1869,24 @@ private fun PackageRegistrationScreen(
                         Button(
                             onClick = {
                                 if (manualInput.isNotBlank()) {
-                                    addresses.add(manualInput)
+                                    val selectedCourse = targetCourseCode
+                                    if (selectedCourse == null) {
+                                        addresses.add(manualInput)
+                                    } else {
+                                        onAddCourseAddress(selectedCourse, manualInput)
+                                        courseSavedMessage = "${selectedCourse}コースへ住所を追加しました"
+                                    }
                                     manualInput = ""
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = manualInput.isNotBlank()
-                        ) { Text("直接入力した住所を追加") }
+                        ) {
+                            Text(targetCourseCode?.let { "${it}コースへ住所を追加" } ?: "直接入力した住所を追加")
+                        }
+                        if (courseSavedMessage.isNotBlank()) {
+                            Text(courseSavedMessage, color = SuccessGreen, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }

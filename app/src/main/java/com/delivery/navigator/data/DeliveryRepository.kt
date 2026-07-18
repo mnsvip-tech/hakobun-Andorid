@@ -141,6 +141,23 @@ fun createPackagesFromCourse(course: RegularCourse, existingCount: Int): List<De
     }
 }
 
+suspend fun createCourseAddressFromInput(
+    recipient: String,
+    address: String,
+    timeWindow: TimeWindow,
+    memo: String
+): CourseAddress {
+    val (lat, lng) = geocodeAddress(address)
+    return CourseAddress(
+        recipient = recipient.ifBlank { "届け先未入力" },
+        address = address,
+        timeWindow = timeWindow,
+        memo = memo.ifBlank { "定期コース登録" },
+        latitude = lat,
+        longitude = lng
+    )
+}
+
 suspend fun createDeliveryPackageFromRegistration(
     result: PackageRegistrationResult,
     existingCount: Int
@@ -316,6 +333,72 @@ fun calculateNearestRoute(packages: List<DeliveryPackage>): List<RouteStop> {
     }
 
     return ordered
+}
+
+suspend fun fetchDrivingRoutePoints(
+    origin: Pair<Double, Double>,
+    destination: Pair<Double, Double>
+): List<Pair<Double, Double>> {
+    return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val apiKey = com.delivery.navigator.BuildConfig.MAPS_API_KEY
+            if (apiKey.isBlank()) return@runCatching emptyList()
+            val url = java.net.URL(
+                "https://maps.googleapis.com/maps/api/directions/json" +
+                    "?origin=${origin.first},${origin.second}" +
+                    "&destination=${destination.first},${destination.second}" +
+                    "&mode=driving&language=ja&region=JP&key=$apiKey"
+            )
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 8000
+            connection.readTimeout = 8000
+            val json = connection.inputStream.bufferedReader().readText()
+            connection.disconnect()
+            val root = org.json.JSONObject(json)
+            val routes = root.optJSONArray("routes")
+            if (routes != null && routes.length() > 0) {
+                val encoded = routes
+                    .getJSONObject(0)
+                    .getJSONObject("overview_polyline")
+                    .optString("points")
+                decodePolyline(encoded)
+            } else {
+                emptyList()
+            }
+        }.getOrElse { emptyList() }
+    }
+}
+
+private fun decodePolyline(encoded: String): List<Pair<Double, Double>> {
+    val points = mutableListOf<Pair<Double, Double>>()
+    var index = 0
+    var latitude = 0
+    var longitude = 0
+
+    while (index < encoded.length) {
+        var result = 0
+        var shift = 0
+        var byte: Int
+        do {
+            byte = encoded[index++].code - 63
+            result = result or ((byte and 0x1f) shl shift)
+            shift += 5
+        } while (byte >= 0x20 && index < encoded.length)
+        latitude += if ((result and 1) != 0) (result shr 1).inv() else result shr 1
+
+        result = 0
+        shift = 0
+        do {
+            byte = encoded[index++].code - 63
+            result = result or ((byte and 0x1f) shl shift)
+            shift += 5
+        } while (byte >= 0x20 && index < encoded.length)
+        longitude += if ((result and 1) != 0) (result shr 1).inv() else result shr 1
+
+        points.add(Pair(latitude / 100000.0, longitude / 100000.0))
+    }
+
+    return points
 }
 
 fun calculateEndOfDaySummary(packages: List<DeliveryPackage>): EndOfDaySummary {
