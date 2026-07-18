@@ -12,6 +12,8 @@ import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RouteStop
 import com.delivery.navigator.model.TimeWindow
+import java.util.Calendar
+import java.util.Locale
 
 private const val CURRENT_LATITUDE = 35.681236
 private const val CURRENT_LONGITUDE = 139.767125
@@ -327,6 +329,13 @@ fun calculateEndOfDaySummary(packages: List<DeliveryPackage>): EndOfDaySummary {
 }
 
 fun createEndOfDayCalendarIntent(summary: EndOfDaySummary): Intent {
+    val todayStart = Calendar.getInstance(Locale.JAPAN).apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+    val tomorrowStart = todayStart + 24 * 60 * 60 * 1000
     val description = """
         配達件数: ${summary.deliveredStops}
         配達個数: ${summary.deliveredPackages}
@@ -335,10 +344,12 @@ fun createEndOfDayCalendarIntent(summary: EndOfDaySummary): Intent {
 
     return Intent(Intent.ACTION_INSERT).apply {
         data = CalendarContract.Events.CONTENT_URI
-        putExtra(CalendarContract.Events.TITLE, "HAKOBUN 配送終了処理")
+        type = "vnd.android.cursor.item/event"
+        putExtra(CalendarContract.Events.TITLE, "HAKOBUN 本日の配送実績")
         putExtra(CalendarContract.Events.DESCRIPTION, description)
-        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, System.currentTimeMillis())
-        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, System.currentTimeMillis())
+        putExtra(Intent.EXTRA_TEXT, description)
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, todayStart)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, tomorrowStart)
         putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
     }
 }

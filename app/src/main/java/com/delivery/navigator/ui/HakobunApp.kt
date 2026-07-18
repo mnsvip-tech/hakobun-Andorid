@@ -236,7 +236,16 @@ fun HakobunApp() {
                 onBack = { isSupportHubOpen = false },
                 onSelect = { activeMenuItem = it },
                 onLoginToggle = { isLoggedIn = !isLoggedIn },
-                onFinishDay = { summary -> context.startActivity(createEndOfDayCalendarIntent(summary)) }
+                onFinishDay = { summary ->
+                    runCatching {
+                        context.startActivity(createEndOfDayCalendarIntent(summary))
+                    }.onSuccess {
+                        packages.clear()
+                        fixedRouteNumbers.clear()
+                        selectedPackageCode = ""
+                        persistPackages()
+                    }
+                }
             )
             return@MaterialTheme
         }
@@ -711,14 +720,19 @@ private fun AccountMenuDetailScreen(
 private fun EndOfDayPanel(packages: List<DeliveryPackage>, onFinishDay: (EndOfDaySummary) -> Unit) {
     val summary = calculateEndOfDaySummary(packages)
     WhiteCard {
-        Text("終了処理", fontWeight = FontWeight.Bold)
+        Text("終了処理 / バックアップはこちら", fontWeight = FontWeight.Bold)
+        Text(
+            "カレンダー転記後、本日の配達データは0件にリセットされます。必要な方は先に住所データ管理のバックアップを実行してください。",
+            color = MutedText,
+            style = MaterialTheme.typography.bodySmall
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SummaryMetric("配達件数", summary.deliveredStops.toString(), Modifier.weight(1f))
             SummaryMetric("配達個数", summary.deliveredPackages.toString(), Modifier.weight(1f))
             SummaryMetric("持戻り", summary.returnedPackages.toString(), Modifier.weight(1f))
         }
         Button(onClick = { onFinishDay(summary) }, modifier = Modifier.fillMaxWidth()) {
-            Text("終了処理してカレンダー入力")
+            Text("終了処理してカレンダー入力・リセット")
         }
     }
 }
@@ -747,17 +761,36 @@ private fun AddressBackupPanel(
     onImportTextChange: (String) -> Unit,
     onImport: () -> Unit
 ) {
+    val context = LocalContext.current
+    val clipboard = remember {
+        context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+    }
     WhiteCard {
         Text("住所データ管理", fontWeight = FontWeight.Bold)
         Text("定期コース以外の住所もバックアップ・インポートできます。", color = MutedText)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = onExport, modifier = Modifier.weight(1f)) { Text("バックアップ") }
-            Button(onClick = onImport, enabled = importText.isNotBlank(), modifier = Modifier.weight(1f)) {
-                Text("インポート")
-            }
-        }
+        Button(onClick = onExport, modifier = Modifier.fillMaxWidth()) { Text("バックアップを作成") }
         if (backupText.isNotBlank()) {
             TextBox(backupText)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        val clip = android.content.ClipData.newPlainText("hakobun_backup", backupText)
+                        clipboard.setPrimaryClip(clip)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("コピー") }
+                Button(
+                    onClick = {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, backupText)
+                            putExtra(Intent.EXTRA_SUBJECT, "HAKOBUN 住所バックアップ")
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "バックアップを共有"))
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("共有") }
+            }
         }
         OutlinedTextField(
             value = importText,
@@ -767,6 +800,11 @@ private fun AddressBackupPanel(
             placeholder = { Text("伝票番号,届け先,住所,時間帯,メモ") },
             minLines = 2
         )
+        Button(
+            onClick = onImport,
+            enabled = importText.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("インポート") }
     }
 }
 
