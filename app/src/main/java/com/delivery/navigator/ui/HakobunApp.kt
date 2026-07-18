@@ -3,6 +3,8 @@ package com.delivery.navigator.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
 import android.graphics.Bitmap
 import android.graphics.Canvas as AndroidCanvas
 import android.graphics.Paint
@@ -58,6 +60,7 @@ import com.delivery.navigator.data.createDeliveryPackageFromRegistration
 import com.delivery.navigator.data.createEndOfDayCalendarIntent
 import com.delivery.navigator.data.createPackagesFromCourse
 import com.delivery.navigator.data.currentRouteOrigin
+import com.delivery.navigator.data.geocodeAddressPublic
 import com.delivery.navigator.data.exportPackages
 import com.delivery.navigator.data.fetchDrivingRoutePoints
 import com.delivery.navigator.data.hidesMapPin
@@ -129,6 +132,15 @@ fun HakobunApp() {
     var homePanel by remember { mutableStateOf<HomePanel?>(null) }
     var showMapControls by remember { mutableStateOf(true) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
+    var currentLocation by remember { mutableStateOf<LatLng?>(null) }
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            LocationServices.getFusedLocationProviderClient(context).lastLocation
+                .addOnSuccessListener { loc -> loc?.let { currentLocation = LatLng(it.latitude, it.longitude) } }
+        }
+    }
     val persistPackages = { deliveryStore.savePackages(packages) }
     val persistRegularCourses = { deliveryStore.saveRegularCourses(regularCourseList) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
@@ -181,7 +193,7 @@ fun HakobunApp() {
             addressCandidate = createAddressCandidateFromText("音声入力", spokenAddress)
         }
     }
-    LaunchedEffect(packages.size) {
+    LaunchedEffect(packages.size, packages.firstOrNull()?.trackingCode, packages.lastOrNull()?.trackingCode) {
         assignFixedRouteNumbers(fixedRouteNumbers, packages)
     }
 
@@ -326,6 +338,7 @@ fun HakobunApp() {
                     packages = visibleMapPackages,
                     fixedRouteNumbers = fixedRouteNumbers,
                     selectedCode = selectedPackage?.takeUnless { it.status.hidesMapPin() }?.trackingCode,
+                    origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second),
                     onSelect = { selectedPackageCode = it },
                     onNavigate = {
                         context.startActivity(
@@ -376,6 +389,16 @@ fun HakobunApp() {
                             packages.addAll(importedPackages)
                             selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
                             persistPackages()
+                            coroutineScope.launch {
+                                importedPackages.forEach { pkg ->
+                                    if (pkg.latitude == 0.0 && pkg.longitude == 0.0 && pkg.address.isNotBlank()) {
+                                        val (lat, lng) = com.delivery.navigator.data.geocodeAddressPublic(pkg.address)
+                                        val idx = packages.indexOfFirst { it.trackingCode == pkg.trackingCode }
+                                        if (idx >= 0) packages[idx] = packages[idx].copy(latitude = lat, longitude = lng)
+                                    }
+                                }
+                                persistPackages()
+                            }
                         },
                         onAddCourseAddress = { courseCode, recipient, address, timeWindow, memo ->
                             coroutineScope.launch {
@@ -441,6 +464,9 @@ private fun assignFixedRouteNumbers(
     fixedRouteNumbers: MutableMap<String, Int>,
     packages: List<DeliveryPackage>
 ) {
+    val currentCodes = packages.map { it.trackingCode }.toSet()
+    fixedRouteNumbers.keys.retainAll(currentCodes)
+
     val unnumberedPackages = packages.filterNot { fixedRouteNumbers.containsKey(it.trackingCode) }
     if (unnumberedPackages.isEmpty()) return
 
@@ -681,14 +707,13 @@ private fun FullScreenDeliveryMap(
     packages: List<DeliveryPackage>,
     fixedRouteNumbers: Map<String, Int>,
     selectedCode: String?,
+    origin: LatLng,
     onSelect: (String) -> Unit,
     onNavigate: (DeliveryPackage) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val routeStops = calculateNearestRoute(packages)
     val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
-    val originPair = currentRouteOrigin()
-    val origin = LatLng(originPair.first, originPair.second)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(origin, 12.5f)
     }
@@ -696,17 +721,25 @@ private fun FullScreenDeliveryMap(
     var mapBearing by remember { mutableStateOf(0f) }
     var drivingRoutePoints by remember { mutableStateOf<List<LatLng>>(emptyList()) }
     val activeRouteDestination = selectedPackage ?: routeStops.firstOrNull()?.deliveryPackage
-    LaunchedEffect(selectedPackage?.trackingCode, mapLoaded) {
-        if (!mapLoaded) return@LaunchedEffect
-        selectedPackage?.let {
-            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f))
+    LaunchedEffect(selectedPackage?.trackingCode) {
+        if (mapLoaded) {
+            selectedPackage?.let {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f))
+            }
+        }
+    }
+    LaunchedEffect(mapLoaded) {
+        if (mapLoaded) {
+            selectedPackage?.let {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f))
+            }
         }
     }
     LaunchedEffect(activeRouteDestination?.trackingCode) {
         drivingRoutePoints = activeRouteDestination
             ?.let {
                 fetchDrivingRoutePoints(
-                    origin = originPair,
+                    origin = origin.latitude to origin.longitude,
                     destination = it.latitude to it.longitude
                 ).map { point -> LatLng(point.first, point.second) }
             }
@@ -1186,21 +1219,6 @@ private fun RegularCoursePanel(
     }
 }
 
-@Composable
-private fun RegularCoursePanel(courses: List<RegularCourse>, onLoadCourse: (RegularCourse) -> Unit) {
-    WhiteCard {
-        Text("定期配送コース", fontWeight = FontWeight.Bold)
-        Text("A〜Dコースの登録住所を今日の配達へ呼び出します。", color = MutedText)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            courses.forEach { course ->
-                Button(onClick = { onLoadCourse(course) }, modifier = Modifier.weight(1f)) {
-                    Text(course.code)
-                }
-            }
-        }
-        Text("例: 本日はAコース、明日はDコースを読み込み", color = MutedText)
-    }
-}
 
 @Composable
 private fun AddressBackupPanel(
@@ -1343,24 +1361,33 @@ private fun DeliveryGoogleMap(
     packages: List<DeliveryPackage>,
     fixedRouteNumbers: Map<String, Int>,
     selectedCode: String?,
+    origin: LatLng,
     onSelect: (String) -> Unit,
     onNavigate: (DeliveryPackage) -> Unit
 ) {
     val routeStops = calculateNearestRoute(packages)
     val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
-    val originPair = currentRouteOrigin()
-    val origin = LatLng(originPair.first, originPair.second)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(origin, 12.5f)
     }
     var mapBearing by remember { mutableStateOf(0f) }
     var mapLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(selectedPackage?.trackingCode, mapLoaded) {
-        if (!mapLoaded) return@LaunchedEffect
-        selectedPackage?.let {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f)
-            )
+    LaunchedEffect(selectedPackage?.trackingCode) {
+        if (mapLoaded) {
+            selectedPackage?.let {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f)
+                )
+            }
+        }
+    }
+    LaunchedEffect(mapLoaded) {
+        if (mapLoaded) {
+            selectedPackage?.let {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f)
+                )
+            }
         }
     }
 
@@ -1702,6 +1729,7 @@ private fun PackageRegistrationScreen(
     }
 
     val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
     val canAddMore = addresses.size < 5
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
@@ -1776,7 +1804,7 @@ private fun PackageRegistrationScreen(
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Button(
                                     onClick = {
-                                        if (context.checkSelfPermission(Manifest.permission.CAMERA) ==
+                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
                                             PackageManager.PERMISSION_GRANTED
                                         ) cameraOcrLauncher.launch(null)
                                         else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -1840,7 +1868,8 @@ private fun PackageRegistrationScreen(
                             )
                             Button(
                                 onClick = {
-                                    scope.launch {
+                                    postalSearchJob?.cancel()
+                                    postalSearchJob = scope.launch {
                                         val result = searchPostalCode(postalCode)
                                         candidate = result
                                         val isValid = result.address.isNotBlank() &&
@@ -1852,9 +1881,9 @@ private fun PackageRegistrationScreen(
                                 enabled = postalCode.length == 7
                             ) { Text("検索") }
                         }
-                        // 候補エラー表示（住所が見つからない場合のみ）
+                        // 住所候補表示（成功・失敗ともに表示）
                         candidate?.let { c ->
-                            if (c.address.contains("見つかりません") || c.address.contains("エラー")) {
+                            if (c.address.isNotBlank()) {
                                 TextBox("${c.sourceLabel} / ${c.confidenceLabel}\n${c.address}")
                             }
                         }
@@ -2213,13 +2242,11 @@ private fun openNavigationIntent(address: String): Intent {
 }
 
 private fun openNavigationIntent(latitude: Double, longitude: Double, label: String): Intent {
-    val origin = currentRouteOrigin()
     val navigationUri = Uri.Builder()
         .scheme("https")
         .authority("www.google.com")
         .path("maps/dir/")
         .appendQueryParameter("api", "1")
-        .appendQueryParameter("origin", "${origin.first},${origin.second}")
         .appendQueryParameter("destination", "$latitude,$longitude")
         .appendQueryParameter("travelmode", "driving")
         .appendQueryParameter("dir_action", "navigate")
@@ -2247,7 +2274,8 @@ private fun recognizeAddressFromBitmap(
         .addOnSuccessListener { result ->
             onSuccess(createAddressCandidateFromText("OCR読み取り", result.text))
         }
-        .addOnFailureListener {
+        .addOnFailureListener { e ->
+            android.util.Log.e("OCR", "Text recognition failed", e)
             onFailure()
         }
 }

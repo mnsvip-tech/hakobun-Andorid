@@ -186,6 +186,8 @@ suspend fun createDeliveryPackageFromRegistration(
     )
 }
 
+suspend fun geocodeAddressPublic(address: String): Pair<Double, Double> = geocodeAddress(address)
+
 private suspend fun geocodeAddress(address: String): Pair<Double, Double> {
     return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         runCatching {
@@ -197,14 +199,19 @@ private suspend fun geocodeAddress(address: String): Pair<Double, Double> {
             val connection = url.openConnection() as java.net.HttpURLConnection
             connection.connectTimeout = 8000
             connection.readTimeout = 8000
-            val json = connection.inputStream.bufferedReader().readText()
-            connection.disconnect()
+            val json = try {
+                connection.inputStream.bufferedReader().readText()
+            } finally {
+                connection.disconnect()
+            }
             val root = org.json.JSONObject(json)
             val results = root.optJSONArray("results")
-            if (results != null && results.length() > 0) {
-                val location = results.getJSONObject(0)
-                    .getJSONObject("geometry")
-                    .getJSONObject("location")
+            val location = results
+                ?.takeIf { it.length() > 0 }
+                ?.optJSONObject(0)
+                ?.optJSONObject("geometry")
+                ?.optJSONObject("location")
+            if (location != null) {
                 Pair(location.getDouble("lat"), location.getDouble("lng"))
             } else {
                 prefectureFallback(address)
@@ -305,8 +312,8 @@ fun importPackages(source: String, existingCount: Int): List<DeliveryPackage> {
                     cod = false,
                     hasLocker = false,
                     memo = parts.getOrNull(4).orEmpty(),
-                    latitude = 35.65 + ((generatedNumber * 19) % 60) / 1000.0,
-                    longitude = 139.70 + ((generatedNumber * 29) % 90) / 1000.0,
+                    latitude = 0.0,
+                    longitude = 0.0,
                     status = DeliveryStatus.Pending
                 )
             }
@@ -352,19 +359,19 @@ suspend fun fetchDrivingRoutePoints(
             val connection = url.openConnection() as java.net.HttpURLConnection
             connection.connectTimeout = 8000
             connection.readTimeout = 8000
-            val json = connection.inputStream.bufferedReader().readText()
-            connection.disconnect()
-            val root = org.json.JSONObject(json)
-            val routes = root.optJSONArray("routes")
-            if (routes != null && routes.length() > 0) {
-                val encoded = routes
-                    .getJSONObject(0)
-                    .getJSONObject("overview_polyline")
-                    .optString("points")
-                decodePolyline(encoded)
-            } else {
-                emptyList()
+            val json = try {
+                connection.inputStream.bufferedReader().readText()
+            } finally {
+                connection.disconnect()
             }
+            val root = org.json.JSONObject(json)
+            val encoded = root.optJSONArray("routes")
+                ?.takeIf { it.length() > 0 }
+                ?.optJSONObject(0)
+                ?.optJSONObject("overview_polyline")
+                ?.optString("points")
+                .orEmpty()
+            if (encoded.isNotBlank()) decodePolyline(encoded) else emptyList()
         }.getOrElse { emptyList() }
     }
 }

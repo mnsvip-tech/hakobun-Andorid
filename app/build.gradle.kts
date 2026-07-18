@@ -59,6 +59,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
     implementation("com.google.maps.android:maps-compose:6.12.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
