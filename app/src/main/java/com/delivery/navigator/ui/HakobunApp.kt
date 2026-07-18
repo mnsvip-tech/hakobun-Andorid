@@ -1,6 +1,8 @@
 package com.delivery.navigator.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas as AndroidCanvas
 import android.graphics.Paint
@@ -60,6 +62,7 @@ import com.delivery.navigator.data.currentRouteOrigin
 import com.delivery.navigator.data.exportPackages
 import com.delivery.navigator.data.hidesMapPin
 import com.delivery.navigator.data.importPackages
+import com.delivery.navigator.data.LocalDeliveryStore
 import com.delivery.navigator.data.regularCourses
 import com.delivery.navigator.data.samplePackages
 import com.delivery.navigator.data.searchPostalCode
@@ -86,16 +89,27 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
+import com.google.mlkit.vision.text.TextRecognition
 
 @Composable
 fun HakobunApp() {
-    val packages = remember { mutableStateListOf<DeliveryPackage>().apply { addAll(samplePackages()) } }
+    val context = LocalContext.current
+    val deliveryStore = remember(context) { LocalDeliveryStore(context) }
+    val packages = remember(deliveryStore) {
+        mutableStateListOf<DeliveryPackage>().apply {
+            val savedPackages = deliveryStore.loadPackages()
+            addAll(savedPackages.ifEmpty { samplePackages() })
+        }
+    }
     var selectedWindow by remember { mutableStateOf(TimeWindow.All) }
     var selectedMapTimeWindow by remember { mutableStateOf(TimeWindow.All) }
     var selectedPackageCode by remember { mutableStateOf(packages.first().trackingCode) }
     var postalCode by remember { mutableStateOf("") }
     var addressCandidate by remember { mutableStateOf<AddressCandidate?>(null) }
     var isRegisteringPackage by remember { mutableStateOf(false) }
+    var isSupportHubOpen by remember { mutableStateOf(false) }
     var activeMenuItem by remember { mutableStateOf<AccountMenuItem?>(null) }
     var isLoggedIn by remember { mutableStateOf(true) }
     var backupText by remember { mutableStateOf("") }
@@ -103,7 +117,46 @@ fun HakobunApp() {
     var selectedSummaryFilter by remember { mutableStateOf<PackageSummaryFilter?>(null) }
     var redeliveryCandidateCode by remember { mutableStateOf<String?>(null) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
-    val context = LocalContext.current
+    val persistPackages = { deliveryStore.savePackages(packages) }
+    val cameraOcrLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap == null) {
+            addressCandidate = AddressCandidate(
+                sourceLabel = "OCR",
+                postalCode = "",
+                address = "画像を取得できませんでした",
+                confidenceLabel = "未取得"
+            )
+            return@rememberLauncherForActivityResult
+        }
+        recognizeAddressFromBitmap(
+            bitmap = bitmap,
+            onSuccess = { candidate -> addressCandidate = candidate },
+            onFailure = {
+                addressCandidate = AddressCandidate(
+                    sourceLabel = "OCR",
+                    postalCode = "",
+                    address = "住所を読み取れませんでした",
+                    confidenceLabel = "要確認"
+                )
+            }
+        )
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            cameraOcrLauncher.launch(null)
+        } else {
+            addressCandidate = AddressCandidate(
+                sourceLabel = "カメラ",
+                postalCode = "",
+                address = "カメラ権限が許可されていません",
+                confidenceLabel = "権限確認"
+            )
+        }
+    }
     val voiceInputLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -112,12 +165,7 @@ fun HakobunApp() {
             ?.firstOrNull()
             .orEmpty()
         if (spokenAddress.isNotBlank()) {
-            addressCandidate = AddressCandidate(
-                sourceLabel = "音声入力",
-                postalCode = "",
-                address = spokenAddress,
-                confidenceLabel = "候補"
-            )
+            addressCandidate = createAddressCandidateFromText("音声入力", spokenAddress)
         }
     }
     LaunchedEffect(packages.map { it.trackingCode }) {
@@ -157,6 +205,7 @@ fun HakobunApp() {
                             val index = packages.indexOfFirst { it.trackingCode == packageItem.trackingCode }
                             if (index >= 0) {
                                 packages[index] = packageItem.copy(status = DeliveryStatus.Redelivery)
+                                persistPackages()
                             }
                             selectedPackageCode = packageItem.trackingCode
                             redeliveryCandidateCode = null
@@ -179,6 +228,18 @@ fun HakobunApp() {
             return@MaterialTheme
         }
 
+        if (isSupportHubOpen) {
+            SupportHubScreen(
+                packages = packages,
+                isLoggedIn = isLoggedIn,
+                onBack = { isSupportHubOpen = false },
+                onSelect = { activeMenuItem = it },
+                onLoginToggle = { isLoggedIn = !isLoggedIn },
+                onFinishDay = { summary -> context.startActivity(createEndOfDayCalendarIntent(summary)) }
+            )
+            return@MaterialTheme
+        }
+
         if (isRegisteringPackage) {
             val registrationAddress = addressCandidate?.address
                 ?: selectedPackage?.address
@@ -191,6 +252,7 @@ fun HakobunApp() {
                 onRegister = { result ->
                     packages.add(createDeliveryPackageFromRegistration(result, packages.size))
                     selectedPackageCode = packages.last().trackingCode
+                    persistPackages()
                     isRegisteringPackage = false
                 }
             )
@@ -201,6 +263,8 @@ fun HakobunApp() {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -212,7 +276,7 @@ fun HakobunApp() {
                             selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
                         },
                         isLoggedIn = isLoggedIn,
-                        onOpenMenu = { activeMenuItem = AccountMenuItem.Announcements },
+                        onOpenMenu = { isSupportHubOpen = true },
                         onRegisterPackage = { isRegisteringPackage = true }
                     )
                 }
@@ -228,24 +292,12 @@ fun HakobunApp() {
                     }
                 }
                 item {
-                    AccountMenuPanel(
-                        isLoggedIn = isLoggedIn,
-                        onSelect = { activeMenuItem = it },
-                        onLoginToggle = { isLoggedIn = !isLoggedIn }
-                    )
-                }
-                item {
-                    EndOfDayPanel(
-                        packages = packages,
-                        onFinishDay = { summary -> context.startActivity(createEndOfDayCalendarIntent(summary)) }
-                    )
-                }
-                item {
                     RegularCoursePanel(
                         courses = regularCourses(),
                         onLoadCourse = { course ->
                             packages.addAll(createPackagesFromCourse(course, packages.size))
                             selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
+                            persistPackages()
                         }
                     )
                 }
@@ -259,6 +311,7 @@ fun HakobunApp() {
                             val importedPackages = importPackages(importText, packages.size)
                             packages.addAll(importedPackages)
                             selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
+                            persistPackages()
                         }
                     )
                 }
@@ -268,12 +321,11 @@ fun HakobunApp() {
                         candidate = addressCandidate,
                         onPostalCodeChange = { postalCode = it.filter(Char::isDigit).take(7) },
                         onCameraScan = {
-                            addressCandidate = AddressCandidate(
-                                sourceLabel = "カメラ識別",
-                                postalCode = "1000005",
-                                address = "東京都千代田区丸の内",
-                                confidenceLabel = "候補"
-                            )
+                            if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                cameraOcrLauncher.launch(null)
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
                         },
                         onVoiceInput = {
                             voiceInputLauncher.launch(createVoiceAddressIntent())
@@ -313,6 +365,7 @@ fun HakobunApp() {
                                 val index = packages.indexOfFirst { it.trackingCode == packageItem.trackingCode }
                                 if (index >= 0) {
                                     packages[index] = packageItem.copy(status = status)
+                                    persistPackages()
                                 }
                             }
                         )
@@ -387,8 +440,15 @@ private fun Header(
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                TextButton(onClick = onOpenMenu) { Text("お知らせ") }
-                Button(onClick = onRegisterPackage) { Text("荷物登録") }
+                Button(
+                    onClick = onOpenMenu,
+                    modifier = Modifier.height(40.dp)
+                ) { Text("お知らせ") }
+                Spacer(modifier = Modifier.height(6.dp))
+                Button(
+                    onClick = onRegisterPackage,
+                    modifier = Modifier.height(40.dp)
+                ) { Text("荷物登録") }
             }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -455,6 +515,63 @@ private fun SummaryFilteredPackagePanel(
 }
 
 @Composable
+private fun SupportHubScreen(
+    packages: List<DeliveryPackage>,
+    isLoggedIn: Boolean,
+    onBack: () -> Unit,
+    onSelect: (AccountMenuItem) -> Unit,
+    onLoginToggle: () -> Unit,
+    onFinishDay: (EndOfDaySummary) -> Unit
+) {
+    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onBack) { Text("← 戻る") }
+                    Text("お知らせ", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.width(64.dp))
+                }
+            }
+            item {
+                Box {
+                    AccountMenuPanel(
+                        isLoggedIn = isLoggedIn,
+                        onSelect = onSelect,
+                        onLoginToggle = onLoginToggle
+                    )
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 4.dp, end = 2.dp)
+                            .width(18.dp)
+                            .height(108.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(BrandPurple)
+                    )
+                }
+            }
+            item {
+                EndOfDayPanel(
+                    packages = packages,
+                    onFinishDay = onFinishDay
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun AccountMenuPanel(
     isLoggedIn: Boolean,
     onSelect: (AccountMenuItem) -> Unit,
@@ -478,14 +595,17 @@ private fun AccountMenuPanel(
                     Box(
                         modifier = Modifier
                             .weight(1f)
+                            .heightIn(min = 96.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFFF6F7F9))
+                            .border(1.dp, Color(0xFFE2E7EF), RoundedCornerShape(8.dp))
                             .clickable { onSelect(item) }
                             .padding(10.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                             Text(item.title, fontWeight = FontWeight.Bold)
                             Text(item.description, color = MutedText, style = MaterialTheme.typography.labelSmall)
+                            Text("詳細を見る →", color = BrandPurple, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -511,6 +631,8 @@ private fun AccountMenuDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -739,6 +861,13 @@ private fun DeliveryGoogleMap(
         position = CameraPosition.fromLatLngZoom(origin, 12.5f)
     }
     var mapBearing by remember { mutableStateOf(0f) }
+    LaunchedEffect(selectedPackage?.trackingCode) {
+        selectedPackage?.let {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f)
+            )
+        }
+    }
 
     Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(8.dp)) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -797,6 +926,15 @@ private fun DeliveryGoogleMap(
                         snippet = "ルート計算の基準点",
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
                     )
+                    if (routeStops.isNotEmpty()) {
+                        Polyline(
+                            points = listOf(origin) + routeStops.map {
+                                LatLng(it.deliveryPackage.latitude, it.deliveryPackage.longitude)
+                            },
+                            color = Color(0x552457D6),
+                            width = 6f
+                        )
+                    }
                     routeStops.forEach { stop ->
                         val item = stop.deliveryPackage
                         val routeNumber = fixedRouteNumbers[item.trackingCode] ?: stop.routeNumber
@@ -823,9 +961,24 @@ private fun DeliveryGoogleMap(
             }
             TimeWindowLegend()
             selectedPackage?.let {
-                Button(onClick = { onNavigate(it) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Googleマップでナビ: ${it.recipient}")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = {
+                            cameraPositionState.move(
+                                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16f)
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("選択ピンへ")
+                    }
+                    Button(onClick = { onNavigate(it) }, modifier = Modifier.weight(1f)) {
+                        Text("ナビ開始")
+                    }
                 }
+            }
+            routeStops.firstOrNull()?.deliveryPackage?.let {
+                Text("次の候補: ${it.recipient} / ${it.timeWindow.label}", color = MutedText)
             }
         }
     }
@@ -923,6 +1076,7 @@ private fun PackageRegistrationScreen(
     var selectedShape by remember { mutableStateOf(PackageShape.SmallBox) }
     var selectedType by remember { mutableStateOf(PackageColorType.Kraft) }
     var selectedSize by remember { mutableStateOf(PackageSizeOption.Medium) }
+    val hasRequiredInput = address.isNotBlank() && (trackingNumber.isNotBlank() || recipientName.isNotBlank())
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -936,18 +1090,25 @@ private fun PackageRegistrationScreen(
             ) {
                 TextButton(onClick = onBack) { Text("← 戻る") }
                 Text("荷物登録", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.width(64.dp))
+                StatusPill(if (hasRequiredInput) DeliveryStatus.InProgress else DeliveryStatus.Pending)
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
+                    .navigationBarsPadding()
                     .padding(16.dp)
-                    .padding(bottom = 80.dp),
+                    .padding(bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 WhiteCard {
-                    Text("住所", color = MutedText)
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column {
+                            Text("届け先", fontWeight = FontWeight.Bold)
+                            Text("OCR・音声・郵便番号から引き継いだ住所です", color = MutedText)
+                        }
+                        Text("必須", color = BrandBlue, fontWeight = FontWeight.Bold)
+                    }
                     Text(address, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = hasLocker, onCheckedChange = { hasLocker = it })
@@ -959,6 +1120,7 @@ private fun PackageRegistrationScreen(
                     }
                 }
                 WhiteCard {
+                    Text("現場メモ", fontWeight = FontWeight.Bold)
                     LabeledField("表札", "表札情報を入力できます", nameplate) { nameplate = it }
                     LabeledField("メモ", "届け先メモを入力できます", deliveryMemo) { deliveryMemo = it }
                     LabeledField("荷物メモ", "荷姿の情報等を入力できます", packageMemo) { packageMemo = it }
@@ -971,6 +1133,7 @@ private fun PackageRegistrationScreen(
                 }
                 WhiteCard {
                     Text("伝票情報", fontWeight = FontWeight.Bold)
+                    Text("伝票番号または届け先名のどちらかを入力してください。", color = MutedText)
                     LabeledField("伝票番号", "例）0123-4567-8910-1112", trackingNumber) { trackingNumber = it }
                     LabeledField("届け先名", "例）善隣 太郎", recipientName) { recipientName = it }
                     LabeledField("電話番号", "例）09012345678", phoneNumber) { phoneNumber = it }
@@ -1004,11 +1167,14 @@ private fun PackageRegistrationScreen(
                     )
                 )
             },
+            enabled = hasRequiredInput,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .fillMaxWidth()
-                .height(64.dp)
-        ) { Text("登録", fontWeight = FontWeight.Bold) }
+                .height(56.dp)
+        ) { Text(if (hasRequiredInput) "登録して保存" else "伝票番号または届け先名を入力", fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -1319,10 +1485,63 @@ private fun openNavigationIntent(latitude: Double, longitude: Double, label: Str
     }
 }
 
+private fun recognizeAddressFromBitmap(
+    bitmap: Bitmap,
+    onSuccess: (AddressCandidate) -> Unit,
+    onFailure: () -> Unit
+) {
+    val image = InputImage.fromBitmap(bitmap, 0)
+    val recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+    recognizer.process(image)
+        .addOnSuccessListener { result ->
+            onSuccess(createAddressCandidateFromText("OCR読み取り", result.text))
+        }
+        .addOnFailureListener {
+            onFailure()
+        }
+}
+
+private fun createAddressCandidateFromText(sourceLabel: String, sourceText: String): AddressCandidate {
+    val postalCode = Regex("""\d{3}[-\s]?\d{4}""")
+        .find(sourceText)
+        ?.value
+        ?.filter(Char::isDigit)
+        .orEmpty()
+    val address = extractLikelyAddress(sourceText)
+
+    return AddressCandidate(
+        sourceLabel = sourceLabel,
+        postalCode = postalCode,
+        address = address.ifBlank { sourceText.lineSequence().firstOrNull { it.isNotBlank() }.orEmpty() },
+        confidenceLabel = if (address.isNotBlank()) "住所候補" else "要確認"
+    )
+}
+
+private fun extractLikelyAddress(sourceText: String): String {
+    val lines = sourceText
+        .lineSequence()
+        .map { it.trim().replace("〒", "") }
+        .filter { it.isNotBlank() }
+        .toList()
+    val addressIndex = lines.indexOfFirst { line ->
+        listOf("東京都", "北海道", "大阪府", "京都府", "県").any { marker -> line.contains(marker) }
+    }
+    if (addressIndex < 0) return ""
+
+    return lines
+        .drop(addressIndex)
+        .take(2)
+        .joinToString("")
+        .replace(Regex("""\d{3}[-\s]?\d{4}"""), "")
+        .trim()
+}
+
 private fun createVoiceAddressIntent(): Intent {
     return Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ja-JP")
+        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+        putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
         putExtra(RecognizerIntent.EXTRA_PROMPT, "届け先住所を話してください")
     }
 }
@@ -1330,6 +1549,7 @@ private fun createVoiceAddressIntent(): Intent {
 private fun yesNo(value: Boolean): String = if (value) "あり" else "なし"
 
 private val BrandBlue = Color(0xFF2457D6)
+private val BrandPurple = Color(0xFF6D55B3)
 private val MutedText = Color(0xFF637083)
 private val SuccessGreen = Color(0xFF177245)
 private val AbsentGray = Color(0xFF7A8491)
