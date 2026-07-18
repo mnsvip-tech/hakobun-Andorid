@@ -236,6 +236,7 @@ fun HakobunApp() {
                 onBack = { isSupportHubOpen = false },
                 onSelect = { activeMenuItem = it },
                 onLoginToggle = { isLoggedIn = !isLoggedIn },
+                onGoToBackup = { isSupportHubOpen = false },
                 onFinishDay = { summary ->
                     runCatching {
                         context.startActivity(createEndOfDayCalendarIntent(summary))
@@ -541,6 +542,7 @@ private fun SupportHubScreen(
     onBack: () -> Unit,
     onSelect: (AccountMenuItem) -> Unit,
     onLoginToggle: () -> Unit,
+    onGoToBackup: () -> Unit,
     onFinishDay: (EndOfDaySummary) -> Unit
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
@@ -580,6 +582,7 @@ private fun SupportHubScreen(
             }
             EndOfDayPanel(
                 packages = packages,
+                onGoToBackup = onGoToBackup,
                 onFinishDay = onFinishDay
             )
         }
@@ -717,15 +720,25 @@ private fun AccountMenuDetailScreen(
 }
 
 @Composable
-private fun EndOfDayPanel(packages: List<DeliveryPackage>, onFinishDay: (EndOfDaySummary) -> Unit) {
+private fun EndOfDayPanel(
+    packages: List<DeliveryPackage>,
+    onGoToBackup: () -> Unit,
+    onFinishDay: (EndOfDaySummary) -> Unit
+) {
     val summary = calculateEndOfDaySummary(packages)
     WhiteCard {
-        Text("終了処理 / バックアップはこちら", fontWeight = FontWeight.Bold)
+        Text("終了処理", fontWeight = FontWeight.Bold)
         Text(
             "カレンダー転記後、本日の配達データは0件にリセットされます。必要な方は先に住所データ管理のバックアップを実行してください。",
             color = MutedText,
             style = MaterialTheme.typography.bodySmall
         )
+        TextButton(
+            onClick = onGoToBackup,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("▶ 住所データをバックアップする（こちら）", color = BrandBlue)
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SummaryMetric("配達件数", summary.deliveredStops.toString(), Modifier.weight(1f))
             SummaryMetric("配達個数", summary.deliveredPackages.toString(), Modifier.weight(1f))
