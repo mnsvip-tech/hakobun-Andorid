@@ -280,7 +280,7 @@
     <string name="faq_header_title">常见问题 (FAQ)</string>
     <string name="faq_header_desc">点击问题即可显示答案</string>
     <string name="faq_footer_title">问题未解决？</string>
-    <string name="faq_footer_body">请通过侧边菜单 →「用户反馈」联系我们。\n邮箱：support@hakobun.example</string>
+    <string name="faq_footer_body">请通过侧边菜单 →「用户反馈」联系我们。\n邮箱：Hakobun.support@gmail.com</string>
 
     <!-- FAQ 分类 -->
     <string name="faq_cat_basic">基本操作</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">我想反馈Bug或改进建议</string>
     <string name="faq_a_16">请通过侧边菜单 → 通知 →「用户反馈」提交。\n\n请提供具体情况（操作步骤、设备型号、Android版本），以便我们快速响应。</string>
     <string name="faq_q_17">联系方式是？</string>
-    <string name="faq_a_17">邮箱：support@hakobun.example\n\n联系时请提供以下信息：\n· 设备型号及Android版本\n· 应用版本\n· 问题重现步骤\n\n我们将在工作时间内（工作日10:00〜18:00）回复。</string>
+    <string name="faq_a_17">邮箱：Hakobun.support@gmail.com\n\n联系时请提供以下信息：\n· 设备型号及Android版本\n· 应用版本\n· 问题重现步骤\n\n我们将在工作时间内（工作日10:00〜18:00）回复。</string>
 
     <!-- 服务条款（扩展） -->
     <string name="terms_header_title">HAKOBUN 服务条款与隐私政策</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">第10条　准据法与管辖法院</string>
     <string name="terms_s10_body">本条款依据日本法律。与本条款相关的纠纷，以东京地方法院为第一审专属合意管辖法院。</string>
     <string name="terms_contact_title">联系方式</string>
-    <string name="terms_contact_body">如有关于条款或隐私的疑问，请联系我们：\n\n邮箱：support@hakobun.example\n\n※ 本政策内容与我们在Google Play数据安全表中声明的内容一致。</string>
+    <string name="terms_contact_body">如有关于条款或隐私的疑问，请联系我们：\n\n邮箱：Hakobun.support@gmail.com\n\n※ 本政策内容与我们在Google Play数据安全表中声明的内容一致。</string>
 </resources>

@@ -280,7 +280,7 @@
     <string name="faq_header_title">Perguntas Frequentes (FAQ)</string>
     <string name="faq_header_desc">Toque em uma pergunta para ver a resposta</string>
     <string name="faq_footer_title">Ainda precisa de ajuda?</string>
-    <string name="faq_footer_body">Entre em contato pelo menu lateral → "Feedback do usuário".\nE-mail: support@hakobun.example</string>
+    <string name="faq_footer_body">Entre em contato pelo menu lateral → "Feedback do usuário".\nE-mail: Hakobun.support@gmail.com</string>
 
     <!-- Categorias do FAQ -->
     <string name="faq_cat_basic">Uso básico</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">Quero relatar um bug ou sugerir uma melhoria</string>
     <string name="faq_a_16">Envie pelo menu lateral → Avisos →「Feedback do usuário」.\n\nForneça detalhes específicos (passos para reproduzir, modelo do dispositivo, versão do Android) para uma resposta mais rápida.</string>
     <string name="faq_q_17">Qual é o contato de suporte?</string>
-    <string name="faq_a_17">E-mail: support@hakobun.example\n\nAo entrar em contato, informe:\n· Modelo do dispositivo e versão do Android\n· Versão do aplicativo\n· Passos para reproduzir o problema\n\nRespondemos no horário comercial (Seg–Sex, 10h–18h, horário de Tóquio).</string>
+    <string name="faq_a_17">E-mail: Hakobun.support@gmail.com\n\nAo entrar em contato, informe:\n· Modelo do dispositivo e versão do Android\n· Versão do aplicativo\n· Passos para reproduzir o problema\n\nRespondemos no horário comercial (Seg–Sex, 10h–18h, horário de Tóquio).</string>
 
     <!-- Termos de serviço (expandido) -->
     <string name="terms_header_title">Termos de Serviço e Política de Privacidade do HAKOBUN</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">Artigo 10　Lei aplicável e jurisdição</string>
     <string name="terms_s10_body">Estes termos são regidos pelas leis do Japão. Quaisquer disputas decorrentes destes termos estarão sujeitas à jurisdição exclusiva do Tribunal Distrital de Tóquio como tribunal de primeira instância.</string>
     <string name="terms_contact_title">Contato</string>
-    <string name="terms_contact_body">Para dúvidas sobre estes termos ou sobre nossa política de privacidade, entre em contato:\n\nE-mail: support@hakobun.example\n\n* O conteúdo desta política é consistente com o que declaramos no formulário de segurança de dados da Google Play.</string>
+    <string name="terms_contact_body">Para dúvidas sobre estes termos ou sobre nossa política de privacidade, entre em contato:\n\nE-mail: Hakobun.support@gmail.com\n\n* O conteúdo desta política é consistente com o que declaramos no formulário de segurança de dados da Google Play.</string>
 </resources>

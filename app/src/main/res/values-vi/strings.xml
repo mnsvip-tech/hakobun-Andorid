@@ -280,7 +280,7 @@
     <string name="faq_header_title">Câu hỏi thường gặp (FAQ)</string>
     <string name="faq_header_desc">Nhấn vào câu hỏi để xem câu trả lời</string>
     <string name="faq_footer_title">Vẫn chưa giải quyết được?</string>
-    <string name="faq_footer_body">Liên hệ qua menu bên → "Phản hồi người dùng".\nEmail: support@hakobun.example</string>
+    <string name="faq_footer_body">Liên hệ qua menu bên → "Phản hồi người dùng".\nEmail: Hakobun.support@gmail.com</string>
 
     <!-- Danh mục FAQ -->
     <string name="faq_cat_basic">Thao tác cơ bản</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">Tôi muốn báo lỗi hoặc góp ý cải thiện</string>
     <string name="faq_a_16">Gửi qua menu bên → Thông báo → 「Phản hồi người dùng」.\n\nVui lòng cung cấp chi tiết cụ thể (các bước thực hiện, mẫu thiết bị, phiên bản Android) để chúng tôi xử lý nhanh hơn.</string>
     <string name="faq_q_17">Liên hệ hỗ trợ ở đâu?</string>
-    <string name="faq_a_17">Email: support@hakobun.example\n\nKhi liên hệ, vui lòng cung cấp:\n· Mẫu thiết bị và phiên bản Android\n· Phiên bản ứng dụng\n· Các bước tái hiện vấn đề\n\nChúng tôi phản hồi trong giờ làm việc (Thứ Hai–Thứ Sáu, 10:00–18:00 JST).</string>
+    <string name="faq_a_17">Email: Hakobun.support@gmail.com\n\nKhi liên hệ, vui lòng cung cấp:\n· Mẫu thiết bị và phiên bản Android\n· Phiên bản ứng dụng\n· Các bước tái hiện vấn đề\n\nChúng tôi phản hồi trong giờ làm việc (Thứ Hai–Thứ Sáu, 10:00–18:00 JST).</string>
 
     <!-- Điều khoản dịch vụ (mở rộng) -->
     <string name="terms_header_title">Điều khoản dịch vụ &amp; Chính sách bảo mật HAKOBUN</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">Điều 10　Luật áp dụng &amp; Tòa án có thẩm quyền</string>
     <string name="terms_s10_body">Các điều khoản này được điều chỉnh bởi luật pháp Nhật Bản. Bất kỳ tranh chấp nào phát sinh từ các điều khoản này sẽ thuộc thẩm quyền độc quyền của Tòa án Quận Tokyo với tư cách là tòa án xét xử sơ thẩm.</string>
     <string name="terms_contact_title">Liên hệ</string>
-    <string name="terms_contact_body">Nếu có câu hỏi về điều khoản hoặc quyền riêng tư, vui lòng liên hệ:\n\nEmail: support@hakobun.example\n\n※ Nội dung chính sách này nhất quán với những gì chúng tôi đã khai báo trong biểu mẫu Bảo mật dữ liệu Google Play.</string>
+    <string name="terms_contact_body">Nếu có câu hỏi về điều khoản hoặc quyền riêng tư, vui lòng liên hệ:\n\nEmail: Hakobun.support@gmail.com\n\n※ Nội dung chính sách này nhất quán với những gì chúng tôi đã khai báo trong biểu mẫu Bảo mật dữ liệu Google Play.</string>
 </resources>

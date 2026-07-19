@@ -280,7 +280,7 @@
     <string name="faq_header_title">よくある質問 (FAQ)</string>
     <string name="faq_header_desc">質問をタップすると回答が表示されます</string>
     <string name="faq_footer_title">解決しない場合は</string>
-    <string name="faq_footer_body">サイドメニュー →「ユーザーからのフィードバック」からご連絡ください。\nメール：support@hakobun.example</string>
+    <string name="faq_footer_body">サイドメニュー →「ユーザーからのフィードバック」からご連絡ください。\nメール：Hakobun.support@gmail.com</string>
 
     <!-- FAQ カテゴリ -->
     <string name="faq_cat_basic">基本操作</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">バグ・改善要望を伝えたい</string>
     <string name="faq_a_16">サイドメニュー → お知らせ →「ユーザーからのフィードバック」からご送信ください。\n\n具体的な状況（操作手順・端末機種・Androidバージョン）をご記入いただくと迅速に対応できます。</string>
     <string name="faq_q_17">お問い合わせ先は？</string>
-    <string name="faq_a_17">メール：support@hakobun.example\n\nお問い合わせの際は以下の情報をお知らせください。\n・端末機種・Androidバージョン\n・アプリバージョン\n・問題の再現手順\n\n営業時間内（平日10:00〜18:00）にご返答します。</string>
+    <string name="faq_a_17">メール：Hakobun.support@gmail.com\n\nお問い合わせの際は以下の情報をお知らせください。\n・端末機種・Androidバージョン\n・アプリバージョン\n・問題の再現手順\n\n営業時間内（平日10:00〜18:00）にご返答します。</string>
 
     <!-- 利用規約（拡張） -->
     <string name="terms_header_title">HAKOBUN ご利用規約・プライバシーポリシー</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">第10条　準拠法・管轄裁判所</string>
     <string name="terms_s10_body">本規約は日本法に準拠します。本規約に関する紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。</string>
     <string name="terms_contact_title">お問い合わせ</string>
-    <string name="terms_contact_body">規約・プライバシーに関するご質問は下記までお問い合わせください。\n\nメール：support@hakobun.example\n\n※ Google Play のデータセキュリティフォームに記載した内容と本ポリシーは整合しています。</string>
+    <string name="terms_contact_body">規約・プライバシーに関するご質問は下記までお問い合わせください。\n\nメール：Hakobun.support@gmail.com\n\n※ Google Play のデータセキュリティフォームに記載した内容と本ポリシーは整合しています。</string>
 </resources>

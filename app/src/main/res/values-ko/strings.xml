@@ -280,7 +280,7 @@
     <string name="faq_header_title">자주 묻는 질문 (FAQ)</string>
     <string name="faq_header_desc">질문을 탭하면 답변이 표시됩니다</string>
     <string name="faq_footer_title">해결되지 않으셨나요?</string>
-    <string name="faq_footer_body">사이드 메뉴 → 「사용자 피드백」을 통해 문의해 주세요.\n이메일: support@hakobun.example</string>
+    <string name="faq_footer_body">사이드 메뉴 → 「사용자 피드백」을 통해 문의해 주세요.\n이메일: Hakobun.support@gmail.com</string>
 
     <!-- FAQ 카테고리 -->
     <string name="faq_cat_basic">기본 사용법</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">버그나 개선 의견을 전달하고 싶어요</string>
     <string name="faq_a_16">사이드 메뉴 → 알림 → 「사용자 피드백」에서 보내주세요.\n\n구체적인 상황(조작 순서, 기기 모델, Android 버전)을 기재해 주시면 신속하게 대응할 수 있습니다.</string>
     <string name="faq_q_17">문의처는 어디인가요?</string>
-    <string name="faq_a_17">이메일: support@hakobun.example\n\n문의 시 다음 정보를 알려주세요:\n· 기기 모델 및 Android 버전\n· 앱 버전\n· 문제 재현 단계\n\n영업 시간(평일 10:00〜18:00)에 답변드립니다.</string>
+    <string name="faq_a_17">이메일: Hakobun.support@gmail.com\n\n문의 시 다음 정보를 알려주세요:\n· 기기 모델 및 Android 버전\n· 앱 버전\n· 문제 재현 단계\n\n영업 시간(평일 10:00〜18:00)에 답변드립니다.</string>
 
     <!-- 이용약관(확장) -->
     <string name="terms_header_title">HAKOBUN 이용약관 및 개인정보처리방침</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">제10조　준거법 및 관할 법원</string>
     <string name="terms_s10_body">본 약관은 일본법에 준거합니다. 본 약관과 관련된 분쟁은 도쿄 지방법원을 제1심 전속 합의 관할 법원으로 합니다.</string>
     <string name="terms_contact_title">문의</string>
-    <string name="terms_contact_body">약관 또는 개인정보에 관한 질문은 아래로 문의해 주세요:\n\n이메일: support@hakobun.example\n\n※ 본 정책의 내용은 Google Play 데이터 보안 양식에 기재한 내용과 일치합니다.</string>
+    <string name="terms_contact_body">약관 또는 개인정보에 관한 질문은 아래로 문의해 주세요:\n\n이메일: Hakobun.support@gmail.com\n\n※ 본 정책의 내용은 Google Play 데이터 보안 양식에 기재한 내용과 일치합니다.</string>
 </resources>

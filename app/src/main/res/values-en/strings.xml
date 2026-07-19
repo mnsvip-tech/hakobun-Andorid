@@ -280,7 +280,7 @@
     <string name="faq_header_title">Frequently Asked Questions (FAQ)</string>
     <string name="faq_header_desc">Tap a question to reveal the answer</string>
     <string name="faq_footer_title">Still need help?</string>
-    <string name="faq_footer_body">Contact us via the side menu → "User Feedback".\nEmail: support@hakobun.example</string>
+    <string name="faq_footer_body">Contact us via the side menu → "User Feedback".\nEmail: Hakobun.support@gmail.com</string>
 
     <!-- FAQ Categories -->
     <string name="faq_cat_basic">Basic Usage</string>
@@ -324,7 +324,7 @@
     <string name="faq_q_16">I want to report a bug or suggest an improvement</string>
     <string name="faq_a_16">Send feedback via the side menu → Notices → "User Feedback."\n\nPlease include specific details (steps to reproduce, device model, Android version) for a faster response.</string>
     <string name="faq_q_17">How do I contact support?</string>
-    <string name="faq_a_17">Email: support@hakobun.example\n\nWhen contacting us, please provide:\n· Device model and Android version\n· App version\n· Steps to reproduce the issue\n\nWe respond during business hours (Mon–Fri, 10:00–18:00 JST).</string>
+    <string name="faq_a_17">Email: Hakobun.support@gmail.com\n\nWhen contacting us, please provide:\n· Device model and Android version\n· App version\n· Steps to reproduce the issue\n\nWe respond during business hours (Mon–Fri, 10:00–18:00 JST).</string>
 
     <!-- Terms (Extended) -->
     <string name="terms_header_title">HAKOBUN Terms of Service &amp; Privacy Policy</string>
@@ -351,5 +351,5 @@
     <string name="terms_s10_title">Article 10 – Governing Law &amp; Jurisdiction</string>
     <string name="terms_s10_body">These terms are governed by the laws of Japan. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the Tokyo District Court as the court of first instance.</string>
     <string name="terms_contact_title">Contact</string>
-    <string name="terms_contact_body">For questions about these terms or our privacy practices, please contact us:\n\nEmail: support@hakobun.example\n\n* The content of this policy is consistent with what we have declared in the Google Play Data Safety form.</string>
+    <string name="terms_contact_body">For questions about these terms or our privacy practices, please contact us:\n\nEmail: Hakobun.support@gmail.com\n\n* The content of this policy is consistent with what we have declared in the Google Play Data Safety form.</string>
 </resources>
