@@ -173,12 +173,28 @@ fun HakobunApp() {
     var showMapControls by remember { mutableStateOf(true) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
-            LocationServices.getFusedLocationProviderClient(context).lastLocation
+            fusedLocationClient.lastLocation
                 .addOnSuccessListener { loc -> loc?.let { currentLocation = LatLng(it.latitude, it.longitude) } }
+        }
+    }
+    val onLocateMe: (onResult: (LatLng) -> Unit) -> Unit = { onResult ->
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.getCurrentLocation(
+                com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null
+            ).addOnSuccessListener { loc ->
+                loc?.let {
+                    val latLng = LatLng(it.latitude, it.longitude)
+                    currentLocation = latLng
+                    onResult(latLng)
+                }
+            }
         }
     }
     val persistPackages = { deliveryStore.savePackages(packages) }
@@ -422,6 +438,7 @@ fun HakobunApp() {
                     selectedCode = selectedPackage?.takeUnless { it.status.hidesMapPin() }?.trackingCode,
                     origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second),
                     onSelect = { selectedPackageCode = it },
+                    onLocateMe = onLocateMe,
                     onNavigate = {
                         context.startActivity(
                             openNavigationIntent(
@@ -796,6 +813,7 @@ private fun FullScreenDeliveryMap(
     selectedCode: String?,
     origin: LatLng,
     onSelect: (String) -> Unit,
+    onLocateMe: ((onResult: (LatLng) -> Unit) -> Unit)? = null,
     onNavigate: (DeliveryPackage) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -889,7 +907,11 @@ private fun FullScreenDeliveryMap(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             FloatingMapButton(stringResource(R.string.current_location)) {
-                if (mapLoaded) cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(origin, 12.5f))
+                if (mapLoaded) {
+                    onLocateMe?.invoke { latLng ->
+                        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                    } ?: cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(origin, 15f))
+                }
             }
             selectedPackage?.let { item ->
                 FloatingMapButton(stringResource(R.string.navi)) { onNavigate(item) }
