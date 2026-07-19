@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Chung -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← Quay lại</string>
+    <string name="close">Đóng</string>
+    <string name="cancel">Hủy</string>
+    <string name="save">Lưu</string>
+    <string name="register">Đăng ký</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="copy">Sao chép</string>
+    <string name="share">Chia sẻ</string>
+    <string name="import_label">Nhập</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="menu">Menu</string>
+    <string name="send_to_ops">Gửi đến vận hành</string>
+
+    <!-- Trạng thái đăng nhập -->
+    <string name="logged_in">Đã đăng nhập</string>
+    <string name="not_logged_in">Chưa đăng nhập</string>
+    <string name="login">Đăng nhập</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="guest_mode">Chế độ khách</string>
+    <string name="driver_mode_logged_in">Chế độ tài xế / Đã đăng nhập</string>
+
+    <!-- Màn hình chính -->
+    <string name="delivery_plan_overview">Tổng quan kế hoạch giao hàng</string>
+    <string name="notice">Thông báo</string>
+    <string name="hide_summary">Ẩn thống kê</string>
+    <string name="show_summary">Hiện thống kê</string>
+    <string name="all_time_windows">Tất cả</string>
+    <string name="all_time_windows_filter">Tất cả khung giờ</string>
+    <string name="tagline">Giao hàng hôm nay nhẹ nhàng và chính xác</string>
+
+    <!-- Bộ lọc tóm tắt -->
+    <string name="remaining">Còn lại</string>
+    <string name="completed">Hoàn thành</string>
+    <string name="absent">Vắng mặt</string>
+
+    <!-- Menu bên -->
+    <string name="package_registration_menu">Đăng ký hàng</string>
+    <string name="package_registration_desc">Thêm hàng qua địa chỉ, OCR hoặc nhập giọng nói</string>
+    <string name="course_menu">Nhận hàng / Tuyến cố định</string>
+    <string name="course_desc">Tải tuyến A~D vào danh sách giao hôm nay</string>
+    <string name="delivery_list_menu">Danh sách giao hàng</string>
+    <string name="delivery_list_desc">Xem thẻ còn lại·hoàn thành·vắng mặt</string>
+    <string name="backup_menu">Sao lưu</string>
+    <string name="backup_desc">Sao chép·chia sẻ·khôi phục dữ liệu địa chỉ</string>
+    <string name="account_menu">Thông tin tài khoản</string>
+    <string name="account_desc">Xem tên tài xế·trạm·liên hệ</string>
+    <string name="support_menu">Thông báo / Kết thúc ngày</string>
+    <string name="support_desc">Hỗ trợ và ghi lịch tại đây</string>
+    <string name="fullscreen_map_hint">Bản đồ hiển thị toàn màn hình. Gọi các thao tác cần thiết từ menu bên trái.</string>
+
+    <!-- Nút bản đồ -->
+    <string name="current_location">Vị trí hiện tại</string>
+    <string name="navi">Điều hướng</string>
+    <string name="rotate">Xoay</string>
+    <string name="marker_current_location">Vị trí hiện tại</string>
+    <string name="marker_route_base_point">Điểm xuất phát tính tuyến đường</string>
+
+    <!-- Tiêu đề bảng điều khiển -->
+    <string name="panel_delivery_list">Danh sách giao hàng</string>
+    <string name="panel_courses">Nhận hàng / Tuyến cố định</string>
+    <string name="panel_backup">Sao lưu</string>
+
+    <!-- Màn hình danh sách giao hàng -->
+    <string name="package_count">%1$d kiện</string>
+    <string name="summary_list_title">Danh sách %1$s</string>
+    <string name="showing_count">Đang hiển thị %1$d kiện</string>
+    <string name="no_packages">Không có hàng phù hợp.</string>
+    <string name="absent_redelivery_hint">Nhấn vào mục vắng mặt để xác nhận giao lại.</string>
+
+    <!-- Màn hình hỗ trợ -->
+    <string name="support_hub_title">Thông báo</string>
+    <string name="account_support_title">Tài khoản &amp; Hỗ trợ</string>
+    <string name="account_support_desc">Quản lý liên hệ vận hành·cài đặt·yêu cầu</string>
+    <string name="detail_link">Xem chi tiết →</string>
+
+    <!-- Kết thúc ngày -->
+    <string name="end_of_day_title">Kết thúc ngày</string>
+    <string name="end_of_day_desc">Sau khi ghi lịch, dữ liệu giao hàng hôm nay sẽ được đặt lại về 0. Vui lòng sao lưu dữ liệu địa chỉ trước nếu cần.</string>
+    <string name="backup_link">▶ Sao lưu dữ liệu địa chỉ（tại đây）</string>
+    <string name="delivered_stops">Số chuyến giao</string>
+    <string name="delivered_packages">Số kiện giao</string>
+    <string name="returned_packages">Hoàn lại</string>
+    <string name="finish_day_button">Kết thúc &amp; Ghi vào lịch·Đặt lại</string>
+
+    <!-- Tuyến cố định -->
+    <string name="regular_courses_title">Tuyến giao hàng cố định</string>
+    <string name="course_address_hint">Thêm địa chỉ bằng cách chọn tuyến trong màn hình đăng ký hàng.</string>
+    <string name="course_chip_label">Tuyến %1$s</string>
+    <string name="course_summary">%1$s / %2$d địa chỉ đã đăng ký</string>
+    <string name="load_course_button">Tải tuyến %1$s vào giao hàng hôm nay</string>
+
+    <!-- Sao lưu -->
+    <string name="backup_data_title">Quản lý dữ liệu địa chỉ</string>
+    <string name="backup_data_desc">Có thể sao lưu và nhập địa chỉ ngoài tuyến cố định.</string>
+    <string name="create_backup">Tạo bản sao lưu</string>
+    <string name="share_title">HAKOBUN Sao lưu địa chỉ</string>
+    <string name="share_chooser">Chia sẻ bản sao lưu</string>
+    <string name="import_data_label">Dữ liệu nhập</string>
+    <string name="import_placeholder">Số vận đơn,Người nhận,Địa chỉ,Khung giờ,Ghi chú</string>
+
+    <!-- Bộ lọc khung giờ bản đồ -->
+    <string name="map_time_window_title">Bản đồ: Hàng theo khung giờ</string>
+    <string name="map_time_window_desc">Không có khung giờ dùng ghim đen, có khung giờ dùng màu tương ứng.</string>
+
+    <!-- Bản đồ giao hàng -->
+    <string name="delivery_map_title">Bản đồ giao hàng</string>
+    <string name="delivery_map_desc">Hàng được sắp xếp theo thứ tự gần nhất từ vị trí hiện tại</string>
+    <string name="go_to_selected_pin">Đến ghim đã chọn</string>
+    <string name="start_navi">Bắt đầu điều hướng</string>
+    <string name="next_candidate">Tiếp theo: %1$s / %2$s</string>
+
+    <!-- Chi tiết hàng -->
+    <string name="package_info">Hàng %1$s / Cỡ %2$s / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">Khung giờ %1$s / COD %2$s / Tủ khóa %3$s</string>
+    <string name="status_complete">Hoàn thành</string>
+    <string name="status_absent">Vắng mặt</string>
+    <string name="status_return">Hoàn lại</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+
+    <!-- Màn hình chỉnh sửa hàng -->
+    <string name="package_edit_title">Chỉnh sửa hàng</string>
+    <string name="recipient_info_title">Thông tin người nhận</string>
+    <string name="tracking_code_label">Số vận đơn</string>
+    <string name="address_label">Địa chỉ</string>
+    <string name="recipient_field_label">Tên người nhận</string>
+    <string name="recipient_placeholder">Nhập tên người nhận</string>
+    <string name="memo_field_label">Ghi chú</string>
+    <string name="memo_placeholder">Nhập ghi chú</string>
+    <string name="delivery_status_title">Trạng thái giao hàng</string>
+    <string name="time_window_title">Khung giờ</string>
+    <string name="navigation_title">Điều hướng</string>
+    <string name="start_navi_button">Khởi động điều hướng</string>
+
+    <!-- Màn hình đăng ký hàng -->
+    <string name="package_registration_title">Đăng ký hàng</string>
+    <string name="delivery_addresses_title">Địa chỉ giao hàng</string>
+    <string name="address_count_fraction">%1$d/5 kiện</string>
+    <string name="add_address_hint">Thêm địa chỉ từ khu vực nhập bên dưới</string>
+    <string name="address_index_label">Kiện %1$d</string>
+    <string name="open_map">Bản đồ</string>
+    <string name="add_address_section">Thêm địa chỉ</string>
+    <string name="camera">Camera</string>
+    <string name="voice">Giọng nói</string>
+    <string name="registration_target">Đăng ký vào</string>
+    <string name="normal_package">Hàng thường</string>
+    <string name="course_target_hint">Chọn tuyến %1$s sẽ lưu địa chỉ này vào nhóm nhận hàng cố định.</string>
+    <string name="normal_target_hint">Chọn hàng thường sẽ đăng ký vào bản đồ giao hàng hôm nay.</string>
+    <string name="postal_code_label">Mã bưu chính</string>
+    <string name="postal_placeholder">VD: 1000005</string>
+    <string name="manual_input_label">Nhập thủ công</string>
+    <string name="manual_placeholder">VD: 1-1-1 Marunouchi, Chiyoda, Tokyo</string>
+    <string name="add_to_course_button">Thêm địa chỉ vào tuyến %1$s</string>
+    <string name="add_manual_button">Thêm địa chỉ nhập thủ công</string>
+    <string name="course_saved_message">Đã thêm địa chỉ vào tuyến %1$s</string>
+    <string name="register_count_button">Đăng ký %1$d kiện lên bản đồ</string>
+    <string name="add_address_first">Vui lòng thêm ít nhất 1 địa chỉ</string>
+    <string name="geocoding_hint">Đang mã hóa địa chỉ...</string>
+    <string name="drag_pin_hint">Kéo ghim để điều chỉnh vị trí</string>
+
+    <!-- Bảng nhập địa chỉ -->
+    <string name="address_input_title">Nhập địa chỉ</string>
+    <string name="address_input_desc">Tạo địa chỉ ứng cử qua camera·giọng nói·mã bưu chính</string>
+    <string name="register_package_button">Đăng ký hàng</string>
+    <string name="clear_input">Xóa nội dung nhập</string>
+
+    <!-- Màn hình tài khoản người dùng -->
+    <string name="user_account_title">Thông tin tài khoản người dùng</string>
+    <string name="profile_title">Hồ sơ</string>
+    <string name="driver_name_label">Tên tài xế *</string>
+    <string name="driver_name_placeholder">VD: Nguyễn Văn A</string>
+    <string name="base_label">Trạm gốc</string>
+    <string name="base_placeholder">VD: Chi nhánh Hà Nội</string>
+    <string name="contact_label">Liên hệ（điện thoại）</string>
+    <string name="contact_placeholder">VD: 090-0000-0000</string>
+    <string name="email_label">Địa chỉ email</string>
+    <string name="email_placeholder">VD: driver@example.com</string>
+    <string name="save_changes">Lưu thay đổi</string>
+    <string name="register_profile">Đăng ký</string>
+    <string name="info_driver_name">Tên tài xế</string>
+    <string name="info_base">Trạm gốc</string>
+    <string name="info_contact">Liên hệ</string>
+    <string name="info_email">Email</string>
+    <string name="info_login_status">Trạng thái đăng nhập</string>
+    <string name="not_set">Chưa đặt</string>
+
+    <!-- Thẻ gói -->
+    <string name="plan_billing_title">Gói &amp; Thanh toán</string>
+    <string name="premium_plan">✓ Gói Premium</string>
+    <string name="premium_features">Tất cả tính năng đều có thể sử dụng.</string>
+    <string name="free_trial_expired">⚠ Hết thời gian dùng thử miễn phí</string>
+    <string name="free_trial_active">Đang dùng thử miễn phí</string>
+    <string name="trial_remaining_days">Còn %1$d ngày</string>
+    <string name="trial_auto_upgrade">Sau khi hết hạn sẽ tự động chuyển sang gói Premium.</string>
+    <string name="trial_after_register">Sau khi đăng ký, dùng thử miễn phí 1 tháng.</string>
+    <string name="free_plan_name">Miễn phí</string>
+    <string name="free_trial_period">Dùng thử 1 tháng</string>
+    <string name="free_features">· Tính năng cơ bản\n· Đăng ký 5 kiện\n· Sao lưu</string>
+    <string name="premium_plan_name">Premium</string>
+    <string name="premium_price">¥980 / tháng</string>
+    <string name="premium_features_list">· Toàn bộ tính năng\n· Đăng ký không giới hạn\n· Hỗ trợ ưu tiên</string>
+    <string name="subscribe_google_pay">Đăng ký Premium qua Google Pay</string>
+    <string name="subscription_terms">Tháng đầu miễn phí, sau đó ¥980/tháng（đã bao gồm thuế）. Hủy bất cứ lúc nào.</string>
+    <string name="subscribe_complete">Đã chuyển sang gói Premium thành công</string>
+    <string name="billing_not_available">Không thể khởi động Google Play Billing</string>
+    <string name="plan_not_found">Không tìm thấy gói（vui lòng kiểm tra cài đặt Play Console）</string>
+
+    <!-- Hộp thoại giới hạn trả phí -->
+    <string name="paywall_title">Hết thời gian dùng thử miễn phí</string>
+    <string name="paywall_message">Cần nâng cấp lên gói Premium để đăng ký hàng mới.\n\nTháng đầu miễn phí dùng thử.</string>
+    <string name="go_premium">Đăng ký Premium</string>
+
+    <!-- Hộp thoại giao lại -->
+    <string name="redelivery_title">Giao lại không?</string>
+    <string name="redelivery_confirm">Giao lại</string>
+
+    <!-- Phản hồi -->
+    <string name="feedback_label">Nội dung phản hồi</string>
+    <string name="feedback_placeholder">VD: Muốn ghim bản đồ to hơn một chút</string>
+    <string name="feedback_sent">Đã lưu như đang chờ gửi. Sẽ gửi đến vận hành sau khi tích hợp API.</string>
+
+    <!-- Chi tiết thông báo -->
+    <string name="announcement_important">Quan trọng</string>
+    <string name="announcement_important_text">Đang phát triển Google Maps làm bản đồ chính. ZENRIN API sẽ được thay thế trong tương lai.</string>
+    <string name="announcement_update">Cập nhật</string>
+    <string name="announcement_update_text">Hàng hoàn thành·hoàn về công ty sẽ ẩn khỏi ghim bản đồ.</string>
+    <string name="announcement_guide">Hướng dẫn</string>
+    <string name="announcement_guide_text">Dùng kết thúc ngày để ghi số lượng trong ngày vào lịch.</string>
+
+    <!-- Chi tiết cài đặt -->
+    <string name="settings_map">Bản đồ</string>
+    <string name="settings_map_text">Hiển thị Google Maps, ghim theo khung giờ, la bàn, thu phóng</string>
+    <string name="settings_navi">Điều hướng</string>
+    <string name="settings_navi_text">Khởi động điều hướng Google Maps sau khi nhấn ghim</string>
+    <string name="settings_notification">Thông báo</string>
+    <string name="settings_notification_text">Dự kiến thêm thông báo vận hành và cảnh báo khung giờ</string>
+
+    <!-- Trợ giúp -->
+    <string name="help_contact">Liên hệ</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">FAQ</string>
+    <string name="help_faq_text">OCR địa chỉ, tìm kiếm mã bưu chính, tuyến cố định, sao lưu</string>
+    <string name="help_emergency">Khẩn cấp</string>
+    <string name="help_emergency_text">Liên hệ quản lý vận tải của công ty</string>
+
+    <!-- Điều khoản -->
+    <string name="terms_purpose">Ứng dụng này nhằm hỗ trợ công việc giao hàng. Ưu tiên tuân thủ luật giao thông thực tế và quy định của công ty giao hàng.</string>
+    <string name="terms_privacy">Thông tin cá nhân như địa chỉ·tên·số điện thoại chỉ được xử lý trong phạm vi cần thiết cho công việc giao hàng.</string>
+    <string name="terms_maps">Khi sử dụng Google Maps và ZENRIN API trong tương lai, phải tuân theo điều khoản sử dụng của từng dịch vụ.</string>
+
+    <!-- OCR / Giọng nói -->
+    <string name="ocr_no_image">Không thể lấy hình ảnh</string>
+    <string name="ocr_not_retrieved">Chưa lấy được</string>
+    <string name="ocr_failed">Không thể đọc địa chỉ</string>
+    <string name="ocr_needs_check">Cần xác nhận</string>
+    <string name="camera_no_permission">Quyền camera chưa được cấp</string>
+    <string name="camera_permission_check">Xác nhận quyền</string>
+    <string name="voice_prompt">Vui lòng đọc địa chỉ giao hàng</string>
+    <string name="memo_added_from_registration">Thêm từ màn hình đăng ký hàng</string>
+
+    <!-- Chú thích -->
+    <string name="legend_none">Không có</string>
+    <string name="legend_morning">Buổi sáng</string>
+    <string name="legend_afternoon">Buổi chiều</string>
+    <string name="legend_evening">Buổi tối</string>
+    <string name="legend_absent">Vắng mặt</string>
+</resources>

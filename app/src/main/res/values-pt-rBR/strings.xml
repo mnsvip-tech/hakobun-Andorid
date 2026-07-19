@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Geral -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← Voltar</string>
+    <string name="close">Fechar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
+    <string name="register">Registrar</string>
+    <string name="search">Pesquisar</string>
+    <string name="copy">Copiar</string>
+    <string name="share">Compartilhar</string>
+    <string name="import_label">Importar</string>
+    <string name="delete">Excluir</string>
+    <string name="edit">Editar</string>
+    <string name="menu">Menu</string>
+    <string name="send_to_ops">Enviar para operações</string>
+
+    <!-- Status de login -->
+    <string name="logged_in">Conectado</string>
+    <string name="not_logged_in">Desconectado</string>
+    <string name="login">Entrar</string>
+    <string name="logout">Sair</string>
+    <string name="guest_mode">Modo visitante</string>
+    <string name="driver_mode_logged_in">Modo entregador / Conectado</string>
+
+    <!-- Tela inicial -->
+    <string name="delivery_plan_overview">Resumo do plano de entregas</string>
+    <string name="notice">Avisos</string>
+    <string name="hide_summary">Ocultar resumo</string>
+    <string name="show_summary">Mostrar resumo</string>
+    <string name="all_time_windows">Todos</string>
+    <string name="all_time_windows_filter">Todos os horários</string>
+    <string name="tagline">Torne as entregas de hoje mais ágeis e precisas</string>
+
+    <!-- Filtros de resumo -->
+    <string name="remaining">Pendentes</string>
+    <string name="completed">Concluídas</string>
+    <string name="absent">Ausente</string>
+
+    <!-- Menu lateral -->
+    <string name="package_registration_menu">Registrar pacote</string>
+    <string name="package_registration_desc">Adicione pacotes via endereço, OCR ou voz</string>
+    <string name="course_menu">Coleta / Rotas fixas</string>
+    <string name="course_desc">Carregar rotas A~D para as entregas de hoje</string>
+    <string name="delivery_list_menu">Lista de entregas</string>
+    <string name="delivery_list_desc">Veja cartões de pendentes·concluídos·ausentes</string>
+    <string name="backup_menu">Backup</string>
+    <string name="backup_desc">Copiar·compartilhar·restaurar dados de endereço</string>
+    <string name="account_menu">Informações da conta</string>
+    <string name="account_desc">Ver nome do entregador·base·contato</string>
+    <string name="support_menu">Avisos / Encerramento do dia</string>
+    <string name="support_desc">Suporte e exportação para calendário aqui</string>
+    <string name="fullscreen_map_hint">O mapa é exibido em tela cheia. Acesse as funções pelo menu à esquerda.</string>
+
+    <!-- Botões do mapa -->
+    <string name="current_location">Minha localização</string>
+    <string name="navi">Navegar</string>
+    <string name="rotate">Girar</string>
+    <string name="marker_current_location">Minha localização</string>
+    <string name="marker_route_base_point">Ponto de origem do cálculo de rota</string>
+
+    <!-- Títulos do painel -->
+    <string name="panel_delivery_list">Lista de entregas</string>
+    <string name="panel_courses">Coleta / Rotas fixas</string>
+    <string name="panel_backup">Backup</string>
+
+    <!-- Tela de lista de entregas -->
+    <string name="package_count">%1$d itens</string>
+    <string name="summary_list_title">Lista de %1$s</string>
+    <string name="showing_count">Exibindo %1$d itens</string>
+    <string name="no_packages">Nenhum pacote encontrado.</string>
+    <string name="absent_redelivery_hint">Toque em um item ausente para confirmar a reentrega.</string>
+
+    <!-- Tela de suporte -->
+    <string name="support_hub_title">Avisos</string>
+    <string name="account_support_title">Conta &amp; Suporte</string>
+    <string name="account_support_desc">Gerencie contatos da operação·configurações·solicitações</string>
+    <string name="detail_link">Ver detalhes →</string>
+
+    <!-- Encerramento do dia -->
+    <string name="end_of_day_title">Encerramento do dia</string>
+    <string name="end_of_day_desc">Após a exportação para o calendário, os dados de entrega do dia serão redefinidos para zero. Faça o backup dos dados de endereço primeiro, se necessário.</string>
+    <string name="backup_link">▶ Fazer backup dos dados de endereço（aqui）</string>
+    <string name="delivered_stops">Paradas entregues</string>
+    <string name="delivered_packages">Pacotes entregues</string>
+    <string name="returned_packages">Devolvidos</string>
+    <string name="finish_day_button">Encerrar &amp; Exportar para calendário·Redefinir</string>
+
+    <!-- Rotas regulares -->
+    <string name="regular_courses_title">Rotas fixas de entrega</string>
+    <string name="course_address_hint">Adicione endereços selecionando uma rota na tela de registro de pacotes.</string>
+    <string name="course_chip_label">Rota %1$s</string>
+    <string name="course_summary">%1$s / %2$d endereços registrados</string>
+    <string name="load_course_button">Carregar rota %1$s nas entregas de hoje</string>
+
+    <!-- Backup -->
+    <string name="backup_data_title">Gerenciamento de dados de endereço</string>
+    <string name="backup_data_desc">Faça backup e importe endereços além das rotas fixas.</string>
+    <string name="create_backup">Criar backup</string>
+    <string name="share_title">HAKOBUN Backup de endereços</string>
+    <string name="share_chooser">Compartilhar backup</string>
+    <string name="import_data_label">Dados de importação</string>
+    <string name="import_placeholder">Código,Destinatário,Endereço,Horário,Observação</string>
+
+    <!-- Filtro de janela de tempo no mapa -->
+    <string name="map_time_window_title">Mapa: Pacotes por janela de tempo</string>
+    <string name="map_time_window_desc">Pacotes sem horário usam alfinetes pretos; com horário usam a cor do período.</string>
+
+    <!-- Mapa de entregas -->
+    <string name="delivery_map_title">Mapa de entregas</string>
+    <string name="delivery_map_desc">Pacotes ordenados do mais próximo ao mais distante</string>
+    <string name="go_to_selected_pin">Ir ao alfinete selecionado</string>
+    <string name="start_navi">Iniciar navegação</string>
+    <string name="next_candidate">Próximo: %1$s / %2$s</string>
+
+    <!-- Detalhes do pacote -->
+    <string name="package_info">Pacote %1$s / Tam. %2$s / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">Horário %1$s / Contra entrega %2$s / Armário %3$s</string>
+    <string name="status_complete">Entregue</string>
+    <string name="status_absent">Ausente</string>
+    <string name="status_return">Devolvido</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+
+    <!-- Tela de edição de pacote -->
+    <string name="package_edit_title">Editar pacote</string>
+    <string name="recipient_info_title">Informações do destinatário</string>
+    <string name="tracking_code_label">Código de rastreamento</string>
+    <string name="address_label">Endereço</string>
+    <string name="recipient_field_label">Nome do destinatário</string>
+    <string name="recipient_placeholder">Digite o nome do destinatário</string>
+    <string name="memo_field_label">Observação</string>
+    <string name="memo_placeholder">Digite uma observação</string>
+    <string name="delivery_status_title">Status da entrega</string>
+    <string name="time_window_title">Janela de tempo</string>
+    <string name="navigation_title">Navegação</string>
+    <string name="start_navi_button">Iniciar navegação</string>
+
+    <!-- Tela de registro de pacote -->
+    <string name="package_registration_title">Registrar pacote</string>
+    <string name="delivery_addresses_title">Endereços de entrega</string>
+    <string name="address_count_fraction">%1$d/5 itens</string>
+    <string name="add_address_hint">Adicione um endereço na área de entrada abaixo</string>
+    <string name="address_index_label">Item %1$d</string>
+    <string name="open_map">Mapa</string>
+    <string name="add_address_section">Adicionar endereço</string>
+    <string name="camera">Câmera</string>
+    <string name="voice">Voz</string>
+    <string name="registration_target">Registrar em</string>
+    <string name="normal_package">Pacote padrão</string>
+    <string name="course_target_hint">Ao selecionar a rota %1$s, este endereço será salvo no grupo de coleta fixa.</string>
+    <string name="normal_target_hint">Ao selecionar pacote padrão, será adicionado ao mapa de entregas de hoje.</string>
+    <string name="postal_code_label">CEP</string>
+    <string name="postal_placeholder">Ex: 01310100</string>
+    <string name="manual_input_label">Entrada manual</string>
+    <string name="manual_placeholder">Ex: Av. Paulista, 1000 - São Paulo, SP</string>
+    <string name="add_to_course_button">Adicionar à rota %1$s</string>
+    <string name="add_manual_button">Adicionar endereço digitado</string>
+    <string name="course_saved_message">Endereço adicionado à rota %1$s</string>
+    <string name="register_count_button">Registrar %1$d item(ns) no mapa</string>
+    <string name="add_address_first">Adicione pelo menos 1 endereço</string>
+    <string name="geocoding_hint">Geocodificando endereço...</string>
+    <string name="drag_pin_hint">Arraste os alfinetes para ajustar a posição</string>
+
+    <!-- Painel de entrada de endereço -->
+    <string name="address_input_title">Entrada de endereço</string>
+    <string name="address_input_desc">Crie candidatos de endereço via câmera·voz·CEP</string>
+    <string name="register_package_button">Registrar pacote</string>
+    <string name="clear_input">Limpar entrada</string>
+
+    <!-- Tela de conta do usuário -->
+    <string name="user_account_title">Informações da conta do usuário</string>
+    <string name="profile_title">Perfil</string>
+    <string name="driver_name_label">Nome do entregador *</string>
+    <string name="driver_name_placeholder">Ex: João Silva</string>
+    <string name="base_label">Base</string>
+    <string name="base_placeholder">Ex: Filial São Paulo</string>
+    <string name="contact_label">Contato（telefone）</string>
+    <string name="contact_placeholder">Ex: 11-99999-0000</string>
+    <string name="email_label">Endereço de e-mail</string>
+    <string name="email_placeholder">Ex: entregador@example.com</string>
+    <string name="save_changes">Salvar alterações</string>
+    <string name="register_profile">Registrar</string>
+    <string name="info_driver_name">Nome do entregador</string>
+    <string name="info_base">Base</string>
+    <string name="info_contact">Contato</string>
+    <string name="info_email">E-mail</string>
+    <string name="info_login_status">Status de login</string>
+    <string name="not_set">Não definido</string>
+
+    <!-- Cartão de plano -->
+    <string name="plan_billing_title">Plano &amp; Faturamento</string>
+    <string name="premium_plan">✓ Plano Premium</string>
+    <string name="premium_features">Todos os recursos estão disponíveis.</string>
+    <string name="free_trial_expired">⚠ Período gratuito encerrado</string>
+    <string name="free_trial_active">Teste gratuito ativo</string>
+    <string name="trial_remaining_days">%1$d dias restantes</string>
+    <string name="trial_auto_upgrade">Após o término, você será automaticamente transferido para o plano Premium.</string>
+    <string name="trial_after_register">Após o registro, aproveite 1 mês gratuitamente.</string>
+    <string name="free_plan_name">Gratuito</string>
+    <string name="free_trial_period">Teste de 1 mês</string>
+    <string name="free_features">· Recursos básicos\n· 5 registros de pacotes\n· Backup</string>
+    <string name="premium_plan_name">Premium</string>
+    <string name="premium_price">¥980 / mês</string>
+    <string name="premium_features_list">· Todos os recursos\n· Registros ilimitados\n· Suporte prioritário</string>
+    <string name="subscribe_google_pay">Assinar Premium via Google Pay</string>
+    <string name="subscription_terms">Primeiro mês grátis, depois ¥980/mês（imposto incluído）. Cancele quando quiser.</string>
+    <string name="subscribe_complete">Transferência para o plano Premium concluída</string>
+    <string name="billing_not_available">Não foi possível iniciar o Google Play Billing</string>
+    <string name="plan_not_found">Plano não encontrado（verifique as configurações do Play Console）</string>
+
+    <!-- Diálogo de paywall -->
+    <string name="paywall_title">Período gratuito encerrado</string>
+    <string name="paywall_message">É necessário um plano Premium para registrar novos pacotes.\n\nO primeiro mês é gratuito.</string>
+    <string name="go_premium">Assinar Premium</string>
+
+    <!-- Diálogo de reentrega -->
+    <string name="redelivery_title">Agendar reentrega?</string>
+    <string name="redelivery_confirm">Reentrega</string>
+
+    <!-- Feedback -->
+    <string name="feedback_label">Conteúdo do feedback</string>
+    <string name="feedback_placeholder">Ex: Gostaria que os alfinetes do mapa fossem maiores</string>
+    <string name="feedback_sent">Salvo como pendente. Será enviado às operações após integração com API.</string>
+
+    <!-- Detalhes dos avisos -->
+    <string name="announcement_important">Importante</string>
+    <string name="announcement_important_text">Google Maps está sendo desenvolvido como mapa principal. A API ZENRIN será substituída no futuro.</string>
+    <string name="announcement_update">Atualização</string>
+    <string name="announcement_update_text">Pacotes concluídos e devolvidos à empresa ficam ocultos nos alfinetes do mapa.</string>
+    <string name="announcement_guide">Guia</string>
+    <string name="announcement_guide_text">Use o encerramento do dia para registrar as quantidades diárias no calendário.</string>
+
+    <!-- Detalhes de configurações -->
+    <string name="settings_map">Mapa</string>
+    <string name="settings_map_text">Exibição Google Maps, alfinetes por horário, bússola, zoom</string>
+    <string name="settings_navi">Navegação</string>
+    <string name="settings_navi_text">Inicia navegação Google Maps ao tocar no alfinete</string>
+    <string name="settings_notification">Notificações</string>
+    <string name="settings_notification_text">Avisos de operações e alertas por janela de tempo planejados</string>
+
+    <!-- Ajuda -->
+    <string name="help_contact">Contato</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">FAQ</string>
+    <string name="help_faq_text">OCR de endereço, busca por CEP, rotas fixas, backup</string>
+    <string name="help_emergency">Emergência</string>
+    <string name="help_emergency_text">Entre em contato com o gerente de operações da sua empresa</string>
+
+    <!-- Termos -->
+    <string name="terms_purpose">Este aplicativo tem como objetivo auxiliar nas operações de entrega. Priorize as leis de trânsito reais e as regras operacionais da empresa de entrega.</string>
+    <string name="terms_privacy">Informações pessoais como endereços·nomes·números de telefone são tratadas apenas no escopo necessário para operações de entrega.</string>
+    <string name="terms_maps">Ao usar o Google Maps e futuros serviços da API ZENRIN, os termos de serviço de cada serviço se aplicam.</string>
+
+    <!-- OCR / Voz -->
+    <string name="ocr_no_image">Não foi possível obter a imagem</string>
+    <string name="ocr_not_retrieved">Não obtido</string>
+    <string name="ocr_failed">Não foi possível ler o endereço</string>
+    <string name="ocr_needs_check">Necessita revisão</string>
+    <string name="camera_no_permission">Permissão de câmera não concedida</string>
+    <string name="camera_permission_check">Verificação de permissão</string>
+    <string name="voice_prompt">Por favor, diga o endereço de entrega</string>
+    <string name="memo_added_from_registration">Adicionado pela tela de registro de pacotes</string>
+
+    <!-- Legenda -->
+    <string name="legend_none">Sem horário</string>
+    <string name="legend_morning">Manhã</string>
+    <string name="legend_afternoon">Tarde</string>
+    <string name="legend_evening">Noite</string>
+    <string name="legend_absent">Ausente</string>
+</resources>

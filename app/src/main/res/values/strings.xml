@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- アプリ全般 -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← 戻る</string>
+    <string name="close">閉じる</string>
+    <string name="cancel">キャンセル</string>
+    <string name="save">保存する</string>
+    <string name="register">登録</string>
+    <string name="search">検索</string>
+    <string name="copy">コピー</string>
+    <string name="share">共有</string>
+    <string name="import_label">インポート</string>
+    <string name="delete">削除</string>
+    <string name="edit">編集</string>
+    <string name="menu">メニュー</string>
+    <string name="send_to_ops">運営へ送信</string>
+
+    <!-- ログイン状態 -->
+    <string name="logged_in">ログイン中</string>
+    <string name="not_logged_in">未ログイン</string>
+    <string name="login">ログイン</string>
+    <string name="logout">ログアウト</string>
+    <string name="guest_mode">ゲストモード</string>
+    <string name="driver_mode_logged_in">配送員モード / ログイン中</string>
+
+    <!-- ホーム画面 -->
+    <string name="delivery_plan_overview">配達プラン概要</string>
+    <string name="notice">お知らせ</string>
+    <string name="hide_summary">集計を非表示</string>
+    <string name="show_summary">集計を表示</string>
+    <string name="all_time_windows">全て</string>
+    <string name="all_time_windows_filter">全時間帯</string>
+    <string name="tagline">今日の配達を軽く、正確に</string>
+
+    <!-- サマリーフィルター -->
+    <string name="remaining">残り</string>
+    <string name="completed">完了</string>
+    <string name="absent">不在</string>
+
+    <!-- サイドメニュー -->
+    <string name="package_registration_menu">荷物登録</string>
+    <string name="package_registration_desc">住所・OCR・音声入力から荷物を追加</string>
+    <string name="course_menu">集荷 / 定期コース</string>
+    <string name="course_desc">A〜Dコースを今日の配達へ読み込み</string>
+    <string name="delivery_list_menu">配達リスト</string>
+    <string name="delivery_list_desc">残り・完了・不在をカードで確認</string>
+    <string name="backup_menu">バックアップ</string>
+    <string name="backup_desc">住所データのコピー・共有・復元</string>
+    <string name="account_menu">ユーザーアカウント情報</string>
+    <string name="account_desc">ドライバー名・拠点・連絡先を確認</string>
+    <string name="support_menu">お知らせ / 終了処理</string>
+    <string name="support_desc">サポートとカレンダー転記はこちら</string>
+    <string name="fullscreen_map_hint">地図は全画面表示。必要な操作だけ左メニューから呼び出します。</string>
+
+    <!-- 地図ボタン -->
+    <string name="current_location">現在地</string>
+    <string name="navi">ナビ</string>
+    <string name="rotate">回転</string>
+    <string name="marker_current_location">現在地</string>
+    <string name="marker_route_base_point">ルート計算の基準点</string>
+
+    <!-- パネルタイトル -->
+    <string name="panel_delivery_list">配達リスト</string>
+    <string name="panel_courses">集荷 / 定期コース</string>
+    <string name="panel_backup">バックアップ</string>
+
+    <!-- 配達リスト画面 -->
+    <string name="package_count">%1$d件</string>
+    <string name="summary_list_title">%1$s一覧</string>
+    <string name="showing_count">%1$d件を表示中</string>
+    <string name="no_packages">該当する荷物はありません。</string>
+    <string name="absent_redelivery_hint">不在の項目をタップすると再配達確認を表示します。</string>
+
+    <!-- お知らせ画面 -->
+    <string name="support_hub_title">お知らせ</string>
+    <string name="account_support_title">アカウント・サポート</string>
+    <string name="account_support_desc">運営連絡、設定、問い合わせをまとめて管理</string>
+    <string name="detail_link">詳細を見る →</string>
+
+    <!-- 終了処理 -->
+    <string name="end_of_day_title">終了処理</string>
+    <string name="end_of_day_desc">カレンダー転記後、本日の配達データは0件にリセットされます。必要な方は先に住所データ管理のバックアップを実行してください。</string>
+    <string name="backup_link">▶ 住所データをバックアップする（こちら）</string>
+    <string name="delivered_stops">配達件数</string>
+    <string name="delivered_packages">配達個数</string>
+    <string name="returned_packages">持戻り</string>
+    <string name="finish_day_button">終了処理してカレンダー入力・リセット</string>
+
+    <!-- 定期コース -->
+    <string name="regular_courses_title">定期配送コース</string>
+    <string name="course_address_hint">住所追加は荷物登録画面でコースを選んで行います。</string>
+    <string name="course_chip_label">%1$sコース</string>
+    <string name="course_summary">%1$s / 登録住所 %2$d件</string>
+    <string name="load_course_button">%1$sコースを今日の配達へ読み込み</string>
+
+    <!-- バックアップ -->
+    <string name="backup_data_title">住所データ管理</string>
+    <string name="backup_data_desc">定期コース以外の住所もバックアップ・インポートできます。</string>
+    <string name="create_backup">バックアップを作成</string>
+    <string name="share_title">HAKOBUN 住所バックアップ</string>
+    <string name="share_chooser">バックアップを共有</string>
+    <string name="import_data_label">インポートデータ</string>
+    <string name="import_placeholder">伝票番号,届け先,住所,時間帯,メモ</string>
+
+    <!-- 地図表示フィルター -->
+    <string name="map_time_window_title">地図表示: 時間帯別荷物</string>
+    <string name="map_time_window_desc">時間指定なしは黒ピン、時間指定ありは時間帯色で表示します。</string>
+
+    <!-- 配達マップ -->
+    <string name="delivery_map_title">配達マップ</string>
+    <string name="delivery_map_desc">時間帯指定荷物を現在地から近い順に採番</string>
+    <string name="go_to_selected_pin">選択ピンへ</string>
+    <string name="start_navi">ナビ開始</string>
+    <string name="next_candidate">次の候補: %1$s / %2$s</string>
+
+    <!-- 荷物詳細 -->
+    <string name="package_info">荷物 %1$s / %2$sサイズ / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">時間帯 %1$s / 代引き %2$s / 宅配BOX %3$s</string>
+    <string name="status_complete">完了</string>
+    <string name="status_absent">不在</string>
+    <string name="status_return">持戻り</string>
+    <string name="yes">あり</string>
+    <string name="no">なし</string>
+
+    <!-- 荷物編集画面 -->
+    <string name="package_edit_title">荷物編集</string>
+    <string name="recipient_info_title">届け先情報</string>
+    <string name="tracking_code_label">伝票番号</string>
+    <string name="address_label">住所</string>
+    <string name="recipient_field_label">届け先名</string>
+    <string name="recipient_placeholder">届け先名を入力</string>
+    <string name="memo_field_label">メモ</string>
+    <string name="memo_placeholder">メモを入力</string>
+    <string name="delivery_status_title">配達状況</string>
+    <string name="time_window_title">時間帯</string>
+    <string name="navigation_title">ナビゲーション</string>
+    <string name="start_navi_button">ナビを起動</string>
+
+    <!-- 荷物登録画面 -->
+    <string name="package_registration_title">荷物登録</string>
+    <string name="delivery_addresses_title">届け先住所</string>
+    <string name="address_count_fraction">%1$d/5件</string>
+    <string name="add_address_hint">下の入力エリアから住所を追加してください</string>
+    <string name="address_index_label">%1$d件目</string>
+    <string name="open_map">地図</string>
+    <string name="add_address_section">住所を追加</string>
+    <string name="camera">カメラ</string>
+    <string name="voice">音声</string>
+    <string name="registration_target">登録先</string>
+    <string name="normal_package">通常荷物</string>
+    <string name="course_target_hint">%1$sコースを選ぶと、この住所は定期集荷グループに保存されます。</string>
+    <string name="normal_target_hint">通常荷物を選ぶと、今日の配達として地図に登録します。</string>
+    <string name="postal_code_label">郵便番号</string>
+    <string name="postal_placeholder">例 1000005</string>
+    <string name="manual_input_label">直接入力</string>
+    <string name="manual_placeholder">例）東京都千代田区丸の内1-1-1</string>
+    <string name="add_to_course_button">%1$sコースへ住所を追加</string>
+    <string name="add_manual_button">直接入力した住所を追加</string>
+    <string name="course_saved_message">%1$sコースへ住所を追加しました</string>
+    <string name="register_count_button">%1$d件を地図に登録</string>
+    <string name="add_address_first">住所を1件以上追加してください</string>
+    <string name="geocoding_hint">住所をジオコーディング中...</string>
+    <string name="drag_pin_hint">ピンをドラッグして位置を調整できます</string>
+
+    <!-- アドレス入力パネル（旧UI） -->
+    <string name="address_input_title">住所入力</string>
+    <string name="address_input_desc">カメラ・音声・郵便番号から住所候補を作成</string>
+    <string name="register_package_button">荷物登録</string>
+    <string name="clear_input">入力をクリア</string>
+
+    <!-- ユーザーアカウント画面 -->
+    <string name="user_account_title">ユーザーアカウント情報</string>
+    <string name="profile_title">プロフィール</string>
+    <string name="driver_name_label">ドライバー名 *</string>
+    <string name="driver_name_placeholder">例）田中 太郎</string>
+    <string name="base_label">所属拠点</string>
+    <string name="base_placeholder">例）東京営業所</string>
+    <string name="contact_label">連絡先（電話）</string>
+    <string name="contact_placeholder">例）090-0000-0000</string>
+    <string name="email_label">メールアドレス</string>
+    <string name="email_placeholder">例）driver@example.com</string>
+    <string name="save_changes">変更を保存</string>
+    <string name="register_profile">登録する</string>
+    <string name="info_driver_name">ドライバー名</string>
+    <string name="info_base">所属拠点</string>
+    <string name="info_contact">連絡先</string>
+    <string name="info_email">メール</string>
+    <string name="info_login_status">ログイン状態</string>
+    <string name="not_set">未設定</string>
+
+    <!-- プランカード -->
+    <string name="plan_billing_title">プランと請求</string>
+    <string name="premium_plan">✓ プレミアムプラン</string>
+    <string name="premium_features">すべての機能が利用できます。</string>
+    <string name="free_trial_expired">⚠ 無料期間終了</string>
+    <string name="free_trial_active">無料トライアル中</string>
+    <string name="trial_remaining_days">残り %1$d日</string>
+    <string name="trial_auto_upgrade">終了後、プレミアムプランへ自動移行します。</string>
+    <string name="trial_after_register">登録後、1ヶ月間無料でご利用いただけます。</string>
+    <string name="free_plan_name">無料</string>
+    <string name="free_trial_period">1ヶ月トライアル</string>
+    <string name="free_features">・基本機能\n・荷物登録5件\n・バックアップ</string>
+    <string name="premium_plan_name">プレミアム</string>
+    <string name="premium_price">¥980 / 月</string>
+    <string name="premium_features_list">・全機能\n・無制限登録\n・優先サポート</string>
+    <string name="subscribe_google_pay">Google Payでプレミアムに登録</string>
+    <string name="subscription_terms">最初の1ヶ月は無料。その後月額¥980（税込）。いつでもキャンセル可能。</string>
+    <string name="subscribe_complete">プレミアムプランへの移行が完了しました</string>
+    <string name="billing_not_available">Google Play Billingを起動できません</string>
+    <string name="plan_not_found">プランが見つかりません（Play Console設定をご確認ください）</string>
+
+    <!-- ペイウォールダイアログ -->
+    <string name="paywall_title">無料期間が終了しました</string>
+    <string name="paywall_message">荷物の新規登録にはプレミアムプランへの移行が必要です。\n\n最初の1ヶ月は無料でお試しいただけます。</string>
+    <string name="go_premium">プレミアムに登録</string>
+
+    <!-- 再配達ダイアログ -->
+    <string name="redelivery_title">再配達しますか？</string>
+    <string name="redelivery_confirm">再配達</string>
+
+    <!-- フィードバック -->
+    <string name="feedback_label">フィードバック内容</string>
+    <string name="feedback_placeholder">例）地図ピンをもう少し大きくしたい</string>
+    <string name="feedback_sent">送信予定として保存しました。API連携後に運営へ送信します。</string>
+
+    <!-- お知らせ詳細 -->
+    <string name="announcement_important">重要</string>
+    <string name="announcement_important_text">Google Mapsを主地図として開発中。ZENRIN APIは将来差し替え予定。</string>
+    <string name="announcement_update">更新</string>
+    <string name="announcement_update_text">完了・会社へ持ち戻りの荷物は地図ピンから非表示。</string>
+    <string name="announcement_guide">案内</string>
+    <string name="announcement_guide_text">終了処理で1日の件数をカレンダーへ登録。</string>
+
+    <!-- 設定詳細 -->
+    <string name="settings_map">地図</string>
+    <string name="settings_map_text">Google Maps表示、時間帯別ピン、コンパス、ズーム</string>
+    <string name="settings_navi">ナビ</string>
+    <string name="settings_navi_text">ピンタップ後にGoogleマップナビを起動</string>
+    <string name="settings_notification">通知</string>
+    <string name="settings_notification_text">運営お知らせ・時間帯指定アラートを予定</string>
+
+    <!-- ヘルプ -->
+    <string name="help_contact">問い合わせ</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">FAQ</string>
+    <string name="help_faq_text">住所OCR、郵便番号検索、定期コース、バックアップ</string>
+    <string name="help_emergency">緊急時</string>
+    <string name="help_emergency_text">所属会社の運行管理者へ連絡</string>
+
+    <!-- 利用規約 -->
+    <string name="terms_purpose">本アプリは配送業務の補助を目的とします。実際の交通法規・配送会社の運用ルールを優先してください。</string>
+    <string name="terms_privacy">住所・氏名・電話番号などの個人情報は、配送業務に必要な範囲でのみ扱います。</string>
+    <string name="terms_maps">Google Mapsおよび将来のZENRIN API利用時は、各サービスの利用規約に従います。</string>
+
+    <!-- OCR / 音声 -->
+    <string name="ocr_no_image">画像を取得できませんでした</string>
+    <string name="ocr_not_retrieved">未取得</string>
+    <string name="ocr_failed">住所を読み取れませんでした</string>
+    <string name="ocr_needs_check">要確認</string>
+    <string name="camera_no_permission">カメラ権限が許可されていません</string>
+    <string name="camera_permission_check">権限確認</string>
+    <string name="voice_prompt">届け先住所を話してください</string>
+    <string name="memo_added_from_registration">荷物登録画面から追加</string>
+
+    <!-- 凡例 -->
+    <string name="legend_none">なし</string>
+    <string name="legend_morning">午前</string>
+    <string name="legend_afternoon">午後</string>
+    <string name="legend_evening">夜間</string>
+    <string name="legend_absent">不在</string>
+</resources>

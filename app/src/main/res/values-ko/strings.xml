@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 일반 -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← 뒤로</string>
+    <string name="close">닫기</string>
+    <string name="cancel">취소</string>
+    <string name="save">저장</string>
+    <string name="register">등록</string>
+    <string name="search">검색</string>
+    <string name="copy">복사</string>
+    <string name="share">공유</string>
+    <string name="import_label">가져오기</string>
+    <string name="delete">삭제</string>
+    <string name="edit">편집</string>
+    <string name="menu">메뉴</string>
+    <string name="send_to_ops">운영팀에 전송</string>
+
+    <!-- 로그인 상태 -->
+    <string name="logged_in">로그인 중</string>
+    <string name="not_logged_in">미로그인</string>
+    <string name="login">로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="guest_mode">게스트 모드</string>
+    <string name="driver_mode_logged_in">배송원 모드 / 로그인 중</string>
+
+    <!-- 홈 화면 -->
+    <string name="delivery_plan_overview">배송 계획 개요</string>
+    <string name="notice">공지</string>
+    <string name="hide_summary">집계 숨기기</string>
+    <string name="show_summary">집계 표시</string>
+    <string name="all_time_windows">전체</string>
+    <string name="all_time_windows_filter">전체 시간대</string>
+    <string name="tagline">오늘의 배송을 가볍고 정확하게</string>
+
+    <!-- 요약 필터 -->
+    <string name="remaining">남은 건</string>
+    <string name="completed">완료</string>
+    <string name="absent">부재</string>
+
+    <!-- 사이드 메뉴 -->
+    <string name="package_registration_menu">화물 등록</string>
+    <string name="package_registration_desc">주소·OCR·음성 입력으로 화물 추가</string>
+    <string name="course_menu">집하 / 정기 노선</string>
+    <string name="course_desc">A~D 노선을 오늘의 배송에 불러오기</string>
+    <string name="delivery_list_menu">배송 목록</string>
+    <string name="delivery_list_desc">남은 건·완료·부재를 카드로 확인</string>
+    <string name="backup_menu">백업</string>
+    <string name="backup_desc">주소 데이터 복사·공유·복원</string>
+    <string name="account_menu">사용자 계정 정보</string>
+    <string name="account_desc">배송원 이름·거점·연락처 확인</string>
+    <string name="support_menu">공지 / 마감 처리</string>
+    <string name="support_desc">지원 및 캘린더 기록은 여기서</string>
+    <string name="fullscreen_map_hint">지도는 전체 화면 표시. 필요한 작업은 왼쪽 메뉴에서 호출합니다.</string>
+
+    <!-- 지도 버튼 -->
+    <string name="current_location">현재 위치</string>
+    <string name="navi">내비</string>
+    <string name="rotate">회전</string>
+    <string name="marker_current_location">현재 위치</string>
+    <string name="marker_route_base_point">경로 계산 기준점</string>
+
+    <!-- 패널 제목 -->
+    <string name="panel_delivery_list">배송 목록</string>
+    <string name="panel_courses">집하 / 정기 노선</string>
+    <string name="panel_backup">백업</string>
+
+    <!-- 배송 목록 화면 -->
+    <string name="package_count">%1$d건</string>
+    <string name="summary_list_title">%1$s 목록</string>
+    <string name="showing_count">%1$d건 표시 중</string>
+    <string name="no_packages">해당하는 화물이 없습니다.</string>
+    <string name="absent_redelivery_hint">부재 항목을 탭하면 재배송 확인이 표시됩니다.</string>
+
+    <!-- 지원 허브 화면 -->
+    <string name="support_hub_title">공지</string>
+    <string name="account_support_title">계정 및 지원</string>
+    <string name="account_support_desc">운영 연락·설정·문의를 통합 관리</string>
+    <string name="detail_link">자세히 보기 →</string>
+
+    <!-- 마감 처리 -->
+    <string name="end_of_day_title">마감 처리</string>
+    <string name="end_of_day_desc">캘린더 기록 후 오늘의 배송 데이터는 0건으로 초기화됩니다. 필요한 경우 먼저 주소 데이터 백업을 실행하세요.</string>
+    <string name="backup_link">▶ 주소 데이터 백업하기（여기）</string>
+    <string name="delivered_stops">배송 건수</string>
+    <string name="delivered_packages">배송 개수</string>
+    <string name="returned_packages">반송</string>
+    <string name="finish_day_button">마감 처리 및 캘린더 입력·초기화</string>
+
+    <!-- 정기 노선 -->
+    <string name="regular_courses_title">정기 배송 노선</string>
+    <string name="course_address_hint">주소 추가는 화물 등록 화면에서 노선을 선택하여 진행합니다.</string>
+    <string name="course_chip_label">%1$s 노선</string>
+    <string name="course_summary">%1$s / 등록 주소 %2$d건</string>
+    <string name="load_course_button">%1$s 노선을 오늘의 배송에 불러오기</string>
+
+    <!-- 백업 -->
+    <string name="backup_data_title">주소 데이터 관리</string>
+    <string name="backup_data_desc">정기 노선 이외의 주소도 백업·가져오기할 수 있습니다.</string>
+    <string name="create_backup">백업 생성</string>
+    <string name="share_title">HAKOBUN 주소 백업</string>
+    <string name="share_chooser">백업 공유</string>
+    <string name="import_data_label">가져오기 데이터</string>
+    <string name="import_placeholder">송장번호,수취인,주소,시간대,메모</string>
+
+    <!-- 지도 시간대 필터 -->
+    <string name="map_time_window_title">지도 표시: 시간대별 화물</string>
+    <string name="map_time_window_desc">시간 미지정은 검정 핀, 시간 지정은 시간대 색상으로 표시합니다.</string>
+
+    <!-- 배송 지도 -->
+    <string name="delivery_map_title">배송 지도</string>
+    <string name="delivery_map_desc">현재 위치에서 가까운 순으로 번호 지정</string>
+    <string name="go_to_selected_pin">선택 핀으로</string>
+    <string name="start_navi">내비 시작</string>
+    <string name="next_candidate">다음 후보: %1$s / %2$s</string>
+
+    <!-- 화물 상세 -->
+    <string name="package_info">화물 %1$s / %2$s 사이즈 / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">시간대 %1$s / 착불 %2$s / 택배함 %3$s</string>
+    <string name="status_complete">완료</string>
+    <string name="status_absent">부재</string>
+    <string name="status_return">반송</string>
+    <string name="yes">있음</string>
+    <string name="no">없음</string>
+
+    <!-- 화물 편집 화면 -->
+    <string name="package_edit_title">화물 편집</string>
+    <string name="recipient_info_title">수취인 정보</string>
+    <string name="tracking_code_label">송장번호</string>
+    <string name="address_label">주소</string>
+    <string name="recipient_field_label">수취인 이름</string>
+    <string name="recipient_placeholder">수취인 이름 입력</string>
+    <string name="memo_field_label">메모</string>
+    <string name="memo_placeholder">메모 입력</string>
+    <string name="delivery_status_title">배송 상태</string>
+    <string name="time_window_title">시간대</string>
+    <string name="navigation_title">내비게이션</string>
+    <string name="start_navi_button">내비 실행</string>
+
+    <!-- 화물 등록 화면 -->
+    <string name="package_registration_title">화물 등록</string>
+    <string name="delivery_addresses_title">배송지 주소</string>
+    <string name="address_count_fraction">%1$d/5건</string>
+    <string name="add_address_hint">아래 입력 영역에서 주소를 추가하세요</string>
+    <string name="address_index_label">%1$d번째</string>
+    <string name="open_map">지도</string>
+    <string name="add_address_section">주소 추가</string>
+    <string name="camera">카메라</string>
+    <string name="voice">음성</string>
+    <string name="registration_target">등록 대상</string>
+    <string name="normal_package">일반 화물</string>
+    <string name="course_target_hint">%1$s 노선을 선택하면 이 주소는 정기 집하 그룹에 저장됩니다.</string>
+    <string name="normal_target_hint">일반 화물을 선택하면 오늘의 배송으로 지도에 등록됩니다.</string>
+    <string name="postal_code_label">우편번호</string>
+    <string name="postal_placeholder">예) 1000005</string>
+    <string name="manual_input_label">직접 입력</string>
+    <string name="manual_placeholder">예) 도쿄도 치요다구 마루노우치 1-1-1</string>
+    <string name="add_to_course_button">%1$s 노선에 주소 추가</string>
+    <string name="add_manual_button">직접 입력한 주소 추가</string>
+    <string name="course_saved_message">%1$s 노선에 주소를 추가했습니다</string>
+    <string name="register_count_button">%1$d건을 지도에 등록</string>
+    <string name="add_address_first">주소를 1건 이상 추가하세요</string>
+    <string name="geocoding_hint">주소 지오코딩 중...</string>
+    <string name="drag_pin_hint">핀을 드래그하여 위치를 조정할 수 있습니다</string>
+
+    <!-- 주소 입력 패널 -->
+    <string name="address_input_title">주소 입력</string>
+    <string name="address_input_desc">카메라·음성·우편번호로 주소 후보 생성</string>
+    <string name="register_package_button">화물 등록</string>
+    <string name="clear_input">입력 초기화</string>
+
+    <!-- 사용자 계정 화면 -->
+    <string name="user_account_title">사용자 계정 정보</string>
+    <string name="profile_title">프로필</string>
+    <string name="driver_name_label">배송원 이름 *</string>
+    <string name="driver_name_placeholder">예) 홍 길동</string>
+    <string name="base_label">소속 거점</string>
+    <string name="base_placeholder">예) 서울 영업소</string>
+    <string name="contact_label">연락처（전화）</string>
+    <string name="contact_placeholder">예) 010-0000-0000</string>
+    <string name="email_label">이메일 주소</string>
+    <string name="email_placeholder">예) driver@example.com</string>
+    <string name="save_changes">변경 저장</string>
+    <string name="register_profile">등록하기</string>
+    <string name="info_driver_name">배송원 이름</string>
+    <string name="info_base">소속 거점</string>
+    <string name="info_contact">연락처</string>
+    <string name="info_email">이메일</string>
+    <string name="info_login_status">로그인 상태</string>
+    <string name="not_set">미설정</string>
+
+    <!-- 플랜 카드 -->
+    <string name="plan_billing_title">플랜 및 결제</string>
+    <string name="premium_plan">✓ 프리미엄 플랜</string>
+    <string name="premium_features">모든 기능을 이용할 수 있습니다.</string>
+    <string name="free_trial_expired">⚠ 무료 기간 종료</string>
+    <string name="free_trial_active">무료 체험 중</string>
+    <string name="trial_remaining_days">남은 %1$d일</string>
+    <string name="trial_auto_upgrade">종료 후 프리미엄 플랜으로 자동 이전됩니다.</string>
+    <string name="trial_after_register">등록 후 1개월간 무료로 이용하실 수 있습니다.</string>
+    <string name="free_plan_name">무료</string>
+    <string name="free_trial_period">1개월 체험</string>
+    <string name="free_features">· 기본 기능\n· 화물 5건 등록\n· 백업</string>
+    <string name="premium_plan_name">프리미엄</string>
+    <string name="premium_price">¥980 / 월</string>
+    <string name="premium_features_list">· 전체 기능\n· 무제한 등록\n· 우선 지원</string>
+    <string name="subscribe_google_pay">Google Pay로 프리미엄 등록</string>
+    <string name="subscription_terms">첫 달 무료, 이후 월 ¥980（세금 포함）. 언제든지 취소 가능.</string>
+    <string name="subscribe_complete">프리미엄 플랜으로 이전이 완료되었습니다</string>
+    <string name="billing_not_available">Google Play Billing을 실행할 수 없습니다</string>
+    <string name="plan_not_found">플랜을 찾을 수 없습니다（Play Console 설정을 확인하세요）</string>
+
+    <!-- 페이월 다이얼로그 -->
+    <string name="paywall_title">무료 기간이 종료되었습니다</string>
+    <string name="paywall_message">새 화물을 등록하려면 프리미엄 플랜으로 이전해야 합니다.\n\n첫 달은 무료로 체험하실 수 있습니다.</string>
+    <string name="go_premium">프리미엄 등록</string>
+
+    <!-- 재배송 다이얼로그 -->
+    <string name="redelivery_title">재배송하시겠습니까?</string>
+    <string name="redelivery_confirm">재배송</string>
+
+    <!-- 피드백 -->
+    <string name="feedback_label">피드백 내용</string>
+    <string name="feedback_placeholder">예) 지도 핀을 좀 더 크게 해주세요</string>
+    <string name="feedback_sent">전송 예정으로 저장되었습니다. API 연동 후 운영팀에 전송됩니다.</string>
+
+    <!-- 공지 상세 -->
+    <string name="announcement_important">중요</string>
+    <string name="announcement_important_text">Google Maps를 주요 지도로 개발 중. ZENRIN API는 향후 교체 예정.</string>
+    <string name="announcement_update">업데이트</string>
+    <string name="announcement_update_text">완료·회사 반송 화물은 지도 핀에서 숨김 처리됩니다.</string>
+    <string name="announcement_guide">안내</string>
+    <string name="announcement_guide_text">마감 처리로 하루 건수를 캘린더에 등록합니다.</string>
+
+    <!-- 설정 상세 -->
+    <string name="settings_map">지도</string>
+    <string name="settings_map_text">Google Maps 표시, 시간대별 핀, 나침반, 줌</string>
+    <string name="settings_navi">내비게이션</string>
+    <string name="settings_navi_text">핀 탭 후 Google 지도 내비 실행</string>
+    <string name="settings_notification">알림</string>
+    <string name="settings_notification_text">운영 공지·시간대 알림 예정</string>
+
+    <!-- 도움말 -->
+    <string name="help_contact">문의</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">FAQ</string>
+    <string name="help_faq_text">주소 OCR, 우편번호 검색, 정기 노선, 백업</string>
+    <string name="help_emergency">긴급 시</string>
+    <string name="help_emergency_text">소속 회사 운행 관리자에게 연락</string>
+
+    <!-- 이용약관 -->
+    <string name="terms_purpose">이 앱은 배송 업무 지원을 목적으로 합니다. 실제 교통법규·배송회사 운영 규칙을 우선하세요.</string>
+    <string name="terms_privacy">주소·성명·전화번호 등 개인정보는 배송 업무에 필요한 범위 내에서만 취급합니다.</string>
+    <string name="terms_maps">Google Maps 및 향후 ZENRIN API 이용 시 각 서비스의 이용약관을 따릅니다.</string>
+
+    <!-- OCR / 음성 -->
+    <string name="ocr_no_image">이미지를 가져올 수 없었습니다</string>
+    <string name="ocr_not_retrieved">미취득</string>
+    <string name="ocr_failed">주소를 인식할 수 없었습니다</string>
+    <string name="ocr_needs_check">확인 필요</string>
+    <string name="camera_no_permission">카메라 권한이 허용되지 않았습니다</string>
+    <string name="camera_permission_check">권한 확인</string>
+    <string name="voice_prompt">배송지 주소를 말씀해 주세요</string>
+    <string name="memo_added_from_registration">화물 등록 화면에서 추가</string>
+
+    <!-- 범례 -->
+    <string name="legend_none">없음</string>
+    <string name="legend_morning">오전</string>
+    <string name="legend_afternoon">오후</string>
+    <string name="legend_evening">야간</string>
+    <string name="legend_absent">부재</string>
+</resources>

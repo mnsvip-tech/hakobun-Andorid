@@ -1,5 +1,7 @@
 package com.delivery.navigator.ui
 
+import androidx.compose.ui.res.stringResource
+import com.delivery.navigator.R
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -251,16 +253,16 @@ fun HakobunApp() {
         if (showPaywallDialog) {
             AlertDialog(
                 onDismissRequest = { showPaywallDialog = false },
-                title = { Text("無料期間が終了しました") },
-                text = { Text("荷物の新規登録にはプレミアムプランへの移行が必要です。\n\n最初の1ヶ月は無料でお試しいただけます。") },
+                title = { Text(stringResource(R.string.paywall_title)) },
+                text = { Text(stringResource(R.string.paywall_message)) },
                 confirmButton = {
                     Button(onClick = {
                         showPaywallDialog = false
                         activeMenuItem = AccountMenuItem.Account
-                    }) { Text("プレミアムに登録") }
+                    }) { Text(stringResource(R.string.go_premium)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showPaywallDialog = false }) { Text("キャンセル") }
+                    TextButton(onClick = { showPaywallDialog = false }) { Text(stringResource(R.string.cancel)) }
                 }
             )
         }
@@ -268,7 +270,7 @@ fun HakobunApp() {
         redeliveryCandidate?.let { packageItem ->
             AlertDialog(
                 onDismissRequest = { redeliveryCandidateCode = null },
-                title = { Text("再配達しますか？") },
+                title = { Text(stringResource(R.string.redelivery_title)) },
                 text = { Text("${packageItem.recipient}\n${packageItem.address}") },
                 confirmButton = {
                     Button(
@@ -281,10 +283,10 @@ fun HakobunApp() {
                             selectedPackageCode = packageItem.trackingCode
                             redeliveryCandidateCode = null
                         }
-                    ) { Text("再配達") }
+                    ) { Text(stringResource(R.string.redelivery_confirm)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { redeliveryCandidateCode = null }) { Text("キャンセル") }
+                    TextButton(onClick = { redeliveryCandidateCode = null }) { Text(stringResource(R.string.cancel)) }
                 }
             )
         }
@@ -600,29 +602,29 @@ private fun MapHomeChrome(
             ) {
                 TextButton(onClick = onOpenMenu) { Text("☰", style = MaterialTheme.typography.titleLarge) }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("配達プラン概要", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                    Text(if (isLoggedIn) "ログイン中" else "未ログイン", color = BrandBlue, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.delivery_plan_overview), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(if (isLoggedIn) stringResource(R.string.logged_in) else stringResource(R.string.not_logged_in), color = BrandBlue, style = MaterialTheme.typography.labelSmall)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = onOpenSupport) { Text("お知らせ") }
-                    Button(onClick = onRegisterPackage, modifier = Modifier.height(38.dp)) { Text("登録") }
+                    TextButton(onClick = onOpenSupport) { Text(stringResource(R.string.notice)) }
+                    Button(onClick = onRegisterPackage, modifier = Modifier.height(38.dp)) { Text(stringResource(R.string.register)) }
                 }
             }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(onClick = onToggleMapControls, modifier = Modifier.height(36.dp)) {
-                Text(if (showMapControls) "集計を非表示" else "集計を表示")
+                Text(if (showMapControls) stringResource(R.string.hide_summary) else stringResource(R.string.show_summary))
             }
         }
         if (showMapControls) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CompactMetricCard("残り", remaining.toString(), selectedFilter == PackageSummaryFilter.Remaining, Modifier.weight(1f)) {
+                CompactMetricCard(stringResource(R.string.remaining), remaining.toString(), selectedFilter == PackageSummaryFilter.Remaining, Modifier.weight(1f)) {
                     onFilterSelected(PackageSummaryFilter.Remaining)
                 }
-                CompactMetricCard("完了", completed.toString(), selectedFilter == PackageSummaryFilter.Completed, Modifier.weight(1f)) {
+                CompactMetricCard(stringResource(R.string.completed), completed.toString(), selectedFilter == PackageSummaryFilter.Completed, Modifier.weight(1f)) {
                     onFilterSelected(PackageSummaryFilter.Completed)
                 }
-                CompactMetricCard("不在", absent.toString(), selectedFilter == PackageSummaryFilter.Absent, Modifier.weight(1f)) {
+                CompactMetricCard(stringResource(R.string.absent), absent.toString(), selectedFilter == PackageSummaryFilter.Absent, Modifier.weight(1f)) {
                     onFilterSelected(PackageSummaryFilter.Absent)
                 }
             }
@@ -636,7 +638,7 @@ private fun MapHomeChrome(
                         FilterChip(
                             selected = selectedMapTimeWindow == window,
                             onClick = { onMapTimeWindowSelected(window) },
-                            label = { Text(if (window == TimeWindow.All) "全て" else window.label) }
+                            label = { Text(if (window == TimeWindow.All) stringResource(R.string.all_time_windows) else window.label) }
                         )
                     }
                 }
@@ -682,7 +684,7 @@ private fun HomeSideMenu(
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = onClose) { Text("×", style = MaterialTheme.typography.headlineSmall) }
-                Text("メニュー", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.menu), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
             }
             Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFE7F6FF)), shape = RoundedCornerShape(18.dp)) {
                 Column(
@@ -692,17 +694,17 @@ private fun HomeSideMenu(
                 ) {
                     StorkMascot(modifier = Modifier.size(58.dp))
                     Text("HAKOBUN", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-                    Text(if (isLoggedIn) "配送員モード / ログイン中" else "ゲストモード", color = MutedText)
+                    Text(if (isLoggedIn) stringResource(R.string.driver_mode_logged_in) else stringResource(R.string.guest_mode), color = MutedText)
                 }
             }
-            SideMenuCard("荷物登録", "住所・OCR・音声入力から荷物を追加", "＋") { onRegisterPackage() }
-            SideMenuCard("集荷 / 定期コース", "A〜Dコースを今日の配達へ読み込み", "◇") { onOpenPanel(HomePanel.Courses) }
-            SideMenuCard("配達リスト", "残り・完了・不在をカードで確認", "☷") { onOpenPanel(HomePanel.Packages) }
-            SideMenuCard("バックアップ", "住所データのコピー・共有・復元", "↻") { onOpenPanel(HomePanel.Backup) }
-            SideMenuCard("ユーザーアカウント情報", "ドライバー名・拠点・連絡先を確認", "👤") { onOpenAccount() }
-            SideMenuCard("お知らせ / 終了処理", "サポートとカレンダー転記はこちら", "i") { onOpenSupport() }
+            SideMenuCard(stringResource(R.string.package_registration_menu), stringResource(R.string.package_registration_desc), "＋") { onRegisterPackage() }
+            SideMenuCard(stringResource(R.string.course_menu), stringResource(R.string.course_desc), "◇") { onOpenPanel(HomePanel.Courses) }
+            SideMenuCard(stringResource(R.string.delivery_list_menu), stringResource(R.string.delivery_list_desc), "☷") { onOpenPanel(HomePanel.Packages) }
+            SideMenuCard(stringResource(R.string.backup_menu), stringResource(R.string.backup_desc), "↻") { onOpenPanel(HomePanel.Backup) }
+            SideMenuCard(stringResource(R.string.account_menu), stringResource(R.string.account_desc), "👤") { onOpenAccount() }
+            SideMenuCard(stringResource(R.string.support_menu), stringResource(R.string.support_desc), "i") { onOpenSupport() }
             Spacer(modifier = Modifier.weight(1f))
-            Text("地図は全画面表示。必要な操作だけ左メニューから呼び出します。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.fullscreen_map_hint), color = MutedText, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -760,14 +762,14 @@ private fun HomePanelSheet(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     when (panel) {
-                        HomePanel.Packages -> "配達リスト"
-                        HomePanel.Courses -> "集荷 / 定期コース"
-                        HomePanel.Backup -> "バックアップ"
+                        HomePanel.Packages -> stringResource(R.string.panel_delivery_list)
+                        HomePanel.Courses -> stringResource(R.string.panel_courses)
+                        HomePanel.Backup -> stringResource(R.string.panel_backup)
                     },
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
-                TextButton(onClick = onClose) { Text("閉じる") }
+                TextButton(onClick = onClose) { Text(stringResource(R.string.close)) }
             }
             when (panel) {
                 HomePanel.Packages -> PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
@@ -843,7 +845,7 @@ private fun FullScreenDeliveryMap(
                 title = "現在地",
                 snippet = "ルート計算の基準点",
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-            )
+            ) // marker title/snippet are shown in Google Maps UI (not Composable Text), kept as-is
             if (drivingRoutePoints.isNotEmpty()) {
                 Polyline(
                     points = drivingRoutePoints,
@@ -877,11 +879,11 @@ private fun FullScreenDeliveryMap(
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            FloatingMapButton("現在地") {
+            FloatingMapButton(stringResource(R.string.current_location)) {
                 if (mapLoaded) cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(origin, 12.5f))
             }
             selectedPackage?.let { item ->
-                FloatingMapButton("ナビ") { onNavigate(item) }
+                FloatingMapButton(stringResource(R.string.navi)) { onNavigate(item) }
             }
         }
         Row(
@@ -992,39 +994,39 @@ private fun Header(
                 StorkMascot(modifier = Modifier.size(58.dp))
                 Column {
                     Text("HAKOBUN", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text("今日の配達を軽く、正確に", color = MutedText)
-                    Text(if (isLoggedIn) "ログイン中" else "未ログイン", color = BrandBlue, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.tagline), color = MutedText)
+                    Text(if (isLoggedIn) stringResource(R.string.logged_in) else stringResource(R.string.not_logged_in), color = BrandBlue, style = MaterialTheme.typography.labelMedium)
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
                 Button(
                     onClick = onOpenMenu,
                     modifier = Modifier.height(40.dp)
-                ) { Text("お知らせ") }
+                ) { Text(stringResource(R.string.notice)) }
                 Spacer(modifier = Modifier.height(6.dp))
                 Button(
                     onClick = onRegisterPackage,
                     modifier = Modifier.height(40.dp)
-                ) { Text("荷物登録") }
+                ) { Text(stringResource(R.string.package_registration_menu)) }
             }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MetricCard(
-                "残り",
+                stringResource(R.string.remaining),
                 remaining.toString(),
                 Modifier.weight(1f),
                 selected = selectedFilter == PackageSummaryFilter.Remaining,
                 onClick = { onFilterSelected(PackageSummaryFilter.Remaining) }
             )
             MetricCard(
-                "完了",
+                stringResource(R.string.completed),
                 completed.toString(),
                 Modifier.weight(1f),
                 selected = selectedFilter == PackageSummaryFilter.Completed,
                 onClick = { onFilterSelected(PackageSummaryFilter.Completed) }
             )
             MetricCard(
-                "不在",
+                stringResource(R.string.absent),
                 absent.toString(),
                 Modifier.weight(1f),
                 selected = selectedFilter == PackageSummaryFilter.Absent,
@@ -1052,13 +1054,13 @@ private fun SummaryFilteredPackagePanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("${filter.label}一覧", fontWeight = FontWeight.Bold)
-                Text("${packages.size}件を表示中", color = MutedText)
+                Text(stringResource(R.string.summary_list_title, filter.label), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.showing_count, packages.size), color = MutedText)
             }
-            TextButton(onClick = onClear) { Text("閉じる") }
+            TextButton(onClick = onClear) { Text(stringResource(R.string.close)) }
         }
         if (packages.isEmpty()) {
-            Text("該当する荷物はありません。", color = MutedText)
+            Text(stringResource(R.string.no_packages), color = MutedText)
         } else {
             PackageList(
                 packages = packages,
@@ -1068,7 +1070,7 @@ private fun SummaryFilteredPackagePanel(
             )
         }
         if (filter == PackageSummaryFilter.Absent) {
-            Text("不在の項目をタップすると再配達確認を表示します。", color = MutedText)
+            Text(stringResource(R.string.absent_redelivery_hint), color = MutedText)
         }
     }
 }
@@ -1098,8 +1100,8 @@ private fun SupportHubScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
-                Text("お知らせ", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.support_hub_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.width(64.dp))
             }
             Box {
@@ -1140,10 +1142,10 @@ private fun AccountMenuPanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("アカウント・サポート", fontWeight = FontWeight.Bold)
-                Text("運営連絡、設定、問い合わせをまとめて管理", color = MutedText)
+                Text(stringResource(R.string.account_support_title), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.account_support_desc), color = MutedText)
             }
-            Button(onClick = onLoginToggle) { Text(if (isLoggedIn) "ログアウト" else "ログイン") }
+            Button(onClick = onLoginToggle) { Text(if (isLoggedIn) stringResource(R.string.logout) else stringResource(R.string.login)) }
         }
         AccountMenuItem.entries.filter { it != AccountMenuItem.Account }.chunked(2).forEach { rowItems ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1161,7 +1163,7 @@ private fun AccountMenuPanel(
                         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                             Text(item.title, fontWeight = FontWeight.Bold)
                             Text(item.description, color = MutedText, style = MaterialTheme.typography.labelSmall)
-                            Text("詳細を見る →", color = BrandPurple, style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.detail_link), color = BrandPurple, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -1274,9 +1276,9 @@ private fun UserAccountScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
-                Text("ユーザーアカウント情報", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                TextButton(onClick = onLoginToggle) { Text(if (isLoggedIn) "ログアウト" else "ログイン") }
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.user_account_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                TextButton(onClick = onLoginToggle) { Text(if (isLoggedIn) stringResource(R.string.logout) else stringResource(R.string.login)) }
             }
 
             // プロフィールカード
@@ -1286,16 +1288,16 @@ private fun UserAccountScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("プロフィール", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.profile_title), fontWeight = FontWeight.Bold)
                     if (userProfile.isRegistered && !isEditing) {
-                        TextButton(onClick = { isEditing = true }) { Text("編集") }
+                        TextButton(onClick = { isEditing = true }) { Text(stringResource(R.string.edit)) }
                     }
                 }
                 if (isEditing) {
-                    LabeledField("ドライバー名 *", "例）田中 太郎", driverName) { driverName = it }
-                    LabeledField("所属拠点", "例）東京営業所", base) { base = it }
-                    LabeledField("連絡先（電話）", "例）090-0000-0000", contact) { contact = it }
-                    LabeledField("メールアドレス", "例）driver@example.com", email) { email = it }
+                    LabeledField(stringResource(R.string.driver_name_label), stringResource(R.string.driver_name_placeholder), driverName) { driverName = it }
+                    LabeledField(stringResource(R.string.base_label), stringResource(R.string.base_placeholder), base) { base = it }
+                    LabeledField(stringResource(R.string.contact_label), stringResource(R.string.contact_placeholder), contact) { contact = it }
+                    LabeledField(stringResource(R.string.email_label), stringResource(R.string.email_placeholder), email) { email = it }
                     Button(
                         onClick = {
                             val trialStart = if (!userProfile.isRegistered) System.currentTimeMillis() else userProfile.trialStartMillis
@@ -1311,19 +1313,19 @@ private fun UserAccountScreen(
                         },
                         enabled = driverName.isNotBlank(),
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text(if (userProfile.isRegistered) "変更を保存" else "登録する") }
+                    ) { Text(if (userProfile.isRegistered) stringResource(R.string.save_changes) else stringResource(R.string.register_profile)) }
                 } else {
-                    InfoRow("ドライバー名", userProfile.driverName.ifBlank { "未設定" })
-                    InfoRow("所属拠点", userProfile.base.ifBlank { "未設定" })
-                    InfoRow("連絡先", userProfile.contact.ifBlank { "未設定" })
-                    InfoRow("メール", userProfile.email.ifBlank { "未設定" })
-                    InfoRow("ログイン状態", if (isLoggedIn) "ログイン中" else "未ログイン")
+                    InfoRow(stringResource(R.string.info_driver_name), userProfile.driverName.ifBlank { stringResource(R.string.not_set) })
+                    InfoRow(stringResource(R.string.info_base), userProfile.base.ifBlank { stringResource(R.string.not_set) })
+                    InfoRow(stringResource(R.string.info_contact), userProfile.contact.ifBlank { stringResource(R.string.not_set) })
+                    InfoRow(stringResource(R.string.info_email), userProfile.email.ifBlank { stringResource(R.string.not_set) })
+                    InfoRow(stringResource(R.string.info_login_status), if (isLoggedIn) stringResource(R.string.logged_in) else stringResource(R.string.not_logged_in))
                 }
             }
 
             // プランカード
             WhiteCard {
-                Text("プランと請求", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.plan_billing_title), fontWeight = FontWeight.Bold)
                 if (isPremium) {
                     Box(
                         modifier = Modifier.fillMaxWidth()
@@ -1332,8 +1334,8 @@ private fun UserAccountScreen(
                             .padding(12.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("✓ プレミアムプラン", color = BrandBlue, fontWeight = FontWeight.Bold)
-                            Text("すべての機能が利用できます。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.premium_plan), color = BrandBlue, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.premium_features), color = MutedText, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 } else {
@@ -1345,15 +1347,15 @@ private fun UserAccountScreen(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                if (isFreeExpired) "⚠ 無料期間終了" else "無料トライアル中",
+                                if (isFreeExpired) stringResource(R.string.free_trial_expired) else stringResource(R.string.free_trial_active),
                                 color = if (isFreeExpired) Color(0xFFE53935) else BrandBlue,
                                 fontWeight = FontWeight.Bold
                             )
                             if (userProfile.isRegistered && !isFreeExpired) {
-                                Text("残り ${trialRemainingDays}日", fontWeight = FontWeight.Bold)
-                                Text("終了後、プレミアムプランへ自動移行します。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.trial_remaining_days, trialRemainingDays), fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.trial_auto_upgrade), color = MutedText, style = MaterialTheme.typography.bodySmall)
                             } else if (!userProfile.isRegistered) {
-                                Text("登録後、1ヶ月間無料でご利用いただけます。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -1366,9 +1368,9 @@ private fun UserAccountScreen(
                                 .padding(12.dp)
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("無料", fontWeight = FontWeight.Bold)
-                                Text("1ヶ月トライアル", color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                                Text("・基本機能\n・荷物登録5件\n・バックアップ", style = MaterialTheme.typography.labelSmall, color = MutedText)
+                                Text(stringResource(R.string.free_plan_name), fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.free_trial_period), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.free_features), style = MaterialTheme.typography.labelSmall, color = MutedText)
                             }
                         }
                         Box(
@@ -1379,9 +1381,9 @@ private fun UserAccountScreen(
                                 .padding(12.dp)
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("プレミアム", fontWeight = FontWeight.Bold)
-                                Text("¥980 / 月", color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                                Text("・全機能\n・無制限登録\n・優先サポート", style = MaterialTheme.typography.labelSmall, color = MutedText)
+                                Text(stringResource(R.string.premium_plan_name), fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.premium_price), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.premium_features_list), style = MaterialTheme.typography.labelSmall, color = MutedText)
                             }
                         }
                     }
@@ -1390,10 +1392,10 @@ private fun UserAccountScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8))
                     ) {
-                        Text("Google Payでプレミアムに登録", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.subscribe_google_pay), color = Color.White, fontWeight = FontWeight.Bold)
                     }
                     Text(
-                        "最初の1ヶ月は無料。その後月額¥980（税込）。いつでもキャンセル可能。",
+                        stringResource(R.string.subscription_terms),
                         color = MutedText,
                         style = MaterialTheme.typography.labelSmall
                     )
@@ -1433,9 +1435,9 @@ private fun AccountMenuDetailScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
                 Text(item.title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-                TextButton(onClick = onLoginToggle) { Text(if (isLoggedIn) "ログアウト" else "ログイン") }
+                TextButton(onClick = onLoginToggle) { Text(if (isLoggedIn) stringResource(R.string.logout) else stringResource(R.string.login)) }
             }
             WhiteCard {
                 Text(item.description, color = MutedText)
@@ -1448,39 +1450,39 @@ private fun AccountMenuDetailScreen(
                                 feedbackSubmitted = false
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("フィードバック内容") },
-                            placeholder = { Text("例）地図ピンをもう少し大きくしたい") },
+                            label = { Text(stringResource(R.string.feedback_label)) },
+                            placeholder = { Text(stringResource(R.string.feedback_placeholder)) },
                             minLines = 4
                         )
                         Button(
                             onClick = { feedbackSubmitted = true },
                             enabled = feedbackText.isNotBlank(),
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("運営へ送信") }
+                        ) { Text(stringResource(R.string.send_to_ops)) }
                         if (feedbackSubmitted) {
-                            Text("送信予定として保存しました。API連携後に運営へ送信します。", color = SuccessGreen)
+                            Text(stringResource(R.string.feedback_sent), color = SuccessGreen)
                         }
                     }
                     AccountMenuItem.Announcements -> {
-                        InfoRow("重要", "Google Mapsを主地図として開発中。ZENRIN APIは将来差し替え予定。")
-                        InfoRow("更新", "完了・会社へ持ち戻りの荷物は地図ピンから非表示。")
-                        InfoRow("案内", "終了処理で1日の件数をカレンダーへ登録。")
+                        InfoRow(stringResource(R.string.announcement_important), stringResource(R.string.announcement_important_text))
+                        InfoRow(stringResource(R.string.announcement_update), stringResource(R.string.announcement_update_text))
+                        InfoRow(stringResource(R.string.announcement_guide), stringResource(R.string.announcement_guide_text))
                     }
                     AccountMenuItem.Account -> { /* UserAccountScreen で処理 */ }
                     AccountMenuItem.Settings -> {
-                        InfoRow("地図", "Google Maps表示、時間帯別ピン、コンパス、ズーム")
-                        InfoRow("ナビ", "ピンタップ後にGoogleマップナビを起動")
-                        InfoRow("通知", "運営お知らせ・時間帯指定アラートを予定")
+                        InfoRow(stringResource(R.string.settings_map), stringResource(R.string.settings_map_text))
+                        InfoRow(stringResource(R.string.settings_navi), stringResource(R.string.settings_navi_text))
+                        InfoRow(stringResource(R.string.settings_notification), stringResource(R.string.settings_notification_text))
                     }
                     AccountMenuItem.Help -> {
-                        InfoRow("問い合わせ", "help@hakobun.example")
-                        InfoRow("FAQ", "住所OCR、郵便番号検索、定期コース、バックアップ")
-                        InfoRow("緊急時", "所属会社の運行管理者へ連絡")
+                        InfoRow(stringResource(R.string.help_contact), stringResource(R.string.help_contact_value))
+                        InfoRow(stringResource(R.string.help_faq), stringResource(R.string.help_faq_text))
+                        InfoRow(stringResource(R.string.help_emergency), stringResource(R.string.help_emergency_text))
                     }
                     AccountMenuItem.Terms -> {
-                        Text("本アプリは配送業務の補助を目的とします。実際の交通法規・配送会社の運用ルールを優先してください。")
-                        Text("住所・氏名・電話番号などの個人情報は、配送業務に必要な範囲でのみ扱います。")
-                        Text("Google Mapsおよび将来のZENRIN API利用時は、各サービスの利用規約に従います。")
+                        Text(stringResource(R.string.terms_purpose))
+                        Text(stringResource(R.string.terms_privacy))
+                        Text(stringResource(R.string.terms_maps))
                     }
                 }
             }
@@ -1496,9 +1498,9 @@ private fun EndOfDayPanel(
 ) {
     val summary = calculateEndOfDaySummary(packages)
     WhiteCard {
-        Text("終了処理", fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.end_of_day_title), fontWeight = FontWeight.Bold)
         Text(
-            "カレンダー転記後、本日の配達データは0件にリセットされます。必要な方は先に住所データ管理のバックアップを実行してください。",
+            stringResource(R.string.end_of_day_desc),
             color = MutedText,
             style = MaterialTheme.typography.bodySmall
         )
@@ -1506,15 +1508,15 @@ private fun EndOfDayPanel(
             onClick = onGoToBackup,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("▶ 住所データをバックアップする（こちら）", color = BrandBlue)
+            Text(stringResource(R.string.backup_link), color = BrandBlue)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SummaryMetric("配達件数", summary.deliveredStops.toString(), Modifier.weight(1f))
-            SummaryMetric("配達個数", summary.deliveredPackages.toString(), Modifier.weight(1f))
-            SummaryMetric("持戻り", summary.returnedPackages.toString(), Modifier.weight(1f))
+            SummaryMetric(stringResource(R.string.delivered_stops), summary.deliveredStops.toString(), Modifier.weight(1f))
+            SummaryMetric(stringResource(R.string.delivered_packages), summary.deliveredPackages.toString(), Modifier.weight(1f))
+            SummaryMetric(stringResource(R.string.returned_packages), summary.returnedPackages.toString(), Modifier.weight(1f))
         }
         Button(onClick = { onFinishDay(summary) }, modifier = Modifier.fillMaxWidth()) {
-            Text("終了処理してカレンダー入力・リセット")
+            Text(stringResource(R.string.finish_day_button))
         }
     }
 }
@@ -1530,26 +1532,26 @@ private fun RegularCoursePanel(
     remember(onAddCourseAddress) { onAddCourseAddress }
 
     WhiteCard {
-        Text("定期配送コース", fontWeight = FontWeight.Bold)
-        Text("住所追加は荷物登録画面でコースを選んで行います。", color = MutedText)
+        Text(stringResource(R.string.regular_courses_title), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.course_address_hint), color = MutedText)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             courses.forEach { course ->
                 FilterChip(
                     selected = selectedCourseCode == course.code,
                     onClick = { selectedCourseCode = course.code },
-                    label = { Text("${course.code}コース") },
+                    label = { Text(stringResource(R.string.course_chip_label, course.code)) },
                     modifier = Modifier.weight(1f)
                 )
             }
         }
         selectedCourse?.let { course ->
-            Text("${course.displayName} / 登録住所 ${course.addresses.size}件", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.course_summary, course.displayName, course.addresses.size), fontWeight = FontWeight.Bold)
             Button(
                 onClick = { onLoadCourse(course) },
                 enabled = course.addresses.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("${course.code}コースを今日の配達へ読み込み")
+                Text(stringResource(R.string.load_course_button, course.code))
             }
             course.addresses.takeLast(5).forEach { item ->
                 TextBox("${item.recipient}\n${item.address}\n${item.timeWindow.label} / ${item.memo}")
@@ -1573,9 +1575,9 @@ private fun AddressBackupPanel(
         context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
     }
     WhiteCard {
-        Text("住所データ管理", fontWeight = FontWeight.Bold)
-        Text("定期コース以外の住所もバックアップ・インポートできます。", color = MutedText)
-        Button(onClick = onExport, modifier = Modifier.fillMaxWidth()) { Text("バックアップを作成") }
+        Text(stringResource(R.string.backup_data_title), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.backup_data_desc), color = MutedText)
+        Button(onClick = onExport, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.create_backup)) }
         if (backupText.isNotBlank()) {
             TextBox(backupText)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1586,7 +1588,7 @@ private fun AddressBackupPanel(
                         onClose()
                     },
                     modifier = Modifier.weight(1f)
-                ) { Text("コピー") }
+                ) { Text(stringResource(R.string.copy)) }
                 Button(
                     onClick = {
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -1598,22 +1600,22 @@ private fun AddressBackupPanel(
                         onClose()
                     },
                     modifier = Modifier.weight(1f)
-                ) { Text("共有") }
+                ) { Text(stringResource(R.string.share)) }
             }
         }
         OutlinedTextField(
             value = importText,
             onValueChange = onImportTextChange,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("インポートデータ") },
-            placeholder = { Text("伝票番号,届け先,住所,時間帯,メモ") },
+            label = { Text(stringResource(R.string.import_data_label)) },
+            placeholder = { Text(stringResource(R.string.import_placeholder)) },
             minLines = 2
         )
         Button(
             onClick = onImport,
             enabled = importText.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
-        ) { Text("インポート") }
+        ) { Text(stringResource(R.string.import_label)) }
     }
 }
 
@@ -1635,12 +1637,12 @@ private fun AddressInputPanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("住所入力", fontWeight = FontWeight.Bold)
-                Text("カメラ・音声・郵便番号から住所候補を作成", color = MutedText)
+                Text(stringResource(R.string.address_input_title), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.address_input_desc), color = MutedText)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onCameraScan) { Text("カメラ") }
-                Button(onClick = onVoiceInput) { Text("音声") }
+                Button(onClick = onCameraScan) { Text(stringResource(R.string.camera)) }
+                Button(onClick = onVoiceInput) { Text(stringResource(R.string.voice)) }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1648,20 +1650,20 @@ private fun AddressInputPanel(
                 value = postalCode,
                 onValueChange = onPostalCodeChange,
                 modifier = Modifier.weight(1f),
-                label = { Text("郵便番号") },
-                placeholder = { Text("例 1000005") },
+                label = { Text(stringResource(R.string.postal_code_label)) },
+                placeholder = { Text(stringResource(R.string.postal_placeholder)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-            Button(onClick = onPostalSearch, enabled = postalCode.length == 7) { Text("検索") }
+            Button(onClick = onPostalSearch, enabled = postalCode.length == 7) { Text(stringResource(R.string.search)) }
         }
         candidate?.let {
             val postalPrefix = it.postalCode.takeIf(String::isNotBlank)?.let { code -> "〒$code " }.orEmpty()
             TextBox("${it.sourceLabel} / ${it.confidenceLabel}\n$postalPrefix${it.address}")
         }
-        Button(onClick = onRegisterPackage, modifier = Modifier.fillMaxWidth()) { Text("荷物登録") }
+        Button(onClick = onRegisterPackage, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.register_package_button)) }
         if (postalCode.isNotEmpty() || candidate != null) {
-            TextButton(onClick = onClear) { Text("入力をクリア") }
+            TextButton(onClick = onClear) { Text(stringResource(R.string.clear_input)) }
         }
     }
 }
@@ -1678,8 +1680,8 @@ private fun TimeWindowFilters(selected: TimeWindow, onSelected: (TimeWindow) -> 
 @Composable
 private fun MapTimeWindowFilters(selected: TimeWindow, onSelected: (TimeWindow) -> Unit) {
     WhiteCard {
-        Text("地図表示: 時間帯別荷物", fontWeight = FontWeight.Bold)
-        Text("時間指定なしは黒ピン、時間指定ありは時間帯色で表示します。", color = MutedText)
+        Text(stringResource(R.string.map_time_window_title), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.map_time_window_desc), color = MutedText)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 TimeWindow.All,
@@ -1691,7 +1693,7 @@ private fun MapTimeWindowFilters(selected: TimeWindow, onSelected: (TimeWindow) 
                 FilterChip(
                     selected = selected == window,
                     onClick = { onSelected(window) },
-                    label = { Text(if (window == TimeWindow.All) "全時間帯" else window.label) }
+                    label = { Text(if (window == TimeWindow.All) stringResource(R.string.all_time_windows_filter) else window.label) }
                 )
             }
         }
@@ -1737,8 +1739,8 @@ private fun DeliveryGoogleMap(
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    Text("配達マップ", fontWeight = FontWeight.Bold)
-                    Text("時間指定荷物を現在地から近い順に採番", color = MutedText)
+                    Text(stringResource(R.string.delivery_map_title), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.delivery_map_desc), color = MutedText)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
@@ -1748,7 +1750,7 @@ private fun DeliveryGoogleMap(
                             cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(origin, 12.5f))
                         }
                     ) {
-                        Text("現在地")
+                        Text(stringResource(R.string.current_location))
                     }
                     Button(
                         enabled = mapLoaded,
@@ -1763,7 +1765,7 @@ private fun DeliveryGoogleMap(
                             )
                         }
                     ) {
-                        Text("回転")
+                        Text(stringResource(R.string.rotate))
                     }
                 }
             }
@@ -1838,15 +1840,15 @@ private fun DeliveryGoogleMap(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("選択ピンへ")
+                        Text(stringResource(R.string.go_to_selected_pin))
                     }
                     Button(onClick = { onNavigate(it) }, modifier = Modifier.weight(1f)) {
-                        Text("ナビ開始")
+                        Text(stringResource(R.string.start_navi))
                     }
                 }
             }
             routeStops.firstOrNull()?.deliveryPackage?.let {
-                Text("次の候補: ${it.recipient} / ${it.timeWindow.label}", color = MutedText)
+                Text(stringResource(R.string.next_candidate, it.recipient, it.timeWindow.label), color = MutedText)
             }
         }
     }
@@ -1867,13 +1869,13 @@ private fun PackageDetail(deliveryPackage: DeliveryPackage, onStatusChange: (Del
             }
             StatusPill(deliveryPackage.status)
         }
-        Text("荷物 ${deliveryPackage.trackingCode} / ${deliveryPackage.size}サイズ / ${deliveryPackage.colorLabel} / ${deliveryPackage.packageType}")
-        Text("時間帯 ${deliveryPackage.timeWindow.label} / 代引き ${yesNo(deliveryPackage.cod)} / 宅配BOX ${yesNo(deliveryPackage.hasLocker)}")
+        Text(stringResource(R.string.package_info, deliveryPackage.trackingCode, deliveryPackage.size, deliveryPackage.colorLabel, deliveryPackage.packageType))
+        Text(stringResource(R.string.package_time_cod_locker, deliveryPackage.timeWindow.label, yesNo(deliveryPackage.cod), yesNo(deliveryPackage.hasLocker)))
         Text(deliveryPackage.memo, color = MutedText)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { onStatusChange(DeliveryStatus.Completed) }) { Text("完了") }
-            Button(onClick = { onStatusChange(DeliveryStatus.Absent) }) { Text("不在") }
-            Button(onClick = { onStatusChange(DeliveryStatus.ReturnToCompany) }) { Text("持戻り") }
+            Button(onClick = { onStatusChange(DeliveryStatus.Completed) }) { Text(stringResource(R.string.status_complete)) }
+            Button(onClick = { onStatusChange(DeliveryStatus.Absent) }) { Text(stringResource(R.string.status_absent)) }
+            Button(onClick = { onStatusChange(DeliveryStatus.ReturnToCompany) }) { Text(stringResource(R.string.status_return)) }
             Button(
                 onClick = {
                     context.startActivity(
@@ -1884,7 +1886,7 @@ private fun PackageDetail(deliveryPackage: DeliveryPackage, onStatusChange: (Del
                         )
                     )
                 }
-            ) { Text("ナビ") }
+            ) { Text(stringResource(R.string.navi)) }
         }
     }
 }
@@ -1908,9 +1910,9 @@ private fun PackageListScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
-                Text("配達リスト", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-                Text("${packages.size}件", color = BrandBlue, fontWeight = FontWeight.Bold)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.panel_delivery_list), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.package_count, packages.size), color = BrandBlue, fontWeight = FontWeight.Bold)
             }
             Column(
                 modifier = Modifier
@@ -1989,8 +1991,8 @@ private fun PackageEditScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
-                Text("荷物編集", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.package_edit_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.width(48.dp))
             }
             Column(
@@ -2003,22 +2005,22 @@ private fun PackageEditScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 WhiteCard {
-                    Text("届け先情報", fontWeight = FontWeight.Bold)
-                    InfoRow("伝票番号", deliveryPackage.trackingCode)
-                    InfoRow("住所", deliveryPackage.address)
-                    LabeledField("届け先名", "届け先名を入力", recipient) { recipient = it }
-                    LabeledField("メモ", "メモを入力", memo) { memo = it }
+                    Text(stringResource(R.string.recipient_info_title), fontWeight = FontWeight.Bold)
+                    InfoRow(stringResource(R.string.tracking_code_label), deliveryPackage.trackingCode)
+                    InfoRow(stringResource(R.string.address_label), deliveryPackage.address)
+                    LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_placeholder), recipient) { recipient = it }
+                    LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), memo) { memo = it }
                 }
                 WhiteCard {
-                    Text("配達状況", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.delivery_status_title), fontWeight = FontWeight.Bold)
                     SegmentedRow(DeliveryStatus.entries, selectedStatus, { it.label }) { selectedStatus = it }
                 }
                 WhiteCard {
-                    Text("時間帯", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
                     SegmentedRow(TimeWindow.entries, selectedTimeWindow, { it.label }) { selectedTimeWindow = it }
                 }
                 WhiteCard {
-                    Text("ナビゲーション", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.navigation_title), fontWeight = FontWeight.Bold)
                     Button(
                         onClick = {
                             context.startActivity(
@@ -2030,7 +2032,7 @@ private fun PackageEditScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("ナビを起動") }
+                    ) { Text(stringResource(R.string.start_navi_button)) }
                 }
             }
         }
@@ -2051,7 +2053,7 @@ private fun PackageEditScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .fillMaxWidth()
                 .height(56.dp)
-        ) { Text("保存する", fontWeight = FontWeight.Bold) }
+        ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -2134,8 +2136,8 @@ private fun PackageRegistrationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("← 戻る") }
-                Text("荷物登録", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.package_registration_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.width(48.dp))
             }
             Column(
@@ -2153,11 +2155,11 @@ private fun PackageRegistrationScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("届け先住所", fontWeight = FontWeight.Bold)
-                        Text("${addresses.size}/5件", color = BrandBlue, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.delivery_addresses_title), fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.address_count_fraction, addresses.size), color = BrandBlue, fontWeight = FontWeight.Bold)
                     }
                     if (addresses.isEmpty()) {
-                        Text("下の入力エリアから住所を追加してください", color = MutedText)
+                        Text(stringResource(R.string.add_address_hint), color = MutedText)
                     } else {
                         addresses.forEachIndexed { index, addr ->
                             Row(
@@ -2170,12 +2172,12 @@ private fun PackageRegistrationScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text("${index + 1}件目", color = BrandBlue, style = MaterialTheme.typography.labelSmall)
+                                    Text(stringResource(R.string.address_index_label, index + 1), color = BrandBlue, style = MaterialTheme.typography.labelSmall)
                                     Text(addr, fontWeight = FontWeight.Bold)
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    TextButton(onClick = { onOpenMap(addr) }) { Text("地図") }
-                                    TextButton(onClick = { addresses.removeAt(index) }) { Text("削除", color = Color(0xFFE53935)) }
+                                    TextButton(onClick = { onOpenMap(addr) }) { Text(stringResource(R.string.open_map)) }
+                                    TextButton(onClick = { addresses.removeAt(index) }) { Text(stringResource(R.string.delete), color = Color(0xFFE53935)) }
                                 }
                             }
                         }
@@ -2190,7 +2192,7 @@ private fun PackageRegistrationScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("住所を追加", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.add_address_section), fontWeight = FontWeight.Bold)
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Button(
                                     onClick = {
@@ -2200,14 +2202,14 @@ private fun PackageRegistrationScreen(
                                         else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                                     },
                                     modifier = Modifier.height(36.dp)
-                                ) { Text("カメラ") }
+                                ) { Text(stringResource(R.string.camera)) }
                                 Button(
                                     onClick = { voiceInputLauncher.launch(createVoiceAddressIntent()) },
                                     modifier = Modifier.height(36.dp)
-                                ) { Text("音声") }
+                                ) { Text(stringResource(R.string.voice)) }
                             }
                         }
-                        Text("登録先", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.registration_target), fontWeight = FontWeight.Bold)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             FilterChip(
                                 selected = targetCourseCode == null,
@@ -2215,7 +2217,7 @@ private fun PackageRegistrationScreen(
                                     targetCourseCode = null
                                     courseSavedMessage = ""
                                 },
-                                label = { Text("通常荷物") }
+                                label = { Text(stringResource(R.string.normal_package)) }
                             )
                         }
                         courses.chunked(2).forEach { rowCourses ->
@@ -2227,7 +2229,7 @@ private fun PackageRegistrationScreen(
                                             targetCourseCode = course.code
                                             courseSavedMessage = ""
                                         },
-                                        label = { Text("${course.code}コース") },
+                                        label = { Text(stringResource(R.string.course_chip_label, course.code)) },
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
@@ -2237,8 +2239,8 @@ private fun PackageRegistrationScreen(
                             }
                         }
                         Text(
-                            targetCourseCode?.let { "${it}コースを選ぶと、この住所は定期集荷グループに保存されます。" }
-                                ?: "通常荷物を選ぶと、今日の配達として地図に登録します。",
+                            targetCourseCode?.let { stringResource(R.string.course_target_hint, it) }
+                                ?: stringResource(R.string.normal_target_hint),
                             color = MutedText,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -2251,8 +2253,8 @@ private fun PackageRegistrationScreen(
                                 value = postalCode,
                                 onValueChange = { postalCode = it.filter(Char::isDigit).take(7) },
                                 modifier = Modifier.weight(1f),
-                                label = { Text("郵便番号") },
-                                placeholder = { Text("例 1000005") },
+                                label = { Text(stringResource(R.string.postal_code_label)) },
+                                placeholder = { Text(stringResource(R.string.postal_placeholder)) },
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
@@ -2269,7 +2271,7 @@ private fun PackageRegistrationScreen(
                                     }
                                 },
                                 enabled = postalCode.length == 7
-                            ) { Text("検索") }
+                            ) { Text(stringResource(R.string.search)) }
                         }
                         // 住所候補表示（成功・失敗ともに表示）
                         candidate?.let { c ->
@@ -2282,8 +2284,8 @@ private fun PackageRegistrationScreen(
                             value = manualInput,
                             onValueChange = { manualInput = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("直接入力") },
-                            placeholder = { Text("例）東京都千代田区丸の内1-1-1") }
+                            label = { Text(stringResource(R.string.manual_input_label)) },
+                            placeholder = { Text(stringResource(R.string.manual_placeholder)) }
                         )
                         Button(
                             onClick = {
@@ -2301,7 +2303,7 @@ private fun PackageRegistrationScreen(
                             modifier = Modifier.fillMaxWidth(),
                             enabled = manualInput.isNotBlank()
                         ) {
-                            Text(targetCourseCode?.let { "${it}コースへ住所を追加" } ?: "直接入力した住所を追加")
+                            Text(targetCourseCode?.let { stringResource(R.string.add_to_course_button, it) } ?: stringResource(R.string.add_manual_button))
                         }
                         if (courseSavedMessage.isNotBlank()) {
                             Text(courseSavedMessage, color = SuccessGreen, fontWeight = FontWeight.Bold)
@@ -2355,7 +2357,7 @@ private fun PackageRegistrationScreen(
                 .height(56.dp)
         ) {
             Text(
-                if (addresses.isNotEmpty()) "${addresses.size}件を地図に登録" else "住所を1件以上追加してください",
+                if (addresses.isNotEmpty()) stringResource(R.string.register_count_button, addresses.size) else stringResource(R.string.add_address_first),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -2409,7 +2411,7 @@ private fun RegistrationMapPreview(
                 }
             }
         }
-        val hintText = if (validPins.isEmpty()) "住所をジオコーディング中..." else "ピンをドラッグして位置を調整できます"
+        val hintText = if (validPins.isEmpty()) stringResource(R.string.geocoding_hint) else stringResource(R.string.drag_pin_hint)
         Text(
             text = hintText,
             modifier = Modifier
@@ -2545,11 +2547,11 @@ private fun StatusPill(status: DeliveryStatus) {
 @Composable
 private fun TimeWindowLegend() {
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        LegendDot(TimeWindow.Unspecified, "なし")
-        LegendDot(TimeWindow.Morning, "午前")
-        LegendDot(TimeWindow.Afternoon, "午後")
-        LegendDot(TimeWindow.Evening, "夜間")
-        LegendDot(color = AbsentGray, label = "不在")
+        LegendDot(TimeWindow.Unspecified, stringResource(R.string.legend_none))
+        LegendDot(TimeWindow.Morning, stringResource(R.string.legend_morning))
+        LegendDot(TimeWindow.Afternoon, stringResource(R.string.legend_afternoon))
+        LegendDot(TimeWindow.Evening, stringResource(R.string.legend_evening))
+        LegendDot(color = AbsentGray, label = stringResource(R.string.legend_absent))
     }
 }
 

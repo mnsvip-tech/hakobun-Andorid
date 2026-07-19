@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 通用 -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← 返回</string>
+    <string name="close">关闭</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="register">注册</string>
+    <string name="search">搜索</string>
+    <string name="copy">复制</string>
+    <string name="share">分享</string>
+    <string name="import_label">导入</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="menu">菜单</string>
+    <string name="send_to_ops">发送给运营</string>
+
+    <!-- 登录状态 -->
+    <string name="logged_in">已登录</string>
+    <string name="not_logged_in">未登录</string>
+    <string name="login">登录</string>
+    <string name="logout">退出登录</string>
+    <string name="guest_mode">访客模式</string>
+    <string name="driver_mode_logged_in">司机模式 / 已登录</string>
+
+    <!-- 主页 -->
+    <string name="delivery_plan_overview">配送计划概览</string>
+    <string name="notice">通知</string>
+    <string name="hide_summary">隐藏统计</string>
+    <string name="show_summary">显示统计</string>
+    <string name="all_time_windows">全部</string>
+    <string name="all_time_windows_filter">全部时段</string>
+    <string name="tagline">让今天的配送更轻松、更准确</string>
+
+    <!-- 汇总筛选 -->
+    <string name="remaining">剩余</string>
+    <string name="completed">已完成</string>
+    <string name="absent">不在家</string>
+
+    <!-- 侧边菜单 -->
+    <string name="package_registration_menu">注册包裹</string>
+    <string name="package_registration_desc">通过地址、OCR或语音输入添加包裹</string>
+    <string name="course_menu">取件 / 固定路线</string>
+    <string name="course_desc">将A~D路线加载到今日配送</string>
+    <string name="delivery_list_menu">配送列表</string>
+    <string name="delivery_list_desc">查看剩余、已完成和不在家的卡片</string>
+    <string name="backup_menu">备份</string>
+    <string name="backup_desc">复制、分享或恢复地址数据</string>
+    <string name="account_menu">用户账户信息</string>
+    <string name="account_desc">查看司机姓名、基地和联系方式</string>
+    <string name="support_menu">通知 / 结束处理</string>
+    <string name="support_desc">支持和日历记录在这里</string>
+    <string name="fullscreen_map_hint">地图全屏显示。所需操作请从左侧菜单调用。</string>
+
+    <!-- 地图按钮 -->
+    <string name="current_location">当前位置</string>
+    <string name="navi">导航</string>
+    <string name="rotate">旋转</string>
+    <string name="marker_current_location">当前位置</string>
+    <string name="marker_route_base_point">路线计算起点</string>
+
+    <!-- 面板标题 -->
+    <string name="panel_delivery_list">配送列表</string>
+    <string name="panel_courses">取件 / 固定路线</string>
+    <string name="panel_backup">备份</string>
+
+    <!-- 配送列表画面 -->
+    <string name="package_count">%1$d件</string>
+    <string name="summary_list_title">%1$s列表</string>
+    <string name="showing_count">显示 %1$d 件</string>
+    <string name="no_packages">没有符合条件的包裹。</string>
+    <string name="absent_redelivery_hint">点击不在家的项目可确认再次配送。</string>
+
+    <!-- 通知中心 -->
+    <string name="support_hub_title">通知</string>
+    <string name="account_support_title">账户与支持</string>
+    <string name="account_support_desc">统一管理运营联系、设置和查询</string>
+    <string name="detail_link">查看详情 →</string>
+
+    <!-- 结束处理 -->
+    <string name="end_of_day_title">结束处理</string>
+    <string name="end_of_day_desc">日历记录后，今日配送数据将重置为零。如需保留请先备份地址数据。</string>
+    <string name="backup_link">▶ 备份地址数据（点击这里）</string>
+    <string name="delivered_stops">配送次数</string>
+    <string name="delivered_packages">配送件数</string>
+    <string name="returned_packages">退回</string>
+    <string name="finish_day_button">结束并导出到日历</string>
+
+    <!-- 固定路线 -->
+    <string name="regular_courses_title">固定配送路线</string>
+    <string name="course_address_hint">请在包裹注册画面选择路线后添加地址。</string>
+    <string name="course_chip_label">%1$s路线</string>
+    <string name="course_summary">%1$s / 已注册地址 %2$d件</string>
+    <string name="load_course_button">将%1$s路线加载到今日配送</string>
+
+    <!-- 备份 -->
+    <string name="backup_data_title">地址数据管理</string>
+    <string name="backup_data_desc">可备份和导入固定路线以外的地址。</string>
+    <string name="create_backup">创建备份</string>
+    <string name="share_title">HAKOBUN 地址备份</string>
+    <string name="share_chooser">分享备份</string>
+    <string name="import_data_label">导入数据</string>
+    <string name="import_placeholder">快递单号,收件人,地址,时段,备注</string>
+
+    <!-- 地图时段筛选 -->
+    <string name="map_time_window_title">地图：按时段显示包裹</string>
+    <string name="map_time_window_desc">无时段指定用黑色图钉，有时段指定用时段颜色显示。</string>
+
+    <!-- 配送地图 -->
+    <string name="delivery_map_title">配送地图</string>
+    <string name="delivery_map_desc">按距当前位置由近到远排序</string>
+    <string name="go_to_selected_pin">前往选中图钉</string>
+    <string name="start_navi">开始导航</string>
+    <string name="next_candidate">下一个：%1$s / %2$s</string>
+
+    <!-- 包裹详情 -->
+    <string name="package_info">包裹 %1$s / %2$s尺寸 / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">时段 %1$s / 货到付款 %2$s / 快递柜 %3$s</string>
+    <string name="status_complete">已完成</string>
+    <string name="status_absent">不在家</string>
+    <string name="status_return">退回</string>
+    <string name="yes">有</string>
+    <string name="no">无</string>
+
+    <!-- 包裹编辑画面 -->
+    <string name="package_edit_title">编辑包裹</string>
+    <string name="recipient_info_title">收件方信息</string>
+    <string name="tracking_code_label">快递单号</string>
+    <string name="address_label">地址</string>
+    <string name="recipient_field_label">收件人姓名</string>
+    <string name="recipient_placeholder">请输入收件人姓名</string>
+    <string name="memo_field_label">备注</string>
+    <string name="memo_placeholder">请输入备注</string>
+    <string name="delivery_status_title">配送状态</string>
+    <string name="time_window_title">时段</string>
+    <string name="navigation_title">导航</string>
+    <string name="start_navi_button">启动导航</string>
+
+    <!-- 包裹注册画面 -->
+    <string name="package_registration_title">注册包裹</string>
+    <string name="delivery_addresses_title">收件地址</string>
+    <string name="address_count_fraction">%1$d/5件</string>
+    <string name="add_address_hint">请从下方输入区域添加地址</string>
+    <string name="address_index_label">第%1$d件</string>
+    <string name="open_map">地图</string>
+    <string name="add_address_section">添加地址</string>
+    <string name="camera">相机</string>
+    <string name="voice">语音</string>
+    <string name="registration_target">注册到</string>
+    <string name="normal_package">普通包裹</string>
+    <string name="course_target_hint">选择%1$s路线后，此地址将保存到固定取件组。</string>
+    <string name="normal_target_hint">选择普通包裹后，将添加到今日配送地图。</string>
+    <string name="postal_code_label">邮政编码</string>
+    <string name="postal_placeholder">例 1000005</string>
+    <string name="manual_input_label">手动输入</string>
+    <string name="manual_placeholder">例）东京都千代田区丸之内1-1-1</string>
+    <string name="add_to_course_button">添加到%1$s路线</string>
+    <string name="add_manual_button">添加手动输入的地址</string>
+    <string name="course_saved_message">已将地址添加到%1$s路线</string>
+    <string name="register_count_button">将%1$d件注册到地图</string>
+    <string name="add_address_first">请至少添加一个地址</string>
+    <string name="geocoding_hint">正在地理编码地址...</string>
+    <string name="drag_pin_hint">拖动图钉可调整位置</string>
+
+    <!-- 地址输入面板 -->
+    <string name="address_input_title">地址输入</string>
+    <string name="address_input_desc">通过相机、语音或邮政编码创建地址候选</string>
+    <string name="register_package_button">注册包裹</string>
+    <string name="clear_input">清除输入</string>
+
+    <!-- 用户账户画面 -->
+    <string name="user_account_title">用户账户信息</string>
+    <string name="profile_title">个人资料</string>
+    <string name="driver_name_label">司机姓名 *</string>
+    <string name="driver_name_placeholder">例）田中 太郎</string>
+    <string name="base_label">所属基地</string>
+    <string name="base_placeholder">例）东京营业所</string>
+    <string name="contact_label">联系电话</string>
+    <string name="contact_placeholder">例）090-0000-0000</string>
+    <string name="email_label">电子邮件</string>
+    <string name="email_placeholder">例）driver@example.com</string>
+    <string name="save_changes">保存更改</string>
+    <string name="register_profile">注册</string>
+    <string name="info_driver_name">司机姓名</string>
+    <string name="info_base">所属基地</string>
+    <string name="info_contact">联系方式</string>
+    <string name="info_email">邮件</string>
+    <string name="info_login_status">登录状态</string>
+    <string name="not_set">未设置</string>
+
+    <!-- 套餐卡片 -->
+    <string name="plan_billing_title">套餐与账单</string>
+    <string name="premium_plan">✓ 高级套餐</string>
+    <string name="premium_features">所有功能均可使用。</string>
+    <string name="free_trial_expired">⚠ 免费试用已结束</string>
+    <string name="free_trial_active">免费试用中</string>
+    <string name="trial_remaining_days">剩余 %1$d 天</string>
+    <string name="trial_auto_upgrade">试用结束后将自动升级到高级套餐。</string>
+    <string name="trial_after_register">注册后可免费使用1个月。</string>
+    <string name="free_plan_name">免费</string>
+    <string name="free_trial_period">1个月试用</string>
+    <string name="free_features">· 基本功能\n· 最多5件包裹注册\n· 备份</string>
+    <string name="premium_plan_name">高级版</string>
+    <string name="premium_price">¥980 / 月</string>
+    <string name="premium_features_list">· 全部功能\n· 无限注册\n· 优先支持</string>
+    <string name="subscribe_google_pay">通过Google Pay订阅高级版</string>
+    <string name="subscription_terms">首月免费，之后每月¥980（含税）。随时可取消。</string>
+    <string name="subscribe_complete">已成功升级到高级套餐</string>
+    <string name="billing_not_available">无法启动Google Play Billing</string>
+    <string name="plan_not_found">未找到套餐（请检查Play Console设置）</string>
+
+    <!-- 付费墙对话框 -->
+    <string name="paywall_title">免费试用已结束</string>
+    <string name="paywall_message">注册新包裹需要升级到高级套餐。\n\n首月免费体验。</string>
+    <string name="go_premium">升级到高级版</string>
+
+    <!-- 再次配送对话框 -->
+    <string name="redelivery_title">安排再次配送？</string>
+    <string name="redelivery_confirm">再次配送</string>
+
+    <!-- 反馈 -->
+    <string name="feedback_label">反馈内容</string>
+    <string name="feedback_placeholder">例）希望地图图钉更大一些</string>
+    <string name="feedback_sent">已保存为待发送。API集成后将发送给运营。</string>
+
+    <!-- 公告详情 -->
+    <string name="announcement_important">重要</string>
+    <string name="announcement_important_text">Google Maps正在开发为主地图。ZENRIN API将来会被替换。</string>
+    <string name="announcement_update">更新</string>
+    <string name="announcement_update_text">已完成和退回公司的包裹将从地图图钉中隐藏。</string>
+    <string name="announcement_guide">指南</string>
+    <string name="announcement_guide_text">通过结束处理将一天的件数登记到日历。</string>
+
+    <!-- 设置详情 -->
+    <string name="settings_map">地图</string>
+    <string name="settings_map_text">Google Maps显示、时段图钉、罗盘、缩放</string>
+    <string name="settings_navi">导航</string>
+    <string name="settings_navi_text">点击图钉后启动Google地图导航</string>
+    <string name="settings_notification">通知</string>
+    <string name="settings_notification_text">计划推出运营通知和时段提醒</string>
+
+    <!-- 帮助 -->
+    <string name="help_contact">联系方式</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">常见问题</string>
+    <string name="help_faq_text">地址OCR、邮政编码搜索、固定路线、备份</string>
+    <string name="help_emergency">紧急情况</string>
+    <string name="help_emergency_text">请联系所属公司的运营管理员</string>
+
+    <!-- 服务条款 -->
+    <string name="terms_purpose">本应用旨在辅助配送业务。请优先遵守实际交通法规和配送公司的运营规则。</string>
+    <string name="terms_privacy">地址、姓名、电话号码等个人信息仅在配送业务必要的范围内处理。</string>
+    <string name="terms_maps">使用Google Maps及未来ZENRIN API服务时，须遵守各服务的使用条款。</string>
+
+    <!-- OCR / 语音 -->
+    <string name="ocr_no_image">无法获取图像</string>
+    <string name="ocr_not_retrieved">未获取</string>
+    <string name="ocr_failed">无法识别地址</string>
+    <string name="ocr_needs_check">需要确认</string>
+    <string name="camera_no_permission">相机权限未获批准</string>
+    <string name="camera_permission_check">权限确认</string>
+    <string name="voice_prompt">请说出收件地址</string>
+    <string name="memo_added_from_registration">从包裹注册画面添加</string>
+
+    <!-- 图例 -->
+    <string name="legend_none">无</string>
+    <string name="legend_morning">上午</string>
+    <string name="legend_afternoon">下午</string>
+    <string name="legend_evening">夜间</string>
+    <string name="legend_absent">不在家</string>
+</resources>

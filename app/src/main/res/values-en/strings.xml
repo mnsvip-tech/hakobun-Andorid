@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- General -->
+    <string name="app_name">HAKOBUN</string>
+    <string name="back">← Back</string>
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="register">Register</string>
+    <string name="search">Search</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="import_label">Import</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="menu">Menu</string>
+    <string name="send_to_ops">Send to Operations</string>
+
+    <!-- Login Status -->
+    <string name="logged_in">Logged In</string>
+    <string name="not_logged_in">Not Logged In</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="guest_mode">Guest Mode</string>
+    <string name="driver_mode_logged_in">Driver Mode / Logged In</string>
+
+    <!-- Home Screen -->
+    <string name="delivery_plan_overview">Delivery Plan Overview</string>
+    <string name="notice">Notices</string>
+    <string name="hide_summary">Hide Summary</string>
+    <string name="show_summary">Show Summary</string>
+    <string name="all_time_windows">All</string>
+    <string name="all_time_windows_filter">All Times</string>
+    <string name="tagline">Make today\'s deliveries light and accurate</string>
+
+    <!-- Summary Filters -->
+    <string name="remaining">Remaining</string>
+    <string name="completed">Completed</string>
+    <string name="absent">Absent</string>
+
+    <!-- Side Menu -->
+    <string name="package_registration_menu">Register Package</string>
+    <string name="package_registration_desc">Add packages via address, OCR, or voice input</string>
+    <string name="course_menu">Pickup / Regular Routes</string>
+    <string name="course_desc">Load routes A–D into today\'s deliveries</string>
+    <string name="delivery_list_menu">Delivery List</string>
+    <string name="delivery_list_desc">View remaining, completed, and absent cards</string>
+    <string name="backup_menu">Backup</string>
+    <string name="backup_desc">Copy, share, or restore address data</string>
+    <string name="account_menu">User Account</string>
+    <string name="account_desc">View driver name, base, and contact info</string>
+    <string name="support_menu">Notices / End of Day</string>
+    <string name="support_desc">Support and calendar export here</string>
+    <string name="fullscreen_map_hint">Map is full screen. Access functions from the left menu as needed.</string>
+
+    <!-- Map Buttons -->
+    <string name="current_location">My Location</string>
+    <string name="navi">Navigate</string>
+    <string name="rotate">Rotate</string>
+    <string name="marker_current_location">My Location</string>
+    <string name="marker_route_base_point">Route calculation origin</string>
+
+    <!-- Panel Titles -->
+    <string name="panel_delivery_list">Delivery List</string>
+    <string name="panel_courses">Pickup / Regular Routes</string>
+    <string name="panel_backup">Backup</string>
+
+    <!-- Delivery List Screen -->
+    <string name="package_count">%1$d items</string>
+    <string name="summary_list_title">%1$s List</string>
+    <string name="showing_count">Showing %1$d items</string>
+    <string name="no_packages">No matching packages found.</string>
+    <string name="absent_redelivery_hint">Tap an absent item to confirm redelivery.</string>
+
+    <!-- Support Hub Screen -->
+    <string name="support_hub_title">Notices</string>
+    <string name="account_support_title">Account &amp; Support</string>
+    <string name="account_support_desc">Manage operations contact, settings, and inquiries</string>
+    <string name="detail_link">View Details →</string>
+
+    <!-- End of Day -->
+    <string name="end_of_day_title">End of Day</string>
+    <string name="end_of_day_desc">After calendar export, today\'s delivery data will be reset to zero. Please back up your address data first if needed.</string>
+    <string name="backup_link">▶ Back up address data (here)</string>
+    <string name="delivered_stops">Deliveries</string>
+    <string name="delivered_packages">Packages</string>
+    <string name="returned_packages">Returned</string>
+    <string name="finish_day_button">Finish &amp; Export to Calendar</string>
+
+    <!-- Regular Courses -->
+    <string name="regular_courses_title">Regular Delivery Routes</string>
+    <string name="course_address_hint">Add addresses via the package registration screen by selecting a route.</string>
+    <string name="course_chip_label">Route %1$s</string>
+    <string name="course_summary">%1$s / %2$d addresses registered</string>
+    <string name="load_course_button">Load Route %1$s into Today\'s Deliveries</string>
+
+    <!-- Backup -->
+    <string name="backup_data_title">Address Data Management</string>
+    <string name="backup_data_desc">Back up and import addresses outside regular routes.</string>
+    <string name="create_backup">Create Backup</string>
+    <string name="share_title">HAKOBUN Address Backup</string>
+    <string name="share_chooser">Share Backup</string>
+    <string name="import_data_label">Import Data</string>
+    <string name="import_placeholder">Tracking#,Recipient,Address,Time,Note</string>
+
+    <!-- Map Time Window Filter -->
+    <string name="map_time_window_title">Map: Packages by Time Window</string>
+    <string name="map_time_window_desc">No-time packages use black pins; timed packages use time-window colors.</string>
+
+    <!-- Delivery Map -->
+    <string name="delivery_map_title">Delivery Map</string>
+    <string name="delivery_map_desc">Packages sorted by proximity from current location</string>
+    <string name="go_to_selected_pin">Go to Pin</string>
+    <string name="start_navi">Start Navigation</string>
+    <string name="next_candidate">Next: %1$s / %2$s</string>
+
+    <!-- Package Detail -->
+    <string name="package_info">Package %1$s / Size: %2$s / %3$s / %4$s</string>
+    <string name="package_time_cod_locker">Time: %1$s / COD: %2$s / Locker: %3$s</string>
+    <string name="status_complete">Delivered</string>
+    <string name="status_absent">Absent</string>
+    <string name="status_return">Return</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Package Edit Screen -->
+    <string name="package_edit_title">Edit Package</string>
+    <string name="recipient_info_title">Delivery Info</string>
+    <string name="tracking_code_label">Tracking #</string>
+    <string name="address_label">Address</string>
+    <string name="recipient_field_label">Recipient Name</string>
+    <string name="recipient_placeholder">Enter recipient name</string>
+    <string name="memo_field_label">Note</string>
+    <string name="memo_placeholder">Enter note</string>
+    <string name="delivery_status_title">Delivery Status</string>
+    <string name="time_window_title">Time Window</string>
+    <string name="navigation_title">Navigation</string>
+    <string name="start_navi_button">Launch Navigation</string>
+
+    <!-- Package Registration Screen -->
+    <string name="package_registration_title">Register Package</string>
+    <string name="delivery_addresses_title">Delivery Addresses</string>
+    <string name="address_count_fraction">%1$d/5</string>
+    <string name="add_address_hint">Add an address from the input area below</string>
+    <string name="address_index_label">Item %1$d</string>
+    <string name="open_map">Map</string>
+    <string name="add_address_section">Add Address</string>
+    <string name="camera">Camera</string>
+    <string name="voice">Voice</string>
+    <string name="registration_target">Register To</string>
+    <string name="normal_package">Standard Package</string>
+    <string name="course_target_hint">Selecting Route %1$s will save this address to the regular pickup group.</string>
+    <string name="normal_target_hint">Selecting Standard Package will add it to today\'s delivery map.</string>
+    <string name="postal_code_label">Postal Code</string>
+    <string name="postal_placeholder">e.g. 1000005</string>
+    <string name="manual_input_label">Manual Entry</string>
+    <string name="manual_placeholder">e.g. 1-1-1 Marunouchi, Chiyoda-ku, Tokyo</string>
+    <string name="add_to_course_button">Add to Route %1$s</string>
+    <string name="add_manual_button">Add Manually Entered Address</string>
+    <string name="course_saved_message">Address added to Route %1$s</string>
+    <string name="register_count_button">Register %1$d item(s) on Map</string>
+    <string name="add_address_first">Please add at least one address</string>
+    <string name="geocoding_hint">Geocoding address...</string>
+    <string name="drag_pin_hint">Drag pins to adjust positions</string>
+
+    <!-- Address Input Panel -->
+    <string name="address_input_title">Address Input</string>
+    <string name="address_input_desc">Create address candidates via camera, voice, or postal code</string>
+    <string name="register_package_button">Register Package</string>
+    <string name="clear_input">Clear Input</string>
+
+    <!-- User Account Screen -->
+    <string name="user_account_title">User Account</string>
+    <string name="profile_title">Profile</string>
+    <string name="driver_name_label">Driver Name *</string>
+    <string name="driver_name_placeholder">e.g. John Smith</string>
+    <string name="base_label">Base Location</string>
+    <string name="base_placeholder">e.g. Tokyo Branch</string>
+    <string name="contact_label">Phone Number</string>
+    <string name="contact_placeholder">e.g. 090-0000-0000</string>
+    <string name="email_label">Email Address</string>
+    <string name="email_placeholder">e.g. driver@example.com</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="register_profile">Register</string>
+    <string name="info_driver_name">Driver Name</string>
+    <string name="info_base">Base Location</string>
+    <string name="info_contact">Contact</string>
+    <string name="info_email">Email</string>
+    <string name="info_login_status">Login Status</string>
+    <string name="not_set">Not set</string>
+
+    <!-- Plan Card -->
+    <string name="plan_billing_title">Plan &amp; Billing</string>
+    <string name="premium_plan">✓ Premium Plan</string>
+    <string name="premium_features">All features are available.</string>
+    <string name="free_trial_expired">⚠ Free Trial Ended</string>
+    <string name="free_trial_active">Free Trial Active</string>
+    <string name="trial_remaining_days">%1$d days remaining</string>
+    <string name="trial_auto_upgrade">After trial ends, you\'ll be upgraded to the Premium plan.</string>
+    <string name="trial_after_register">After registration, enjoy 1 month free.</string>
+    <string name="free_plan_name">Free</string>
+    <string name="free_trial_period">1-Month Trial</string>
+    <string name="free_features">· Basic features\n· 5 package registrations\n· Backup</string>
+    <string name="premium_plan_name">Premium</string>
+    <string name="premium_price">¥980 / month</string>
+    <string name="premium_features_list">· All features\n· Unlimited registrations\n· Priority support</string>
+    <string name="subscribe_google_pay">Subscribe via Google Pay</string>
+    <string name="subscription_terms">First month free, then ¥980/month (tax included). Cancel anytime.</string>
+    <string name="subscribe_complete">Successfully upgraded to Premium plan</string>
+    <string name="billing_not_available">Unable to launch Google Play Billing</string>
+    <string name="plan_not_found">Plan not found (please check Play Console settings)</string>
+
+    <!-- Paywall Dialog -->
+    <string name="paywall_title">Free Trial Ended</string>
+    <string name="paywall_message">A Premium plan is required to register new packages.\n\nThe first month is free.</string>
+    <string name="go_premium">Go Premium</string>
+
+    <!-- Redelivery Dialog -->
+    <string name="redelivery_title">Schedule Redelivery?</string>
+    <string name="redelivery_confirm">Redeliver</string>
+
+    <!-- Feedback -->
+    <string name="feedback_label">Feedback</string>
+    <string name="feedback_placeholder">e.g. I\'d like the map pins to be larger</string>
+    <string name="feedback_sent">Saved as pending. Will be sent to operations after API integration.</string>
+
+    <!-- Announcements -->
+    <string name="announcement_important">Important</string>
+    <string name="announcement_important_text">Google Maps is under development as the primary map. ZENRIN API to be replaced in the future.</string>
+    <string name="announcement_update">Update</string>
+    <string name="announcement_update_text">Completed and returned packages are hidden from map pins.</string>
+    <string name="announcement_guide">Guide</string>
+    <string name="announcement_guide_text">Use End of Day to log daily counts to calendar.</string>
+
+    <!-- Settings Detail -->
+    <string name="settings_map">Map</string>
+    <string name="settings_map_text">Google Maps display, time-window pins, compass, zoom</string>
+    <string name="settings_navi">Navigation</string>
+    <string name="settings_navi_text">Launches Google Maps navigation on pin tap</string>
+    <string name="settings_notification">Notifications</string>
+    <string name="settings_notification_text">Operations notices and time-window alerts planned</string>
+
+    <!-- Help -->
+    <string name="help_contact">Contact</string>
+    <string name="help_contact_value">help@hakobun.example</string>
+    <string name="help_faq">FAQ</string>
+    <string name="help_faq_text">Address OCR, postal code search, regular routes, backup</string>
+    <string name="help_emergency">Emergency</string>
+    <string name="help_emergency_text">Contact your company\'s fleet manager</string>
+
+    <!-- Terms -->
+    <string name="terms_purpose">This app is intended to assist with delivery operations. Always follow actual traffic laws and your company\'s delivery guidelines.</string>
+    <string name="terms_privacy">Personal information such as addresses, names, and phone numbers is handled only within the scope necessary for delivery operations.</string>
+    <string name="terms_maps">When using Google Maps or future ZENRIN API services, the respective terms of service apply.</string>
+
+    <!-- OCR / Voice -->
+    <string name="ocr_no_image">Could not retrieve image</string>
+    <string name="ocr_not_retrieved">Not retrieved</string>
+    <string name="ocr_failed">Could not read address</string>
+    <string name="ocr_needs_check">Needs review</string>
+    <string name="camera_no_permission">Camera permission not granted</string>
+    <string name="camera_permission_check">Permission check</string>
+    <string name="voice_prompt">Please say the delivery address</string>
+    <string name="memo_added_from_registration">Added from package registration screen</string>
+
+    <!-- Legend -->
+    <string name="legend_none">None</string>
+    <string name="legend_morning">Morning</string>
+    <string name="legend_afternoon">Afternoon</string>
+    <string name="legend_evening">Evening</string>
+    <string name="legend_absent">Absent</string>
+</resources>
