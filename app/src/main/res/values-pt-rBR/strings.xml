@@ -275,4 +275,81 @@
     <string name="legend_afternoon">Tarde</string>
     <string name="legend_evening">Noite</string>
     <string name="legend_absent">Ausente</string>
+
+    <!-- Cabeçalho/rodapé do FAQ -->
+    <string name="faq_header_title">Perguntas Frequentes (FAQ)</string>
+    <string name="faq_header_desc">Toque em uma pergunta para ver a resposta</string>
+    <string name="faq_footer_title">Ainda precisa de ajuda?</string>
+    <string name="faq_footer_body">Entre em contato pelo menu lateral → "Feedback do usuário".\nE-mail: support@hakobun.example</string>
+
+    <!-- Categorias do FAQ -->
+    <string name="faq_cat_basic">Uso básico</string>
+    <string name="faq_cat_ocr">OCR e entrada por voz</string>
+    <string name="faq_cat_notif">Notificações</string>
+    <string name="faq_cat_sub">Assinatura</string>
+    <string name="faq_cat_data">Dados e backup</string>
+    <string name="faq_cat_other">Outros</string>
+
+    <!-- FAQ Perguntas e Respostas -->
+    <string name="faq_q_01">Como cadastrar um pacote?</string>
+    <string name="faq_a_01">Toque no botão「Cadastrar」no canto superior direito da tela inicial, ou acesse o menu lateral → 「Cadastrar pacote」.\n\nHá três formas de cadastro:\n① Digitar o endereço manualmente\n② Fotografar a etiqueta com a câmera (OCR automático)\n③ Falar o endereço por voz\n\nApós o cadastro, um marcador aparecerá no mapa da tela inicial.</string>
+    <string name="faq_q_02">Quantos pacotes posso cadastrar por dia?</string>
+    <string name="faq_a_02">O plano gratuito (incluindo o período de teste de 1 mês) permite até 5 pacotes por dia.\n\nO plano Premium (¥980/mês) não tem limite de cadastros.\n\nAo atingir o limite, uma notificação de upgrade de plano será exibida ao tocar no botão de cadastro.</string>
+    <string name="faq_q_03">Como atualizar o status de entrega?</string>
+    <string name="faq_a_03">Toque em um marcador no mapa da tela inicial, ou em um cartão na lista de entregas, para abrir a tela de detalhes.\n\nVocê pode alterar o status para「Entregue」「Ausente」「Reentrega」「Devolver ao depósito」, entre outros.</string>
+    <string name="faq_q_04">O marcador no mapa não está no lugar certo</string>
+    <string name="faq_a_04">A precisão depende do geocoding (conversão de endereço em coordenadas).\n\nNa tela de cadastro de pacote, mantenha pressionado o marcador no mapa no final da página e arraste-o para a posição correta. A posição ajustada será salva.</string>
+    <string name="faq_q_05">Como usar as rotas fixas (coleta)?</string>
+    <string name="faq_a_05">Acesse o menu lateral → 「Coleta / Rotas fixas」para carregar em lote as rotas pré-cadastradas (A〜D) na lista de entregas do dia.\n\nAs rotas podem ser cadastradas e editadas em「Gerenciar rotas」na mesma tela.</string>
+    <string name="faq_q_06">O OCR da etiqueta ficou incorreto</string>
+    <string name="faq_a_06">Tente o seguinte:\n\n· Fotografar em local bem iluminado\n· Garantir que toda a etiqueta esteja dentro do enquadramento\n· Segurar o celular com as duas mãos para evitar tremores\n· Verificar se há sujeira, dobras ou reflexos\n\nCada campo pode ser corrigido manualmente após o OCR. A precisão depende da iluminação e da qualidade da impressão.</string>
+    <string name="faq_q_07">A entrada por voz não está sendo reconhecida</string>
+    <string name="faq_a_07">Verifique:\n\n· A permissão de microfone foi concedida ao aplicativo (Configurações → Aplicativos → HAKOBUN → Permissões)\n· Fale em um ambiente silencioso\n· Diga o endereço devagar e com clareza\n\nO reconhecimento de voz usa o mecanismo Google Speech Recognition.</string>
+    <string name="faq_q_08">Não estou recebendo notificações de janela de horário</string>
+    <string name="faq_a_08">Verifique:\n\n① As notificações estão ativadas no aplicativo (Avisos → Configurações → Notificações)\n② Configurações do Android → Aplicativos → HAKOBUN → Notificações está como「Permitir」\n③ O modo economia de bateria não está restringindo a execução em segundo plano\n\nSe o problema persistir, toque em「Reagendar alarmes」.</string>
+    <string name="faq_q_09">Como desativar as notificações?</string>
+    <string name="faq_a_09">No aplicativo: menu lateral → Avisos → Configurações → desative o botão de Notificações.\n\nTambém é possível desativar em Configurações do Android → Aplicativos → HAKOBUN → Notificações.</string>
+    <string name="faq_q_10">Quando termina o período de teste gratuito?</string>
+    <string name="faq_a_10">O período de teste gratuito dura 30 dias a partir da data de cadastro.\n\nVocê pode verificar os dias restantes na tela de Conta do usuário (menu lateral → Informações da conta do usuário).\n\nCancele com pelo menos 24 horas de antecedência ao fim do teste para não ser cobrado.</string>
+    <string name="faq_q_11">Como cancelar a assinatura?</string>
+    <string name="faq_a_11">Acesse a Google Play Store → ícone de conta →「Assinaturas」→ HAKOBUN →「Cancelar assinatura」.\n\nApós o cancelamento, você pode continuar usando até o final do período de cobrança atual. A função de cancelamento no aplicativo está em desenvolvimento.</string>
+    <string name="faq_q_12">O pagamento falhou</string>
+    <string name="faq_a_12">Verifique sua forma de pagamento no Google Play.\n\nGoogle Play Store → Conta → Pagamentos e assinaturas → Formas de pagamento\n\nCartões vencidos ou saldo insuficiente são causas comuns. Consulte também o suporte do Google Play.</string>
+    <string name="faq_q_13">Onde os dados são armazenados?</string>
+    <string name="faq_a_13">Todos os dados são armazenados no armazenamento criptografado do seu smartphone.\n\nNenhum dado é enviado a servidores externos ou sincronizado na nuvem. Desinstalar o aplicativo apagará todos os dados.\n\nRecomendamos exportar dados importantes usando o recurso de backup (menu lateral → Backup).</string>
+    <string name="faq_q_14">Posso transferir os dados ao trocar de celular?</string>
+    <string name="faq_a_14">A transferência automática de dados não é suportada atualmente.\n\nAntes de trocar de dispositivo, exporte os dados com o recurso de backup (copiar/compartilhar) e importe no novo dispositivo.\n\nImportação: menu lateral → Backup → 「Restaurar」</string>
+    <string name="faq_q_15">O aplicativo está lento ou travando</string>
+    <string name="faq_a_15">Tente o seguinte:\n\n① Feche completamente o aplicativo e reinicie\n② Reinicie o dispositivo\n③ Atualize o aplicativo para a versão mais recente (verifique na Google Play Store)\n④ Se houver muitos pacotes cadastrados, use「Encerrar o dia」para redefinir\n\nSe o problema persistir, entre em contato conosco.</string>
+    <string name="faq_q_16">Quero relatar um bug ou sugerir uma melhoria</string>
+    <string name="faq_a_16">Envie pelo menu lateral → Avisos →「Feedback do usuário」.\n\nForneça detalhes específicos (passos para reproduzir, modelo do dispositivo, versão do Android) para uma resposta mais rápida.</string>
+    <string name="faq_q_17">Qual é o contato de suporte?</string>
+    <string name="faq_a_17">E-mail: support@hakobun.example\n\nAo entrar em contato, informe:\n· Modelo do dispositivo e versão do Android\n· Versão do aplicativo\n· Passos para reproduzir o problema\n\nRespondemos no horário comercial (Seg–Sex, 10h–18h, horário de Tóquio).</string>
+
+    <!-- Termos de serviço (expandido) -->
+    <string name="terms_header_title">Termos de Serviço e Política de Privacidade do HAKOBUN</string>
+    <string name="terms_header_date">Última atualização: 19 de julho de 2026</string>
+    <string name="terms_header_intro">Leia os termos a seguir antes de usar o aplicativo. Ao começar a usar, você concorda com estes termos.</string>
+    <string name="terms_s01_title">Artigo 1　Visão geral do serviço</string>
+    <string name="terms_s01_body">O HAKOBUN (doravante "o Aplicativo") é um aplicativo de suporte ao gerenciamento de entregas, projetado para aumentar a eficiência dos entregadores. Oferece recursos como cadastro de pacotes, gerenciamento de rotas, registro de status de entrega e leitura de endereços por OCR.\n\nO Aplicativo é uma ferramenta de suporte operacional. O cumprimento das leis aplicáveis, a direção segura e a observância dos regulamentos da empresa de entrega são responsabilidade exclusiva do usuário.</string>
+    <string name="terms_s02_title">Artigo 2　Elegibilidade</string>
+    <string name="terms_s02_body">O Aplicativo é destinado a pessoas com 18 anos ou mais que atuam em operações de entrega ou como gestores operacionais.\n\nUma conta Google pode ser necessária para usar o Aplicativo. É proibido se cadastrar com informações falsas.</string>
+    <string name="terms_s03_title">Artigo 3　Assinatura e cobrança</string>
+    <string name="terms_s03_body">[Período de teste gratuito]\nUm teste gratuito de 1 mês é oferecido no primeiro cadastro. Todos os recursos estão disponíveis durante o teste. Se não cancelar com pelo menos 24 horas antes do término do teste, você será automaticamente migrado para o plano pago.\n\n[Plano pago (Premium)]\nPreço: ¥980 / mês (impostos incluídos)\nCobrança: Renovação automática mensal via Google Play\nCancelamento: Pode ser feito a qualquer momento em「Assinaturas」na Google Play Store. O acesso continua até o fim do período de cobrança atual.\n\n[Política de reembolso]\nSeguimos a política de reembolso do Google Play. Para cancelamentos dentro de 48 horas após a compra, solicite pelo Google Play.\n\n[Alteração de preço]\nVocê será notificado com pelo menos 30 dias de antecedência sobre mudanças de preço, por meio de avisos no aplicativo ou e-mail.</string>
+    <string name="terms_s04_title">Artigo 4　Dados coletados e como são usados</string>
+    <string name="terms_s04_body">■ Localização (GPS)\nFinalidade: Navegação até os destinos de entrega, exibição de localização atual, otimização de rotas\nColeta: Somente enquanto o aplicativo está em uso (sem coleta em segundo plano)\n\n■ Câmera/Imagens\nFinalidade: Preenchimento automático de endereços via OCR de etiquetas\nArmazenamento: Somente no dispositivo (sem envio para a nuvem)\n\n■ Voz (Microfone)\nFinalidade: Transcrição de endereços e notas por entrada de voz\nArmazenamento: Somente no dispositivo\n\n■ Dados inseridos (nome, endereço, telefone, e-mail)\nFinalidade: Gerenciamento de entregas e configuração do perfil do entregador\nArmazenamento: Armazenamento criptografado no dispositivo (AES-256-GCM)\nTransmissão externa: Nenhuma</string>
+    <string name="terms_s05_title">Artigo 5　Serviços de terceiros</string>
+    <string name="terms_s05_body">■ Google Maps Platform\nUsado para exibição de mapas, navegação e geocodificação de endereços. A Política de Privacidade do Google (https://policies.google.com/privacy) se aplica.\n\n■ Google Play Billing\nUsado para pagamentos de assinatura. As informações de pagamento são gerenciadas pelo Google; o Aplicativo não as armazena.\n\n■ Google ML Kit (Reconhecimento de texto)\nO OCR é realizado somente no dispositivo; nenhum dado é enviado a servidores externos.\n\n■ Google Location Services\nUsado para acesso ao GPS.</string>
+    <string name="terms_s06_title">Artigo 6　Armazenamento de dados e segurança</string>
+    <string name="terms_s06_body">Os dados pessoais e operacionais inseridos são armazenados no armazenamento criptografado do dispositivo (Android EncryptedSharedPreferences / AES-256-GCM).\n\nNenhum dado é transmitido a servidores externos ou sincronizado na nuvem. A desinstalação do Aplicativo removerá todos os dados do dispositivo.\n\nAo usar o recurso de backup, o usuário é responsável pelo gerenciamento dos dados exportados.</string>
+    <string name="terms_s07_title">Artigo 7　Atividades proibidas</string>
+    <string name="terms_s07_body">As seguintes atividades são proibidas:\n\n· Engenharia reversa, adulteração ou redistribuição do Aplicativo\n· Inserir ou usar informações pessoais de terceiros sem consentimento\n· Usar o Aplicativo para qualquer finalidade que viole a lei aplicável\n· Sobrecarregar os servidores ou a infraestrutura do Aplicativo\n· Cadastro fraudulento ou uso indevido para contornar cobranças</string>
+    <string name="terms_s08_title">Artigo 8　Isenção de responsabilidade</string>
+    <string name="terms_s08_body">O Aplicativo é fornecido "no estado em que se encontra". O operador não é responsável por:\n\n· Precisão das informações de mapa ou orientações de rota (sempre siga as placas de trânsito e as leis de tráfego)\n· Precisão dos resultados de OCR\n· Perda de dados por falhas no aplicativo ou interrupções de comunicação\n· Falhas ou alterações de especificações de serviços de terceiros\n· Perdas comerciais ou erros de entrega\n\nSempre verifique pessoalmente as informações de entrega importantes.</string>
+    <string name="terms_s09_title">Artigo 9　Alterações nos termos</string>
+    <string name="terms_s09_body">Estes termos podem ser atualizados sem aviso prévio. Alterações significativas serão comunicadas por meio de notificações no aplicativo ou e-mail. O uso continuado do Aplicativo após as alterações constitui aceitação dos termos revisados.</string>
+    <string name="terms_s10_title">Artigo 10　Lei aplicável e jurisdição</string>
+    <string name="terms_s10_body">Estes termos são regidos pelas leis do Japão. Quaisquer disputas decorrentes destes termos estarão sujeitas à jurisdição exclusiva do Tribunal Distrital de Tóquio como tribunal de primeira instância.</string>
+    <string name="terms_contact_title">Contato</string>
+    <string name="terms_contact_body">Para dúvidas sobre estes termos ou sobre nossa política de privacidade, entre em contato:\n\nE-mail: support@hakobun.example\n\n* O conteúdo desta política é consistente com o que declaramos no formulário de segurança de dados da Google Play.</string>
 </resources>

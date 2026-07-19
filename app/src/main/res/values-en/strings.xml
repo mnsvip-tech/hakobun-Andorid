@@ -275,4 +275,81 @@
     <string name="legend_afternoon">Afternoon</string>
     <string name="legend_evening">Evening</string>
     <string name="legend_absent">Absent</string>
+
+    <!-- FAQ Header / Footer -->
+    <string name="faq_header_title">Frequently Asked Questions (FAQ)</string>
+    <string name="faq_header_desc">Tap a question to reveal the answer</string>
+    <string name="faq_footer_title">Still need help?</string>
+    <string name="faq_footer_body">Contact us via the side menu → "User Feedback".\nEmail: support@hakobun.example</string>
+
+    <!-- FAQ Categories -->
+    <string name="faq_cat_basic">Basic Usage</string>
+    <string name="faq_cat_ocr">OCR &amp; Voice Input</string>
+    <string name="faq_cat_notif">Notifications</string>
+    <string name="faq_cat_sub">Subscription</string>
+    <string name="faq_cat_data">Data &amp; Backup</string>
+    <string name="faq_cat_other">Other</string>
+
+    <!-- FAQ Q&A -->
+    <string name="faq_q_01">How do I register a package?</string>
+    <string name="faq_a_01">Tap the "Register" button at the top right of the Home screen, or go to the side menu → "Register Package".\n\nThere are three methods:\n① Enter address manually\n② Scan a shipping label with your camera (OCR)\n③ Speak the address using voice input\n\nAfter registering, a pin will appear on the Home map.</string>
+    <string name="faq_q_02">How many packages can I register per day?</string>
+    <string name="faq_a_02">The Free plan (including the 1-month trial) allows up to 5 packages per day.\n\nThe Premium plan (¥980/month) has no registration limit.\n\nWhen you reach the limit, a plan upgrade prompt will appear when you tap the register button.</string>
+    <string name="faq_q_03">How do I update a delivery status?</string>
+    <string name="faq_a_03">Tap a pin on the Home map, or tap a card in the delivery list to open the detail screen.\n\nYou can change the status to "Delivered," "Absent," "Redeliver," or "Return to Office."</string>
+    <string name="faq_q_04">The map pin is not in the right location</string>
+    <string name="faq_a_04">Pin accuracy depends on geocoding (address-to-coordinates conversion).\n\nIn the package registration screen, long-press the pin on the map at the bottom and drag it to the correct position. The adjusted location will be saved.</string>
+    <string name="faq_q_05">How do I use regular routes (pickup)?</string>
+    <string name="faq_a_05">Go to the side menu → "Pickup / Regular Routes" to bulk-load pre-registered routes (A–D) into today\'s delivery list.\n\nRoutes can be added and edited in the "Route Management" section on the same screen.</string>
+    <string name="faq_q_06">The OCR reading of the shipping label was inaccurate</string>
+    <string name="faq_a_06">Try the following:\n\n· Shoot in a well-lit area\n· Make sure the entire label fits within the frame\n· Hold the phone steady with both hands\n· Check for smudges, folds, or reflections\n\nEach field can be corrected manually after OCR. Accuracy depends on lighting and print quality.</string>
+    <string name="faq_q_07">Voice input is not being recognized</string>
+    <string name="faq_a_07">Please check:\n\n· Microphone permission is granted to the app (Settings → Apps → HAKOBUN → Permissions)\n· Speak in a quiet environment\n· Speak the address slowly and clearly\n\nVoice recognition uses the Google Speech Recognition engine.</string>
+    <string name="faq_q_08">I\'m not receiving time-window notifications</string>
+    <string name="faq_a_08">Please check:\n\n① Notifications are enabled in the app (Notices → Settings → Notifications)\n② Android Settings → Apps → HAKOBUN → Notifications is set to "Allow"\n③ Battery saver mode is not restricting background activity\n\nIf the problem persists, tap "Reschedule alarms."</string>
+    <string name="faq_q_09">How do I turn off notifications?</string>
+    <string name="faq_a_09">In the app: side menu → Notices → Settings → toggle Notifications to OFF.\n\nYou can also disable them via Android Settings → Apps → HAKOBUN → Notifications.</string>
+    <string name="faq_q_10">When does my free trial end?</string>
+    <string name="faq_a_10">The free trial lasts 30 days from the date you registered.\n\nCheck the remaining days on your User Account screen (side menu → User Account).\n\nCancel at least 24 hours before the trial ends to avoid being charged.</string>
+    <string name="faq_q_11">How do I cancel my subscription?</string>
+    <string name="faq_a_11">Go to Google Play Store → Account icon → "Subscriptions" → HAKOBUN → "Cancel subscription."\n\nYou can continue using the app until the end of the current billing period. In-app cancellation is coming soon.</string>
+    <string name="faq_q_12">My payment failed</string>
+    <string name="faq_a_12">Please check your payment method in Google Play.\n\nGoogle Play Store → Account → Payments &amp; subscriptions → Payment methods\n\nExpired cards or insufficient funds are common causes. Please refer to Google Play support as well.</string>
+    <string name="faq_q_13">Where is my data stored?</string>
+    <string name="faq_a_13">All data is stored in encrypted storage on your device.\n\nNo data is sent to external servers or synced to the cloud. Uninstalling the app will delete all data.\n\nWe recommend exporting important data using the Backup feature (side menu → Backup).</string>
+    <string name="faq_q_14">Can I transfer data to a new device?</string>
+    <string name="faq_a_14">Automatic data transfer is not currently supported.\n\nBefore switching devices, export your data using the Backup feature and import it on your new device.\n\nImport: side menu → Backup → "Restore."</string>
+    <string name="faq_q_15">The app is slow or crashing</string>
+    <string name="faq_a_15">Try the following:\n\n① Fully close and restart the app\n② Restart your device\n③ Update the app to the latest version (check Google Play Store)\n④ If many packages are registered, use "End of Day" to reset\n\nIf the problem persists, please contact us.</string>
+    <string name="faq_q_16">I want to report a bug or suggest an improvement</string>
+    <string name="faq_a_16">Send feedback via the side menu → Notices → "User Feedback."\n\nPlease include specific details (steps to reproduce, device model, Android version) for a faster response.</string>
+    <string name="faq_q_17">How do I contact support?</string>
+    <string name="faq_a_17">Email: support@hakobun.example\n\nWhen contacting us, please provide:\n· Device model and Android version\n· App version\n· Steps to reproduce the issue\n\nWe respond during business hours (Mon–Fri, 10:00–18:00 JST).</string>
+
+    <!-- Terms (Extended) -->
+    <string name="terms_header_title">HAKOBUN Terms of Service &amp; Privacy Policy</string>
+    <string name="terms_header_date">Last updated: July 19, 2026</string>
+    <string name="terms_header_intro">Please read the following terms before using this app. By starting to use the app, you agree to these terms.</string>
+    <string name="terms_s01_title">Article 1 – Service Overview</string>
+    <string name="terms_s01_body">HAKOBUN ("the App") is a delivery management support application designed to improve the efficiency of delivery drivers. It provides features such as package registration, route management, delivery status tracking, and OCR address reading from shipping labels.\n\nThe App is an operational support tool. Compliance with applicable laws, safe driving, and adherence to your delivery company\'s regulations are solely the responsibility of the user.</string>
+    <string name="terms_s02_title">Article 2 – Eligibility</string>
+    <string name="terms_s02_body">The App is intended for users aged 18 and over who are engaged in delivery operations or act as operations managers.\n\nA Google account may be required to use certain features. Registration with false information is prohibited.</string>
+    <string name="terms_s03_title">Article 3 – Subscription &amp; Billing</string>
+    <string name="terms_s03_body">[Free Trial]\nA 1-month free trial is provided upon first registration. All features are available during the trial period. If you do not cancel at least 24 hours before the trial ends, you will automatically be moved to the paid plan.\n\n[Paid Plan (Premium)]\nPrice: ¥980 / month (tax included)\nBilling: Monthly auto-renewal via Google Play\nCancellation: Cancel anytime from "Subscriptions" in the Google Play Store. Access continues until the end of the current billing period.\n\n[Refund Policy]\nRefunds follow Google Play\'s refund policy. For cancellations within 48 hours of purchase, please apply through Google Play.\n\n[Price Changes]\nYou will be notified at least 30 days in advance of any price changes via in-app notice or email.</string>
+    <string name="terms_s04_title">Article 4 – Data Collected and How It Is Used</string>
+    <string name="terms_s04_body">■ Location (GPS)\nPurpose: Navigation to delivery destinations, current location display, route optimization\nCollection: Only while the app is in use (no background collection)\n\n■ Camera / Images\nPurpose: Automatic address entry via OCR of shipping labels\nStorage: On-device only (no cloud upload)\n\n■ Voice (Microphone)\nPurpose: Transcription of addresses and notes via voice input\nStorage: On-device only\n\n■ Input Data (name, address, phone, email)\nPurpose: Delivery management and driver profile setup\nStorage: Encrypted on-device storage (AES-256-GCM)\nExternal transmission: None</string>
+    <string name="terms_s05_title">Article 5 – Third-Party Services</string>
+    <string name="terms_s05_body">■ Google Maps Platform\nUsed for map display, navigation, and address geocoding. Google\'s Privacy Policy (https://policies.google.com/privacy) applies.\n\n■ Google Play Billing\nUsed for subscription payments. Payment information is managed by Google; the App does not store it.\n\n■ Google ML Kit (Text Recognition)\nOCR is performed on-device only; no data is sent to external servers.\n\n■ Google Location Services\nUsed for GPS access.</string>
+    <string name="terms_s06_title">Article 6 – Data Storage &amp; Security</string>
+    <string name="terms_s06_body">Personal and operational data you enter is stored in encrypted on-device storage (Android EncryptedSharedPreferences / AES-256-GCM).\n\nNo data is transmitted to external servers or synced to the cloud. Uninstalling the App will remove all data from the device.\n\nIf you use the Backup feature, you are responsible for managing the exported data.</string>
+    <string name="terms_s07_title">Article 7 – Prohibited Activities</string>
+    <string name="terms_s07_body">The following activities are prohibited:\n\n· Reverse-engineering, tampering with, or redistributing the App\n· Entering or using another person\'s personal information without consent\n· Using the App for any purpose that violates applicable law\n· Placing excessive load on the App\'s servers or infrastructure\n· Fraudulent registration or misuse to circumvent billing</string>
+    <string name="terms_s08_title">Article 8 – Disclaimer</string>
+    <string name="terms_s08_body">The App is provided "as is." The operator is not responsible for:\n\n· Accuracy of map information or route guidance (always follow road signs and traffic laws)\n· Accuracy of OCR results\n· Data loss due to app bugs or communication failures\n· Outages or specification changes by third-party services\n· Business losses or delivery errors\n\nAlways verify important delivery information yourself.</string>
+    <string name="terms_s09_title">Article 9 – Changes to Terms</string>
+    <string name="terms_s09_body">These terms may be updated without prior notice. You will be notified of significant changes via in-app notification or email. Continued use of the App after changes constitutes acceptance of the revised terms.</string>
+    <string name="terms_s10_title">Article 10 – Governing Law &amp; Jurisdiction</string>
+    <string name="terms_s10_body">These terms are governed by the laws of Japan. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the Tokyo District Court as the court of first instance.</string>
+    <string name="terms_contact_title">Contact</string>
+    <string name="terms_contact_body">For questions about these terms or our privacy practices, please contact us:\n\nEmail: support@hakobun.example\n\n* The content of this policy is consistent with what we have declared in the Google Play Data Safety form.</string>
 </resources>

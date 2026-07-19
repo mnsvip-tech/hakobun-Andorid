@@ -275,4 +275,81 @@
     <string name="legend_afternoon">Buổi chiều</string>
     <string name="legend_evening">Buổi tối</string>
     <string name="legend_absent">Vắng mặt</string>
+
+    <!-- Tiêu đề/chân trang FAQ -->
+    <string name="faq_header_title">Câu hỏi thường gặp (FAQ)</string>
+    <string name="faq_header_desc">Nhấn vào câu hỏi để xem câu trả lời</string>
+    <string name="faq_footer_title">Vẫn chưa giải quyết được?</string>
+    <string name="faq_footer_body">Liên hệ qua menu bên → "Phản hồi người dùng".\nEmail: support@hakobun.example</string>
+
+    <!-- Danh mục FAQ -->
+    <string name="faq_cat_basic">Thao tác cơ bản</string>
+    <string name="faq_cat_ocr">OCR &amp; Nhập liệu bằng giọng nói</string>
+    <string name="faq_cat_notif">Thông báo</string>
+    <string name="faq_cat_sub">Đăng ký gói dịch vụ</string>
+    <string name="faq_cat_data">Dữ liệu &amp; Sao lưu</string>
+    <string name="faq_cat_other">Khác</string>
+
+    <!-- FAQ Hỏi &amp; Đáp -->
+    <string name="faq_q_01">Làm thế nào để đăng ký hàng?</string>
+    <string name="faq_a_01">Nhấn nút「Đăng ký」ở góc trên bên phải màn hình Trang chủ, hoặc vào menu bên → 「Đăng ký hàng」.\n\nCó 3 cách đăng ký:\n① Nhập địa chỉ thủ công\n② Chụp vận đơn bằng camera (OCR tự động nhận dạng)\n③ Nhập địa chỉ bằng giọng nói\n\nSau khi đăng ký, ghim sẽ xuất hiện trên bản đồ Trang chủ.</string>
+    <string name="faq_q_02">Mỗi ngày có thể đăng ký bao nhiêu hàng?</string>
+    <string name="faq_a_02">Gói miễn phí (bao gồm 1 tháng dùng thử) cho phép đăng ký tối đa 5 hàng mỗi ngày.\n\nGói Premium (¥980/tháng) không giới hạn số lượng đăng ký.\n\nKhi đạt giới hạn, thông báo nâng cấp gói sẽ hiện ra khi bạn nhấn nút đăng ký.</string>
+    <string name="faq_q_03">Làm thế nào để cập nhật trạng thái giao hàng?</string>
+    <string name="faq_a_03">Nhấn ghim trên bản đồ Trang chủ hoặc nhấn thẻ trong danh sách giao hàng để mở màn hình chi tiết.\n\nBạn có thể thay đổi trạng thái thành「Đã giao」「Vắng mặt」「Giao lại」「Hoàn kho」, v.v.</string>
+    <string name="faq_q_04">Ghim trên bản đồ không hiển thị đúng vị trí</string>
+    <string name="faq_a_04">Độ chính xác phụ thuộc vào quá trình mã hóa địa lý (chuyển đổi địa chỉ → tọa độ).\n\nTrong màn hình đăng ký hàng, nhấn giữ ghim trên bản đồ ở cuối trang và kéo đến vị trí đúng để chỉnh thủ công. Vị trí đã chỉnh sẽ được lưu lại.</string>
+    <string name="faq_q_05">Cách sử dụng tuyến đường cố định (nhận hàng)?</string>
+    <string name="faq_a_05">Vào menu bên → 「Nhận hàng / Tuyến cố định」để tải hàng loạt các tuyến đã đăng ký (A〜D) vào danh sách giao hàng hôm nay.\n\nĐăng ký và chỉnh sửa tuyến có thể thực hiện trong mục 「Quản lý tuyến」trên cùng màn hình.</string>
+    <string name="faq_q_06">Chụp vận đơn bằng camera nhưng chữ bị nhận sai</string>
+    <string name="faq_a_06">Hãy thử các cách sau:\n\n· Chụp ở nơi đủ ánh sáng\n· Đảm bảo toàn bộ vận đơn nằm trong khung hình\n· Giữ điện thoại bằng hai tay để tránh rung\n· Kiểm tra vận đơn có bị bẩn, gấp hoặc phản chiếu ánh sáng không\n\nCác trường có thể chỉnh sửa thủ công sau khi OCR. Độ chính xác phụ thuộc vào ánh sáng và chất lượng in.</string>
+    <string name="faq_q_07">Nhập liệu bằng giọng nói không nhận dạng được</string>
+    <string name="faq_a_07">Vui lòng kiểm tra:\n\n· Ứng dụng đã được cấp quyền microphone chưa (Cài đặt → Ứng dụng → HAKOBUN → Quyền)\n· Nói trong môi trường yên tĩnh\n· Đọc địa chỉ chậm rãi và rõ ràng\n\nNhận dạng giọng nói sử dụng engine Google Speech Recognition.</string>
+    <string name="faq_q_08">Không nhận được thông báo khung giờ</string>
+    <string name="faq_a_08">Vui lòng kiểm tra:\n\n① Thông báo trong ứng dụng đã bật chưa (Thông báo → Cài đặt → Thông báo)\n② Android Cài đặt → Ứng dụng → HAKOBUN → Thông báo đã được đặt thành「Cho phép」chưa\n③ Chế độ tiết kiệm pin có đang giới hạn hoạt động nền không\n\nNếu vẫn còn vấn đề, hãy nhấn nút「Đặt lại báo thức」.</string>
+    <string name="faq_q_09">Làm thế nào để tắt thông báo?</string>
+    <string name="faq_a_09">Trong ứng dụng: menu bên → Thông báo → Cài đặt → tắt nút gạt Thông báo.\n\nBạn cũng có thể tắt qua Android Cài đặt → Ứng dụng → HAKOBUN → Thông báo.</string>
+    <string name="faq_q_10">Bao giờ thì hết thời gian dùng thử miễn phí?</string>
+    <string name="faq_a_10">Thời gian dùng thử miễn phí là 30 ngày kể từ ngày đăng ký.\n\nBạn có thể kiểm tra số ngày còn lại trên màn hình Tài khoản người dùng (menu bên → Thông tin tài khoản người dùng).\n\nHủy trước 24 giờ khi hết thời gian dùng thử để không bị tính phí.</string>
+    <string name="faq_q_11">Làm thế nào để hủy đăng ký?</string>
+    <string name="faq_a_11">Vào Google Play Store → Biểu tượng tài khoản → 「Đăng ký」→ HAKOBUN → 「Hủy đăng ký」.\n\nSau khi hủy, bạn vẫn có thể sử dụng đến cuối tháng hiện tại. Tính năng hủy trong ứng dụng đang được phát triển.</string>
+    <string name="faq_q_12">Thanh toán thất bại</string>
+    <string name="faq_a_12">Vui lòng kiểm tra phương thức thanh toán trên Google Play.\n\nGoogle Play Store → Tài khoản → Thanh toán &amp; đăng ký → Phương thức thanh toán\n\nCó thể do thẻ hết hạn hoặc không đủ số dư. Vui lòng tham khảo thêm hỗ trợ của Google Play.</string>
+    <string name="faq_q_13">Dữ liệu được lưu ở đâu?</string>
+    <string name="faq_a_13">Tất cả dữ liệu được lưu trong bộ nhớ được mã hóa trên điện thoại của bạn.\n\nKhông có dữ liệu nào được gửi lên máy chủ bên ngoài hay đồng bộ lên đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu.\n\nKhuyến nghị xuất dữ liệu quan trọng bằng tính năng Sao lưu (menu bên → Sao lưu).</string>
+    <string name="faq_q_14">Đổi điện thoại có chuyển được dữ liệu không?</string>
+    <string name="faq_a_14">Hiện chưa hỗ trợ chuyển dữ liệu tự động.\n\nTrước khi đổi máy, hãy xuất dữ liệu bằng tính năng Sao lưu (sao chép/chia sẻ), rồi nhập vào thiết bị mới.\n\nChức năng nhập: menu bên → Sao lưu → 「Khôi phục」</string>
+    <string name="faq_q_15">Ứng dụng chậm hoặc bị treo</string>
+    <string name="faq_a_15">Hãy thử:\n\n① Đóng hoàn toàn ứng dụng rồi khởi động lại\n② Khởi động lại thiết bị\n③ Cập nhật ứng dụng lên phiên bản mới nhất (kiểm tra trên Google Play Store)\n④ Nếu đã đăng ký nhiều hàng, dùng「Kết thúc ngày」để đặt lại\n\nNếu vẫn còn vấn đề, vui lòng liên hệ chúng tôi.</string>
+    <string name="faq_q_16">Tôi muốn báo lỗi hoặc góp ý cải thiện</string>
+    <string name="faq_a_16">Gửi qua menu bên → Thông báo → 「Phản hồi người dùng」.\n\nVui lòng cung cấp chi tiết cụ thể (các bước thực hiện, mẫu thiết bị, phiên bản Android) để chúng tôi xử lý nhanh hơn.</string>
+    <string name="faq_q_17">Liên hệ hỗ trợ ở đâu?</string>
+    <string name="faq_a_17">Email: support@hakobun.example\n\nKhi liên hệ, vui lòng cung cấp:\n· Mẫu thiết bị và phiên bản Android\n· Phiên bản ứng dụng\n· Các bước tái hiện vấn đề\n\nChúng tôi phản hồi trong giờ làm việc (Thứ Hai–Thứ Sáu, 10:00–18:00 JST).</string>
+
+    <!-- Điều khoản dịch vụ (mở rộng) -->
+    <string name="terms_header_title">Điều khoản dịch vụ &amp; Chính sách bảo mật HAKOBUN</string>
+    <string name="terms_header_date">Cập nhật lần cuối: 19 tháng 7 năm 2026</string>
+    <string name="terms_header_intro">Vui lòng đọc các điều khoản sau trước khi sử dụng ứng dụng. Khi bắt đầu sử dụng, bạn đồng ý với các điều khoản này.</string>
+    <string name="terms_s01_title">Điều 1　Tổng quan dịch vụ</string>
+    <string name="terms_s01_body">HAKOBUN (sau đây gọi là「Ứng dụng」) là ứng dụng hỗ trợ quản lý giao hàng nhằm nâng cao hiệu quả công việc cho tài xế giao hàng. Cung cấp các tính năng như đăng ký hàng hóa, quản lý tuyến đường, ghi lại trạng thái giao hàng, đọc địa chỉ bằng OCR.\n\nỨng dụng là công cụ hỗ trợ nghiệp vụ. Việc tuân thủ pháp luật, lái xe an toàn và chấp hành quy định của công ty giao hàng trong công việc thực tế là trách nhiệm của người dùng.</string>
+    <string name="terms_s02_title">Điều 2　Điều kiện sử dụng</string>
+    <string name="terms_s02_body">Ứng dụng dành cho người từ 18 tuổi trở lên đang làm việc trong lĩnh vực giao hàng hoặc quản lý nghiệp vụ.\n\nCó thể cần tài khoản Google để sử dụng ứng dụng. Cấm đăng ký bằng thông tin giả mạo.</string>
+    <string name="terms_s03_title">Điều 3　Đăng ký gói &amp; Thanh toán</string>
+    <string name="terms_s03_body">[Dùng thử miễn phí]\nCung cấp 1 tháng dùng thử miễn phí khi đăng ký lần đầu. Có thể sử dụng toàn bộ tính năng trong thời gian dùng thử. Nếu không hủy trước 24 giờ khi hết thời gian dùng thử, sẽ tự động chuyển sang gói có phí.\n\n[Gói có phí (Premium)]\nGiá: ¥980 / tháng (đã bao gồm thuế)\nThanh toán: Tự động gia hạn hàng tháng qua Google Play\nHủy: Có thể hủy bất kỳ lúc nào từ màn hình「Đăng ký」trên Google Play Store. Sau khi hủy vẫn sử dụng được đến cuối tháng.\n\n[Chính sách hoàn tiền]\nTheo chính sách hoàn tiền của Google Play. Hủy trong vòng 48 giờ sau khi mua vui lòng đăng ký qua Google Play.\n\n[Thay đổi giá]\nSẽ thông báo trước 30 ngày qua thông báo trong ứng dụng hoặc email khi có thay đổi giá.</string>
+    <string name="terms_s04_title">Điều 4　Thông tin thu thập và mục đích sử dụng</string>
+    <string name="terms_s04_body">■ Vị trí (GPS)\nMục đích: Dẫn đường đến địa điểm giao hàng, hiển thị vị trí hiện tại, tối ưu hóa tuyến đường\nThời điểm thu thập: Chỉ khi đang sử dụng ứng dụng (không thu thập nền)\n\n■ Camera/Hình ảnh\nMục đích: Nhập địa chỉ tự động bằng OCR vận đơn\nLưu trữ: Chỉ trên thiết bị (không tải lên đám mây)\n\n■ Giọng nói (Microphone)\nMục đích: Chuyển đổi địa chỉ và ghi chú qua nhập liệu bằng giọng nói\nLưu trữ: Chỉ trên thiết bị\n\n■ Thông tin nhập (Họ tên, địa chỉ, điện thoại, email)\nMục đích: Quản lý nghiệp vụ giao hàng và thiết lập hồ sơ tài xế\nLưu trữ: Bộ nhớ mã hóa trên thiết bị (AES-256-GCM)\nGửi ra ngoài: Không</string>
+    <string name="terms_s05_title">Điều 5　Sử dụng dịch vụ bên thứ ba</string>
+    <string name="terms_s05_body">■ Google Maps Platform\nDùng để hiển thị bản đồ, dẫn đường và mã hóa địa lý. Chính sách bảo mật của Google (https://policies.google.com/privacy) được áp dụng.\n\n■ Google Play Billing\nDùng cho thanh toán đăng ký. Thông tin thanh toán do Google quản lý, ứng dụng không lưu trữ.\n\n■ Google ML Kit (Nhận dạng văn bản)\nXử lý OCR chỉ thực hiện trên thiết bị, không gửi dữ liệu lên máy chủ bên ngoài.\n\n■ Dịch vụ vị trí Google\nDùng để lấy vị trí GPS.</string>
+    <string name="terms_s06_title">Điều 6　Lưu trữ dữ liệu &amp; Bảo mật</string>
+    <string name="terms_s06_body">Thông tin cá nhân và dữ liệu nghiệp vụ bạn nhập được lưu trong bộ nhớ mã hóa trên thiết bị (Android EncryptedSharedPreferences / AES-256-GCM).\n\nKhông truyền dữ liệu lên máy chủ bên ngoài hay đồng bộ đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu khỏi thiết bị.\n\nKhi sử dụng tính năng Sao lưu, người dùng tự chịu trách nhiệm quản lý dữ liệu đã xuất.</string>
+    <string name="terms_s07_title">Điều 7　Các hành vi bị cấm</string>
+    <string name="terms_s07_body">Cấm các hành vi sau:\n\n· Dịch ngược, chỉnh sửa hoặc phân phối lại ứng dụng\n· Nhập hoặc sử dụng thông tin cá nhân của người khác mà không được phép\n· Sử dụng ứng dụng cho mục đích vi phạm pháp luật\n· Gây quá tải cho máy chủ hoặc cơ sở hạ tầng của ứng dụng\n· Đăng ký thông tin giả hoặc lạm dụng để tránh thanh toán</string>
+    <string name="terms_s08_title">Điều 8　Miễn trừ trách nhiệm</string>
+    <string name="terms_s08_body">Ứng dụng được cung cấp theo hiện trạng. Nhà vận hành không chịu trách nhiệm về:\n\n· Độ chính xác của thông tin bản đồ hoặc hướng dẫn tuyến đường (luôn ưu tiên biển báo giao thông và luật lệ giao thông)\n· Độ chính xác của kết quả OCR\n· Mất dữ liệu do lỗi ứng dụng hoặc gián đoạn kết nối\n· Sự cố hoặc thay đổi thông số kỹ thuật của dịch vụ bên thứ ba\n· Tổn thất kinh doanh hoặc lỗi giao hàng\n\nHãy tự xác minh thông tin giao hàng quan trọng.</string>
+    <string name="terms_s09_title">Điều 9　Thay đổi điều khoản</string>
+    <string name="terms_s09_body">Các điều khoản này có thể được cập nhật mà không cần thông báo trước. Các thay đổi quan trọng sẽ được thông báo qua thông báo trong ứng dụng hoặc email. Tiếp tục sử dụng ứng dụng sau khi thay đổi đồng nghĩa với việc chấp nhận các điều khoản sửa đổi.</string>
+    <string name="terms_s10_title">Điều 10　Luật áp dụng &amp; Tòa án có thẩm quyền</string>
+    <string name="terms_s10_body">Các điều khoản này được điều chỉnh bởi luật pháp Nhật Bản. Bất kỳ tranh chấp nào phát sinh từ các điều khoản này sẽ thuộc thẩm quyền độc quyền của Tòa án Quận Tokyo với tư cách là tòa án xét xử sơ thẩm.</string>
+    <string name="terms_contact_title">Liên hệ</string>
+    <string name="terms_contact_body">Nếu có câu hỏi về điều khoản hoặc quyền riêng tư, vui lòng liên hệ:\n\nEmail: support@hakobun.example\n\n※ Nội dung chính sách này nhất quán với những gì chúng tôi đã khai báo trong biểu mẫu Bảo mật dữ liệu Google Play.</string>
 </resources>
