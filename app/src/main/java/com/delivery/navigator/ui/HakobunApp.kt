@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -118,6 +119,11 @@ import com.google.mlkit.vision.text.TextRecognition
 import android.os.Build
 import android.os.LocaleList
 import android.app.LocaleManager
+import androidx.compose.material3.Switch
+import com.delivery.navigator.notification.isNotificationEnabled
+import com.delivery.navigator.notification.setNotificationEnabled
+import com.delivery.navigator.notification.showAnnouncementNotification
+import com.delivery.navigator.notification.scheduleAllTimeWindowAlarms
 
 @Composable
 fun HakobunApp() {
@@ -1414,6 +1420,70 @@ private fun UserAccountScreen(
     }
 }
 
+@Composable
+private fun NotificationToggleRow() {
+    val context = LocalContext.current
+    var enabled by remember { mutableStateOf(isNotificationEnabled(context)) }
+    val scope = rememberCoroutineScope()
+
+    WhiteCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.settings_notification),
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        if (enabled) stringResource(R.string.notif_on_desc) else stringResource(R.string.notif_off_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MutedText
+                    )
+                }
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = { newVal ->
+                        enabled = newVal
+                        setNotificationEnabled(context, newVal)
+                    }
+                )
+            }
+            if (enabled) {
+                Text(
+                    stringResource(R.string.notif_schedule_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MutedText
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = {
+                            showAnnouncementNotification(
+                                context,
+                                "【HAKOBUN】運営からのお知らせ",
+                                "アプリが最新バージョンに更新されました。新機能をご確認ください。"
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.notif_test_announcement), style = MaterialTheme.typography.bodySmall)
+                    }
+                    OutlinedButton(
+                        onClick = { scheduleAllTimeWindowAlarms(context) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.notif_reschedule), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
+    }
+}
+
 private data class AppLanguage(val tag: String, val label: String)
 
 private val supportedLanguages = listOf(
@@ -1560,7 +1630,7 @@ private fun AccountMenuDetailScreen(
                     AccountMenuItem.Settings -> {
                         InfoRow(stringResource(R.string.settings_map), stringResource(R.string.settings_map_text))
                         InfoRow(stringResource(R.string.settings_navi), stringResource(R.string.settings_navi_text))
-                        InfoRow(stringResource(R.string.settings_notification), stringResource(R.string.settings_notification_text))
+                        NotificationToggleRow()
                         LanguageSelector()
                     }
                     AccountMenuItem.Help -> {

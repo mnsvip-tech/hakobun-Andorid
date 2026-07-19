@@ -239,6 +239,11 @@
     <string name="settings_navi_text">点击图钉后启动Google地图导航</string>
     <string name="settings_notification">通知</string>
     <string name="settings_notification_text">计划推出运营通知和时段提醒</string>
+    <string name="notif_on_desc">午前・午後・夜間の時間帯アラートが有効</string>
+    <string name="notif_off_desc">通知は無効です</string>
+    <string name="notif_schedule_hint">午前 9:00 / 午後 14:00 / 夜間 18:00 に未配達件数を通知</string>
+    <string name="notif_test_announcement">お知らせをテスト送信</string>
+    <string name="notif_reschedule">アラームを再設定</string>
     <string name="settings_language">言語 / Language</string>
 
     <!-- 帮助 -->

@@ -239,6 +239,11 @@
     <string name="settings_navi_text">Launches Google Maps navigation on pin tap</string>
     <string name="settings_notification">Notifications</string>
     <string name="settings_notification_text">Operations notices and time-window alerts planned</string>
+    <string name="notif_on_desc">Morning / Afternoon / Evening time-window alerts enabled</string>
+    <string name="notif_off_desc">Notifications are disabled</string>
+    <string name="notif_schedule_hint">Alerts fire at 9:00 AM / 2:00 PM / 6:00 PM for pending deliveries</string>
+    <string name="notif_test_announcement">Send test notice</string>
+    <string name="notif_reschedule">Reschedule alarms</string>
     <string name="settings_language">言語 / Language</string>
 
     <!-- Help -->
