@@ -6,8 +6,10 @@ import androidx.security.crypto.MasterKey
 import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
+import com.delivery.navigator.model.MembershipPlan
 import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.TimeWindow
+import com.delivery.navigator.model.UserProfile
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -63,6 +65,35 @@ class LocalDeliveryStore(context: Context) {
         val array = JSONArray()
         courses.forEach { course -> array.put(course.toJson()) }
         preferences.edit().putString(KEY_REGULAR_COURSES, array.toString()).apply()
+    }
+
+    fun loadUserProfile(): UserProfile {
+        val src = preferences.getString(KEY_USER_PROFILE, null).orEmpty()
+        if (src.isBlank()) return UserProfile()
+        return runCatching {
+            val obj = JSONObject(src)
+            UserProfile(
+                driverName = obj.optString("driverName"),
+                base = obj.optString("base"),
+                contact = obj.optString("contact"),
+                email = obj.optString("email"),
+                plan = enumValueOrDefault(obj.optString("plan"), MembershipPlan.Free),
+                trialStartMillis = obj.optLong("trialStartMillis", 0L),
+                isRegistered = obj.optBoolean("isRegistered", false)
+            )
+        }.getOrDefault(UserProfile())
+    }
+
+    fun saveUserProfile(profile: UserProfile) {
+        val obj = JSONObject()
+            .put("driverName", profile.driverName)
+            .put("base", profile.base)
+            .put("contact", profile.contact)
+            .put("email", profile.email)
+            .put("plan", profile.plan.name)
+            .put("trialStartMillis", profile.trialStartMillis)
+            .put("isRegistered", profile.isRegistered)
+        preferences.edit().putString(KEY_USER_PROFILE, obj.toString()).apply()
     }
 
     fun clear() {
@@ -155,5 +186,6 @@ class LocalDeliveryStore(context: Context) {
         const val PREFERENCES_NAME = "hakobun_delivery_store"
         const val KEY_PACKAGES = "packages"
         const val KEY_REGULAR_COURSES = "regular_courses"
+        const val KEY_USER_PROFILE = "user_profile"
     }
 }

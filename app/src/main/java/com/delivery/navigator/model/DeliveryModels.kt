@@ -55,6 +55,19 @@ enum class PackageSizeOption(val label: String) {
     ExtraLarge("120+")
 }
 
+enum class MembershipPlan { Free, Premium }
+
+@Immutable
+data class UserProfile(
+    val driverName: String = "",
+    val base: String = "",
+    val contact: String = "",
+    val email: String = "",
+    val plan: MembershipPlan = MembershipPlan.Free,
+    val trialStartMillis: Long = 0L,
+    val isRegistered: Boolean = false
+)
+
 enum class AccountMenuItem(val title: String, val description: String) {
     Feedback("ユーザーからのフィードバック", "改善要望や不具合報告を運営へ送信"),
     Announcements("運営側からのお知らせ", "重要なお知らせ・メンテナンス情報"),
@@ -103,7 +116,9 @@ data class PackageRegistrationResult(
     val timeWindow: RegistrationTimeWindow,
     val shape: PackageShape,
     val colorType: PackageColorType,
-    val size: PackageSizeOption
+    val size: PackageSizeOption,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )
 
 @Immutable

@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +93,23 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.key
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.material3.ButtonDefaults
+import kotlinx.coroutines.flow.drop
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.queryProductDetails
+import com.delivery.navigator.model.MembershipPlan
+import com.delivery.navigator.model.UserProfile
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.TextRecognition
@@ -124,6 +141,18 @@ fun HakobunApp() {
     var isSupportHubOpen by remember { mutableStateOf(false) }
     var activeMenuItem by remember { mutableStateOf<AccountMenuItem?>(null) }
     var isLoggedIn by remember { mutableStateOf(true) }
+    var userProfile by remember { mutableStateOf(deliveryStore.loadUserProfile()) }
+    var showPaywallDialog by remember { mutableStateOf(false) }
+    val trialRemainingDays = if (userProfile.trialStartMillis > 0L) {
+        val elapsed = System.currentTimeMillis() - userProfile.trialStartMillis
+        (30 - (elapsed / (1000L * 60 * 60 * 24)).toInt()).coerceAtLeast(0)
+    } else 30
+    val isFreeExpired = userProfile.isRegistered &&
+        userProfile.plan != MembershipPlan.Premium &&
+        trialRemainingDays == 0
+    val onRegisterPackageAttempt = {
+        if (isFreeExpired) showPaywallDialog = true else isRegisteringPackage = true
+    }
     var backupText by remember { mutableStateOf("") }
     var importText by remember { mutableStateOf("") }
     var selectedSummaryFilter by remember { mutableStateOf<PackageSummaryFilter?>(null) }
@@ -219,6 +248,23 @@ fun HakobunApp() {
     }
 
     MaterialTheme {
+        if (showPaywallDialog) {
+            AlertDialog(
+                onDismissRequest = { showPaywallDialog = false },
+                title = { Text("無料期間が終了しました") },
+                text = { Text("荷物の新規登録にはプレミアムプランへの移行が必要です。\n\n最初の1ヶ月は無料でお試しいただけます。") },
+                confirmButton = {
+                    Button(onClick = {
+                        showPaywallDialog = false
+                        activeMenuItem = AccountMenuItem.Account
+                    }) { Text("プレミアムに登録") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPaywallDialog = false }) { Text("キャンセル") }
+                }
+            )
+        }
+
         redeliveryCandidate?.let { packageItem ->
             AlertDialog(
                 onDismissRequest = { redeliveryCandidateCode = null },
@@ -244,12 +290,25 @@ fun HakobunApp() {
         }
 
         activeMenuItem?.let { item ->
-            AccountMenuDetailScreen(
-                item = item,
-                isLoggedIn = isLoggedIn,
-                onBack = { activeMenuItem = null },
-                onLoginToggle = { isLoggedIn = !isLoggedIn }
-            )
+            if (item == AccountMenuItem.Account) {
+                UserAccountScreen(
+                    userProfile = userProfile,
+                    isLoggedIn = isLoggedIn,
+                    onBack = { activeMenuItem = null },
+                    onLoginToggle = { isLoggedIn = !isLoggedIn },
+                    onSaveProfile = { updated ->
+                        userProfile = updated
+                        deliveryStore.saveUserProfile(updated)
+                    }
+                )
+            } else {
+                AccountMenuDetailScreen(
+                    item = item,
+                    isLoggedIn = isLoggedIn,
+                    onBack = { activeMenuItem = null },
+                    onLoginToggle = { isLoggedIn = !isLoggedIn }
+                )
+            }
             return@MaterialTheme
         }
 
@@ -271,6 +330,17 @@ fun HakobunApp() {
                         persistPackages()
                     }
                 }
+            )
+            return@MaterialTheme
+        }
+
+        if (homePanel == HomePanel.Packages) {
+            PackageListScreen(
+                packages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages,
+                selectedCode = selectedPackage?.trackingCode,
+                onBack = { homePanel = null },
+                onSelectPackage = onPackageSelected,
+                onEditPackage = { editingPackageCode = it }
             )
             return@MaterialTheme
         }
@@ -359,7 +429,7 @@ fun HakobunApp() {
                     isLoggedIn = isLoggedIn,
                     onOpenMenu = { isHomeMenuOpen = true },
                     onOpenSupport = { isSupportHubOpen = true },
-                    onRegisterPackage = { isRegisteringPackage = true },
+                    onRegisterPackage = { onRegisterPackageAttempt() },
                     onToggleMapControls = { showMapControls = !showMapControls },
                     onFilterSelected = { filter ->
                         selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
@@ -443,11 +513,15 @@ fun HakobunApp() {
                         },
                         onRegisterPackage = {
                             isHomeMenuOpen = false
-                            isRegisteringPackage = true
+                            onRegisterPackageAttempt()
                         },
                         onOpenSupport = {
                             isHomeMenuOpen = false
                             isSupportHubOpen = true
+                        },
+                        onOpenAccount = {
+                            isHomeMenuOpen = false
+                            activeMenuItem = AccountMenuItem.Account
                         },
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -598,6 +672,7 @@ private fun HomeSideMenu(
     onOpenPanel: (HomePanel) -> Unit,
     onRegisterPackage: () -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenAccount: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier, color = Color.White) {
@@ -624,6 +699,7 @@ private fun HomeSideMenu(
             SideMenuCard("集荷 / 定期コース", "A〜Dコースを今日の配達へ読み込み", "◇") { onOpenPanel(HomePanel.Courses) }
             SideMenuCard("配達リスト", "残り・完了・不在をカードで確認", "☷") { onOpenPanel(HomePanel.Packages) }
             SideMenuCard("バックアップ", "住所データのコピー・共有・復元", "↻") { onOpenPanel(HomePanel.Backup) }
+            SideMenuCard("ユーザーアカウント情報", "ドライバー名・拠点・連絡先を確認", "👤") { onOpenAccount() }
             SideMenuCard("お知らせ / 終了処理", "サポートとカレンダー転記はこちら", "i") { onOpenSupport() }
             Spacer(modifier = Modifier.weight(1f))
             Text("地図は全画面表示。必要な操作だけ左メニューから呼び出します。", color = MutedText, style = MaterialTheme.typography.bodySmall)
@@ -696,7 +772,7 @@ private fun HomePanelSheet(
             when (panel) {
                 HomePanel.Packages -> PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
                 HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onAddCourseAddress)
-                HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport)
+                HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClose)
             }
         }
     }
@@ -720,6 +796,7 @@ private fun FullScreenDeliveryMap(
     var mapLoaded by remember { mutableStateOf(false) }
     var mapBearing by remember { mutableStateOf(0f) }
     var drivingRoutePoints by remember { mutableStateOf<List<LatLng>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
     val activeRouteDestination = selectedPackage ?: routeStops.firstOrNull()?.deliveryPackage
     LaunchedEffect(selectedPackage?.trackingCode) {
         if (mapLoaded) {
@@ -807,24 +884,55 @@ private fun FullScreenDeliveryMap(
                 FloatingMapButton("ナビ") { onNavigate(item) }
             }
         }
-        MiniCompass(
-            onClick = {
-                if (mapLoaded) {
-                    mapBearing = 0f
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newCameraPosition(
-                            CameraPosition.Builder(cameraPositionState.position)
-                                .bearing(mapBearing)
-                                .build()
-                        )
-                    )
-                }
-            },
+        Row(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .navigationBarsPadding()
-                .padding(end = 14.dp, bottom = 18.dp)
-        )
+                .padding(end = 14.dp, bottom = 18.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MapZoomButton("+") {
+                    if (mapLoaded) coroutineScope.launch {
+                        cameraPositionState.animate(CameraUpdateFactory.zoomIn())
+                    }
+                }
+                MapZoomButton("−") {
+                    if (mapLoaded) coroutineScope.launch {
+                        cameraPositionState.animate(CameraUpdateFactory.zoomOut())
+                    }
+                }
+            }
+            MiniCompass(
+                onClick = {
+                    if (mapLoaded) {
+                        mapBearing = 0f
+                        cameraPositionState.move(
+                            CameraUpdateFactory.newCameraPosition(
+                                CameraPosition.Builder(cameraPositionState.position)
+                                    .bearing(mapBearing)
+                                    .build()
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun MapZoomButton(label: String, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.size(46.dp).clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(label, color = Color(0xFF20242C), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Light)
+        }
     }
 }
 
@@ -855,7 +963,7 @@ private fun MiniCompass(onClick: () -> Unit, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("▲", color = BrandPurple, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Text("▲", color = Color(0xFFD32F2F), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
             Text("N", color = Color(0xFF20242C), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
         }
     }
@@ -1037,7 +1145,7 @@ private fun AccountMenuPanel(
             }
             Button(onClick = onLoginToggle) { Text(if (isLoggedIn) "ログアウト" else "ログイン") }
         }
-        AccountMenuItem.entries.chunked(2).forEach { rowItems ->
+        AccountMenuItem.entries.filter { it != AccountMenuItem.Account }.chunked(2).forEach { rowItems ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowItems.forEach { item ->
                     Box(
@@ -1059,6 +1167,242 @@ private fun AccountMenuPanel(
                 }
                 if (rowItems.size == 1) {
                     Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+private const val SUBSCRIPTION_PRODUCT_ID = "hakobun_monthly_premium"
+
+@Composable
+private fun UserAccountScreen(
+    userProfile: UserProfile,
+    isLoggedIn: Boolean,
+    onBack: () -> Unit,
+    onLoginToggle: () -> Unit,
+    onSaveProfile: (UserProfile) -> Unit
+) {
+    val context = LocalContext.current
+    val activity = context as? android.app.Activity
+    val scope = rememberCoroutineScope()
+
+    var isEditing by remember { mutableStateOf(!userProfile.isRegistered) }
+    var driverName by remember { mutableStateOf(userProfile.driverName) }
+    var base by remember { mutableStateOf(userProfile.base) }
+    var contact by remember { mutableStateOf(userProfile.contact) }
+    var email by remember { mutableStateOf(userProfile.email) }
+    var billingReady by remember { mutableStateOf(false) }
+    var subscribeMessage by remember { mutableStateOf("") }
+
+    val trialRemainingDays = if (userProfile.trialStartMillis > 0L) {
+        val elapsed = System.currentTimeMillis() - userProfile.trialStartMillis
+        (30 - (elapsed / (1000L * 60 * 60 * 24)).toInt()).coerceAtLeast(0)
+    } else 30
+
+    val isPremium = userProfile.plan == MembershipPlan.Premium
+    val isFreeExpired = !isPremium && trialRemainingDays == 0 && userProfile.isRegistered
+
+    val billingClient = remember {
+        BillingClient.newBuilder(context)
+            .setListener { result, purchases ->
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    purchases?.forEach { purchase ->
+                        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                            onSaveProfile(userProfile.copy(plan = MembershipPlan.Premium))
+                            subscribeMessage = "プレミアムプランへの移行が完了しました"
+                        }
+                    }
+                }
+            }
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
+            )
+            .build()
+    }
+
+    DisposableEffect(Unit) {
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(result: BillingResult) {
+                billingReady = result.responseCode == BillingClient.BillingResponseCode.OK
+            }
+            override fun onBillingServiceDisconnected() { billingReady = false }
+        })
+        onDispose { billingClient.endConnection() }
+    }
+
+    fun launchSubscription() {
+        if (activity == null) { subscribeMessage = "Google Play Billingを起動できません"; return }
+        scope.launch {
+            val params = QueryProductDetailsParams.newBuilder()
+                .setProductList(listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(SUBSCRIPTION_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+                )).build()
+            val result = billingClient.queryProductDetails(params)
+            val productDetails = result.productDetailsList?.firstOrNull()
+            if (productDetails == null) {
+                subscribeMessage = "プランが見つかりません（Play Console設定をご確認ください）"
+                return@launch
+            }
+            val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return@launch
+            val flowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build()
+                )).build()
+            billingClient.launchBillingFlow(activity, flowParams)
+        }
+    }
+
+    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onBack) { Text("← 戻る") }
+                Text("ユーザーアカウント情報", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                TextButton(onClick = onLoginToggle) { Text(if (isLoggedIn) "ログアウト" else "ログイン") }
+            }
+
+            // プロフィールカード
+            WhiteCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("プロフィール", fontWeight = FontWeight.Bold)
+                    if (userProfile.isRegistered && !isEditing) {
+                        TextButton(onClick = { isEditing = true }) { Text("編集") }
+                    }
+                }
+                if (isEditing) {
+                    LabeledField("ドライバー名 *", "例）田中 太郎", driverName) { driverName = it }
+                    LabeledField("所属拠点", "例）東京営業所", base) { base = it }
+                    LabeledField("連絡先（電話）", "例）090-0000-0000", contact) { contact = it }
+                    LabeledField("メールアドレス", "例）driver@example.com", email) { email = it }
+                    Button(
+                        onClick = {
+                            val trialStart = if (!userProfile.isRegistered) System.currentTimeMillis() else userProfile.trialStartMillis
+                            onSaveProfile(userProfile.copy(
+                                driverName = driverName,
+                                base = base,
+                                contact = contact,
+                                email = email,
+                                isRegistered = true,
+                                trialStartMillis = trialStart
+                            ))
+                            isEditing = false
+                        },
+                        enabled = driverName.isNotBlank(),
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(if (userProfile.isRegistered) "変更を保存" else "登録する") }
+                } else {
+                    InfoRow("ドライバー名", userProfile.driverName.ifBlank { "未設定" })
+                    InfoRow("所属拠点", userProfile.base.ifBlank { "未設定" })
+                    InfoRow("連絡先", userProfile.contact.ifBlank { "未設定" })
+                    InfoRow("メール", userProfile.email.ifBlank { "未設定" })
+                    InfoRow("ログイン状態", if (isLoggedIn) "ログイン中" else "未ログイン")
+                }
+            }
+
+            // プランカード
+            WhiteCard {
+                Text("プランと請求", fontWeight = FontWeight.Bold)
+                if (isPremium) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFEAF0FF))
+                            .padding(12.dp)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("✓ プレミアムプラン", color = BrandBlue, fontWeight = FontWeight.Bold)
+                            Text("すべての機能が利用できます。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isFreeExpired) Color(0xFFFFEEEE) else Color(0xFFF6F7F9))
+                            .padding(12.dp)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                if (isFreeExpired) "⚠ 無料期間終了" else "無料トライアル中",
+                                color = if (isFreeExpired) Color(0xFFE53935) else BrandBlue,
+                                fontWeight = FontWeight.Bold
+                            )
+                            if (userProfile.isRegistered && !isFreeExpired) {
+                                Text("残り ${trialRemainingDays}日", fontWeight = FontWeight.Bold)
+                                Text("終了後、プレミアムプランへ自動移行します。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                            } else if (!userProfile.isRegistered) {
+                                Text("登録後、1ヶ月間無料でご利用いただけます。", color = MutedText, style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(
+                            modifier = Modifier.weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(2.dp, BrandPurple, RoundedCornerShape(8.dp))
+                                .background(Color(0xFFF5F0FF))
+                                .padding(12.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("無料", fontWeight = FontWeight.Bold)
+                                Text("1ヶ月トライアル", color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text("・基本機能\n・荷物登録5件\n・バックアップ", style = MaterialTheme.typography.labelSmall, color = MutedText)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier.weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(2.dp, Color(0xFFE2E7EF), RoundedCornerShape(8.dp))
+                                .background(Color.White)
+                                .padding(12.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("プレミアム", fontWeight = FontWeight.Bold)
+                                Text("¥980 / 月", color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text("・全機能\n・無制限登録\n・優先サポート", style = MaterialTheme.typography.labelSmall, color = MutedText)
+                            }
+                        }
+                    }
+                    Button(
+                        onClick = { launchSubscription() },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8))
+                    ) {
+                        Text("Google Payでプレミアムに登録", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                    Text(
+                        "最初の1ヶ月は無料。その後月額¥980（税込）。いつでもキャンセル可能。",
+                        color = MutedText,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                if (subscribeMessage.isNotBlank()) {
+                    Text(
+                        subscribeMessage,
+                        color = if (subscribeMessage.contains("完了")) SuccessGreen else Color(0xFFE53935)
+                    )
                 }
             }
         }
@@ -1122,12 +1466,7 @@ private fun AccountMenuDetailScreen(
                         InfoRow("更新", "完了・会社へ持ち戻りの荷物は地図ピンから非表示。")
                         InfoRow("案内", "終了処理で1日の件数をカレンダーへ登録。")
                     }
-                    AccountMenuItem.Account -> {
-                        InfoRow("ユーザー", if (isLoggedIn) "HAKOBUNドライバー" else "ゲスト")
-                        InfoRow("所属拠点", "未設定")
-                        InfoRow("連絡先", "未設定")
-                        InfoRow("ログイン状態", if (isLoggedIn) "ログイン中" else "未ログイン")
-                    }
+                    AccountMenuItem.Account -> { /* UserAccountScreen で処理 */ }
                     AccountMenuItem.Settings -> {
                         InfoRow("地図", "Google Maps表示、時間帯別ピン、コンパス、ズーム")
                         InfoRow("ナビ", "ピンタップ後にGoogleマップナビを起動")
@@ -1226,7 +1565,8 @@ private fun AddressBackupPanel(
     importText: String,
     onExport: () -> Unit,
     onImportTextChange: (String) -> Unit,
-    onImport: () -> Unit
+    onImport: () -> Unit,
+    onClose: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val clipboard = remember {
@@ -1243,6 +1583,7 @@ private fun AddressBackupPanel(
                     onClick = {
                         val clip = android.content.ClipData.newPlainText("hakobun_backup", backupText)
                         clipboard.setPrimaryClip(clip)
+                        onClose()
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text("コピー") }
@@ -1254,6 +1595,7 @@ private fun AddressBackupPanel(
                             putExtra(Intent.EXTRA_SUBJECT, "HAKOBUN 住所バックアップ")
                         }
                         context.startActivity(Intent.createChooser(shareIntent, "バックアップを共有"))
+                        onClose()
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text("共有") }
@@ -1548,6 +1890,43 @@ private fun PackageDetail(deliveryPackage: DeliveryPackage, onStatusChange: (Del
 }
 
 @Composable
+private fun PackageListScreen(
+    packages: List<DeliveryPackage>,
+    selectedCode: String?,
+    onBack: () -> Unit,
+    onSelectPackage: (String) -> Unit,
+    onEditPackage: (String) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .statusBarsPadding()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onBack) { Text("← 戻る") }
+                Text("配達リスト", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                Text("${packages.size}件", color = BrandBlue, fontWeight = FontWeight.Bold)
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .navigationBarsPadding()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
+            }
+        }
+    }
+}
+
+@Composable
 private fun PackageList(
     packages: List<DeliveryPackage>,
     selectedCode: String?,
@@ -1731,6 +2110,18 @@ private fun PackageRegistrationScreen(
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
     val canAddMore = addresses.size < 5
+    val geocodedLocations = remember { mutableStateMapOf<String, LatLng>() }
+    val pinOverrides = remember { mutableStateMapOf<String, LatLng>() }
+    LaunchedEffect(addresses.size) {
+        addresses.forEach { addr ->
+            if (!geocodedLocations.containsKey(addr) && addr.isNotBlank()) {
+                scope.launch {
+                    val (lat, lng) = geocodeAddressPublic(addr)
+                    if (lat != 0.0 || lng != 0.0) geocodedLocations[addr] = LatLng(lat, lng)
+                }
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -1751,9 +2142,8 @@ private fun PackageRegistrationScreen(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .navigationBarsPadding()
                     .padding(16.dp)
-                    .padding(bottom = 96.dp),
+                    .padding(bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // 登録済み住所リスト
@@ -1919,11 +2309,23 @@ private fun PackageRegistrationScreen(
                     }
                 }
             }
+            if (addresses.isNotEmpty()) {
+                RegistrationMapPreview(
+                    addresses = addresses,
+                    geocodedLocations = geocodedLocations,
+                    pinOverrides = pinOverrides,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                )
+            }
+            Spacer(modifier = Modifier.navigationBarsPadding().height(68.dp))
         }
         Button(
             onClick = {
                 onRegister(
                     addresses.map { addr ->
+                        val latLng = pinOverrides[addr] ?: geocodedLocations[addr]
                         PackageRegistrationResult(
                             address = addr,
                             hasLocker = false,
@@ -1937,7 +2339,9 @@ private fun PackageRegistrationScreen(
                             timeWindow = RegistrationTimeWindow.None,
                             shape = PackageShape.SmallBox,
                             colorType = PackageColorType.Kraft,
-                            size = PackageSizeOption.Medium
+                            size = PackageSizeOption.Medium,
+                            latitude = latLng?.latitude ?: 0.0,
+                            longitude = latLng?.longitude ?: 0.0
                         )
                     }
                 )
@@ -1955,6 +2359,68 @@ private fun PackageRegistrationScreen(
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+}
+
+@Composable
+private fun RegistrationMapPreview(
+    addresses: List<String>,
+    geocodedLocations: Map<String, LatLng>,
+    pinOverrides: MutableMap<String, LatLng>,
+    modifier: Modifier = Modifier
+) {
+    val validPins = addresses.mapIndexedNotNull { index, addr ->
+        val latLng = pinOverrides[addr] ?: geocodedLocations[addr]
+        if (latLng != null) Triple(index, addr, latLng) else null
+    }
+    val defaultCenter = LatLng(35.681236, 139.767125)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(validPins.firstOrNull()?.third ?: defaultCenter, 14f)
+    }
+    LaunchedEffect(validPins.firstOrNull()?.third) {
+        validPins.firstOrNull()?.third?.let {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 14f))
+        }
+    }
+    Box(modifier = modifier) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = false,
+                compassEnabled = false
+            )
+        ) {
+            validPins.forEach { (index, addr, initialLatLng) ->
+                key(addr) {
+                    val markerState = remember { MarkerState(position = initialLatLng) }
+                    LaunchedEffect(markerState) {
+                        snapshotFlow { markerState.position }
+                            .drop(1)
+                            .collect { newPos: LatLng -> pinOverrides[addr] = newPos }
+                    }
+                    Marker(
+                        state = markerState,
+                        title = "${index + 1}件目",
+                        snippet = addr,
+                        draggable = true
+                    )
+                }
+            }
+        }
+        val hintText = if (validPins.isEmpty()) "住所をジオコーディング中..." else "ピンをドラッグして位置を調整できます"
+        Text(
+            text = hintText,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 8.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color(0xCCFFFFFF))
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = Color(0xFF445064)
+        )
     }
 }
 
@@ -2335,3 +2801,15 @@ private val AbsentGray = Color(0xFF7A8491)
 private val AbsentMarkerArgb = android.graphics.Color.rgb(122, 132, 145)
 private val RedeliveryGreen = Color(0xFF00897B)
 private val RedeliveryMarkerArgb = android.graphics.Color.rgb(0, 137, 123)
+
+@androidx.compose.ui.tooling.preview.Preview(
+    showBackground = true,
+    showSystemUi = true,
+    name = "HakobunApp Preview"
+)
+@Composable
+private fun HakobunAppPreview() {
+    MaterialTheme {
+        HakobunApp()
+    }
+}

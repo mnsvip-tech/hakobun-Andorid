@@ -167,7 +167,11 @@ suspend fun createDeliveryPackageFromRegistration(
         .filter { it.isNotBlank() }
         .joinToString(" / ")
         .ifBlank { "登録画面から追加" }
-    val (lat, lng) = geocodeAddress(result.address)
+    val (lat, lng) = if (result.latitude != 0.0 || result.longitude != 0.0) {
+        result.latitude to result.longitude
+    } else {
+        geocodeAddress(result.address)
+    }
 
     return DeliveryPackage(
         trackingCode = result.trackingNumber.ifBlank { "HB-${1000 + generatedNumber}" },

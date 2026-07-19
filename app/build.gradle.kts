@@ -63,5 +63,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
     implementation("com.google.maps.android:maps-compose:6.12.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
