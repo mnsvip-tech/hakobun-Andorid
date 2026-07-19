@@ -253,6 +253,7 @@ fun HakobunApp() {
         .orEmpty()
     val onPackageSelected: (String) -> Unit = { code ->
         selectedPackageCode = code
+        homePanel = null
         if (packages.firstOrNull { it.trackingCode == code }?.status == DeliveryStatus.Absent) {
             redeliveryCandidateCode = code
         }
