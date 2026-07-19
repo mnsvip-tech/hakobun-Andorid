@@ -239,6 +239,7 @@
     <string name="settings_navi_text">Inicia navegação Google Maps ao tocar no alfinete</string>
     <string name="settings_notification">Notificações</string>
     <string name="settings_notification_text">Avisos de operações e alertas por janela de tempo planejados</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- Ajuda -->
     <string name="help_contact">Contato</string>

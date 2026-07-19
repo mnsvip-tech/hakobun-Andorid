@@ -239,6 +239,7 @@
     <string name="settings_navi_text">핀 탭 후 Google 지도 내비 실행</string>
     <string name="settings_notification">알림</string>
     <string name="settings_notification_text">운영 공지·시간대 알림 예정</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- 도움말 -->
     <string name="help_contact">문의</string>

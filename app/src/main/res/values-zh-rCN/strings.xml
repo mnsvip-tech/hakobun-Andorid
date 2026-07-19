@@ -239,6 +239,7 @@
     <string name="settings_navi_text">点击图钉后启动Google地图导航</string>
     <string name="settings_notification">通知</string>
     <string name="settings_notification_text">计划推出运营通知和时段提醒</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- 帮助 -->
     <string name="help_contact">联系方式</string>

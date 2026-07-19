@@ -239,6 +239,7 @@
     <string name="settings_navi_text">Launches Google Maps navigation on pin tap</string>
     <string name="settings_notification">Notifications</string>
     <string name="settings_notification_text">Operations notices and time-window alerts planned</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- Help -->
     <string name="help_contact">Contact</string>

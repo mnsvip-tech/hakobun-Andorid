@@ -115,6 +115,9 @@ import com.delivery.navigator.model.UserProfile
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.TextRecognition
+import android.os.Build
+import android.os.LocaleList
+import android.app.LocaleManager
 
 @Composable
 fun HakobunApp() {
@@ -1411,6 +1414,91 @@ private fun UserAccountScreen(
     }
 }
 
+private data class AppLanguage(val tag: String, val label: String)
+
+private val supportedLanguages = listOf(
+    AppLanguage("ja", "日本語"),
+    AppLanguage("en", "English"),
+    AppLanguage("zh-Hans", "中文（简体）"),
+    AppLanguage("ko", "한국어"),
+    AppLanguage("vi", "Tiếng Việt"),
+    AppLanguage("pt-BR", "Português (Brasil)")
+)
+
+@Composable
+private fun LanguageSelector() {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+
+    val currentTag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val lm = context.getSystemService(LocaleManager::class.java)
+        lm.applicationLocales.get(0)?.toLanguageTag() ?: "ja"
+    } else "ja"
+
+    val currentLabel = supportedLanguages.firstOrNull { currentTag.startsWith(it.tag) }?.label ?: "日本語"
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(R.string.settings_language),
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(currentLabel, style = MaterialTheme.typography.bodyMedium)
+                Text(if (expanded) "▲" else "▼", style = MaterialTheme.typography.bodySmall, color = MutedText)
+            }
+        }
+        if (expanded) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column {
+                    supportedLanguages.forEach { lang ->
+                        val selected = currentTag.startsWith(lang.tag)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        val lm = context.getSystemService(LocaleManager::class.java)
+                                        lm.applicationLocales = LocaleList.forLanguageTags(lang.tag)
+                                    }
+                                    expanded = false
+                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                lang.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (selected) BrandPurple else Color.Unspecified
+                            )
+                            if (selected) Text("✓", color = BrandPurple)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun AccountMenuDetailScreen(
     item: AccountMenuItem,
@@ -1473,6 +1561,7 @@ private fun AccountMenuDetailScreen(
                         InfoRow(stringResource(R.string.settings_map), stringResource(R.string.settings_map_text))
                         InfoRow(stringResource(R.string.settings_navi), stringResource(R.string.settings_navi_text))
                         InfoRow(stringResource(R.string.settings_notification), stringResource(R.string.settings_notification_text))
+                        LanguageSelector()
                     }
                     AccountMenuItem.Help -> {
                         InfoRow(stringResource(R.string.help_contact), stringResource(R.string.help_contact_value))

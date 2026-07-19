@@ -239,6 +239,7 @@
     <string name="settings_navi_text">Khởi động điều hướng Google Maps sau khi nhấn ghim</string>
     <string name="settings_notification">Thông báo</string>
     <string name="settings_notification_text">Dự kiến thêm thông báo vận hành và cảnh báo khung giờ</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- Trợ giúp -->
     <string name="help_contact">Liên hệ</string>

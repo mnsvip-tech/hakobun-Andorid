@@ -239,6 +239,7 @@
     <string name="settings_navi_text">ピンタップ後にGoogleマップナビを起動</string>
     <string name="settings_notification">通知</string>
     <string name="settings_notification_text">運営お知らせ・時間帯指定アラートを予定</string>
+    <string name="settings_language">言語 / Language</string>
 
     <!-- ヘルプ -->
     <string name="help_contact">問い合わせ</string>
