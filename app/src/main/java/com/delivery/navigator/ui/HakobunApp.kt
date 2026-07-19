@@ -1420,6 +1420,208 @@ private fun UserAccountScreen(
     }
 }
 
+private data class FaqItem(val question: String, val answer: String)
+
+private val faqItems = listOf(
+    // ---- 基本操作 ----
+    FaqItem(
+        "荷物はどうやって登録しますか？",
+        "ホーム画面右上の「登録」ボタン、またはサイドメニュー →「荷物登録」から登録できます。\n\n登録方法は3種類あります。\n① 住所を手入力\n② カメラで送り状を撮影してOCR自動読み取り\n③ マイクで音声入力\n\n登録後はホームのマップにピンが表示されます。"
+    ),
+    FaqItem(
+        "1日に登録できる荷物の件数は？",
+        "無料プラン（1ヶ月トライアル含む）は5件まで登録できます。\n\nプレミアムプラン（¥980/月）は件数無制限でご利用いただけます。\n\n上限に達すると登録ボタンを押したタイミングでプラン変更のご案内が表示されます。"
+    ),
+    FaqItem(
+        "荷物の配達状況を更新するには？",
+        "ホーム画面のマップ上のピン、または配達リストのカードをタップすると詳細画面が開きます。\n\n「完了」「不在」「再配達」「会社へ持ち戻り」などのステータスに変更できます。"
+    ),
+    FaqItem(
+        "地図のピンが正しい場所に表示されません",
+        "住所のジオコーディング（住所→緯度経度変換）の精度に依存します。\n\n荷物登録画面の下部にあるマップで、ピンを指で長押しして正しい位置にドラッグすることで手動修正できます。修正した位置は保存されます。"
+    ),
+    FaqItem(
+        "定期コース（集荷）の使い方は？",
+        "サイドメニュー →「集荷 / 定期コース」から、あらかじめ登録したコース（A〜D）を今日の配達リストに一括読み込みできます。\n\nコースの登録・編集は同画面内の「コース管理」から行えます。"
+    ),
+    // ---- OCR / 音声 ----
+    FaqItem(
+        "カメラで送り状を読み取ったら文字がずれました",
+        "以下の点をお試しください。\n\n・明るい場所で撮影する\n・送り状全体がフレームに収まるようにする\n・手ブレしないよう両手で固定する\n・汚れ・折れ・反射がないか確認する\n\nOCR後の各フィールドは手動で修正できます。認識精度は照明・印刷品質に依存します。"
+    ),
+    FaqItem(
+        "音声入力が認識されません",
+        "以下を確認してください。\n\n・マイクの使用許可がアプリに付与されているか（設定 → アプリ → HAKOBUN → 権限）\n・静かな環境で話しかける\n・住所は「東京都千代田区丸の内一丁目」のようにゆっくり明確に話す\n\n音声認識はGoogle音声認識エンジンを使用しています。"
+    ),
+    // ---- 通知 ----
+    FaqItem(
+        "時間帯の通知が届きません",
+        "以下を確認してください。\n\n① 設定 → 通知がONになっているか（アプリ内：お知らせ → 設定項目 → 通知）\n② Androidの設定 → アプリ → HAKOBUN → 通知が「許可」になっているか\n③ 端末の省電力モードがバックグラウンド動作を制限していないか\n\n問題が続く場合は「アラームを再設定」ボタンをタップしてください。"
+    ),
+    FaqItem(
+        "通知を止めたい",
+        "アプリ内：サイドメニュー → お知らせ → 設定項目 → 通知のトグルをOFFにしてください。\n\nまたはAndroidの設定 → アプリ → HAKOBUN → 通知 からも無効にできます。"
+    ),
+    // ---- サブスクリプション ----
+    FaqItem(
+        "無料トライアルはいつ終わりますか？",
+        "ユーザー登録した日から30日間が無料トライアル期間です。\n\nアプリ内のユーザーアカウント画面（サイドメニュー → ユーザーアカウント情報）で残り日数を確認できます。\n\nトライアル終了の24時間前までにキャンセルすれば料金は発生しません。"
+    ),
+    FaqItem(
+        "サブスクリプションをキャンセルするには？",
+        "Google Play ストア → アカウントアイコン → 「定期購入」→ HAKOBUN → 「定期購入を解約」から手続きしてください。\n\n解約後も当月末までご利用いただけます。アプリ内からの解約機能は現在準備中です。"
+    ),
+    FaqItem(
+        "決済に失敗しました",
+        "Google Play のお支払い方法をご確認ください。\n\nGoogle Play ストア → アカウント → お支払いと定期購入 → お支払い方法\n\nカードの有効期限切れ・残高不足などが原因の場合があります。Google Play のサポートもご参照ください。"
+    ),
+    // ---- データ・バックアップ ----
+    FaqItem(
+        "データはどこに保存されますか？",
+        "すべてのデータはお使いのスマートフォン内の暗号化ストレージに保存されます。\n\n外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールするとデータは削除されます。\n\n大切なデータはバックアップ機能（サイドメニュー → バックアップ）でエクスポートしておくことをお勧めします。"
+    ),
+    FaqItem(
+        "機種変更したらデータは引き継げますか？",
+        "現在、自動的なデータ引き継ぎ機能はありません。\n\n機種変更前にバックアップ機能でデータをエクスポート（コピー・共有）し、新しい端末でインポートしてください。\n\nインポート機能：サイドメニュー → バックアップ → 「復元」"
+    ),
+    // ---- その他 ----
+    FaqItem(
+        "アプリが重い・クラッシュします",
+        "以下をお試しください。\n\n① アプリを完全に閉じて再起動する\n② 端末を再起動する\n③ アプリを最新バージョンに更新する（Google Play ストアで確認）\n④ 登録荷物が多い場合は「終了処理」でリセットする\n\n問題が解決しない場合はお問い合わせください。"
+    ),
+    FaqItem(
+        "バグ・改善要望を伝えたい",
+        "サイドメニュー → お知らせ →「ユーザーからのフィードバック」からご送信ください。\n\n具体的な状況（操作手順・端末機種・Androidバージョン）をご記入いただくと迅速に対応できます。"
+    ),
+    FaqItem(
+        "お問い合わせ先は？",
+        "メール：support@hakobun.example\n\nお問い合わせの際は以下の情報をお知らせください。\n・端末機種・Androidバージョン\n・アプリバージョン\n・問題の再現手順\n\n営業時間内（平日10:00〜18:00）にご返答します。"
+    )
+)
+
+@Composable
+private fun FaqAccordionItem(item: FaqItem) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        "Q",
+                        fontWeight = FontWeight.Bold,
+                        color = BrandPurple,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        item.question,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Text(
+                    if (expanded) "▲" else "▼",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MutedText,
+                    modifier = Modifier.padding(start = 8.dp, top = 2.dp)
+                )
+            }
+            if (expanded) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        "A",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2E7D32),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        item.answer,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF333333),
+                        lineHeight = MaterialTheme.typography.bodySmall.lineHeight
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FaqContent() {
+    val categories = listOf(
+        "基本操作" to faqItems.subList(0, 5),
+        "OCR・音声入力" to faqItems.subList(5, 7),
+        "通知" to faqItems.subList(7, 9),
+        "サブスクリプション" to faqItems.subList(9, 12),
+        "データ・バックアップ" to faqItems.subList(12, 14),
+        "その他" to faqItems.subList(14, 17)
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        WhiteCard {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    "よくある質問 (FAQ)",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "質問をタップすると回答が表示されます",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MutedText
+                )
+            }
+        }
+
+        categories.forEach { (categoryName, items) ->
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    "▍$categoryName",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = BrandPurple,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+                items.forEach { item ->
+                    FaqAccordionItem(item)
+                }
+            }
+        }
+
+        WhiteCard {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    "解決しない場合は",
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    "サイドメニュー →「ユーザーからのフィードバック」からご連絡ください。\nメール：support@hakobun.example",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MutedText
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun TermsSection(title: String, body: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -1773,9 +1975,7 @@ private fun AccountMenuDetailScreen(
                         LanguageSelector()
                     }
                     AccountMenuItem.Help -> {
-                        InfoRow(stringResource(R.string.help_contact), stringResource(R.string.help_contact_value))
-                        InfoRow(stringResource(R.string.help_faq), stringResource(R.string.help_faq_text))
-                        InfoRow(stringResource(R.string.help_emergency), stringResource(R.string.help_emergency_text))
+                        FaqContent()
                     }
                     AccountMenuItem.Terms -> {
                         TermsContent()
