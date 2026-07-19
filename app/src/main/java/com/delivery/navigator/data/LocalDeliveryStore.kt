@@ -7,9 +7,11 @@ import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
 import com.delivery.navigator.model.MembershipPlan
+import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.TimeWindow
 import com.delivery.navigator.model.UserProfile
+import com.delivery.navigator.model.toRegistrationTimeWindow
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -101,11 +103,18 @@ class LocalDeliveryStore(context: Context) {
     }
 
     private fun JSONObject.toDeliveryPackage(): DeliveryPackage {
+        val timeWindow = enumValueOrDefault(optString("timeWindow"), TimeWindow.Unspecified)
+        val deliveryTimeWindow = if (has("deliveryTimeWindow")) {
+            enumValueOrDefault(optString("deliveryTimeWindow"), timeWindow.toRegistrationTimeWindow())
+        } else {
+            timeWindow.toRegistrationTimeWindow()
+        }
         return DeliveryPackage(
             trackingCode = optString("trackingCode"),
             recipient = optString("recipient"),
             address = optString("address"),
-            timeWindow = enumValueOrDefault(optString("timeWindow"), TimeWindow.Unspecified),
+            timeWindow = timeWindow,
+            deliveryTimeWindow = deliveryTimeWindow,
             size = optString("size"),
             colorLabel = optString("colorLabel"),
             packageType = optString("packageType"),
@@ -124,6 +133,7 @@ class LocalDeliveryStore(context: Context) {
             .put("recipient", recipient)
             .put("address", address)
             .put("timeWindow", timeWindow.name)
+            .put("deliveryTimeWindow", deliveryTimeWindow.name)
             .put("size", size)
             .put("colorLabel", colorLabel)
             .put("packageType", packageType)

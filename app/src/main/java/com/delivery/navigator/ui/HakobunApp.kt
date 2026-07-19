@@ -86,6 +86,7 @@ import com.delivery.navigator.model.PackageSizeOption
 import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.TimeWindow
+import com.delivery.navigator.model.toTimeWindow
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -396,7 +397,10 @@ fun HakobunApp() {
                 selectedCode = selectedPackage?.trackingCode,
                 onBack = { homePanel = null },
                 onSelectPackage = onPackageSelected,
-                onEditPackage = { editingPackageCode = it }
+                onEditPackage = { code ->
+                    homePanel = null
+                    editingPackageCode = code
+                }
             )
             return@MaterialTheme
         }
@@ -510,7 +514,10 @@ fun HakobunApp() {
                         importText = importText,
                         onClose = { homePanel = null },
                         onSelectPackage = onPackageSelected,
-                        onEditPackage = { editingPackageCode = it },
+                        onEditPackage = { code ->
+                            homePanel = null
+                            editingPackageCode = code
+                        },
                         onExport = { backupText = exportPackages(packages) },
                         onImportTextChange = { importText = it },
                         onImport = {
@@ -936,18 +943,12 @@ private fun FullScreenDeliveryMap(
             routeStops.forEach { stop ->
                 val item = stop.deliveryPackage
                 val routeNumber = stop.routeNumber
-                val pinColor = when (item.timeWindow) {
-                    TimeWindow.Morning -> android.graphics.Color.parseColor("#4FC3F7")
-                    TimeWindow.Afternoon -> android.graphics.Color.parseColor("#FF9800")
-                    TimeWindow.Evening -> android.graphics.Color.parseColor("#9C27B0")
-                    else -> android.graphics.Color.BLACK
-                }
-                val markerIcon = numberedMarkerIcon(routeNumber, pinColor)
                 Marker(
                     state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
                     title = "$routeNumber. ${item.recipient}",
-                    snippet = "${item.timeWindow.label} / ${item.address}",
-                    icon = markerIcon,
+                    snippet = "${item.deliveryTimeWindow.label} / ${item.address}",
+                    icon = deliveryMarkerIcon(routeNumber, item),
+                    anchor = Offset(0.5f, 1f),
                     onClick = {
                         onSelect(item.trackingCode)
                         false
@@ -1660,9 +1661,10 @@ private fun FaqContent() {
     }
 }
 
-private fun numberedMarkerIcon(number: Int, color: Int): com.google.android.gms.maps.model.BitmapDescriptor {
-    val width = 72
-    val height = 105
+private fun standardPinMarkerIcon(label: String, color: Int): com.google.android.gms.maps.model.BitmapDescriptor {
+    val density = android.content.res.Resources.getSystem().displayMetrics.density
+    val width = (30f * density).toInt()
+    val height = (44f * density).toInt()
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = AndroidCanvas(bitmap)
     val cx = width / 2f
@@ -1680,15 +1682,15 @@ private fun numberedMarkerIcon(number: Int, color: Int): com.google.android.gms.
     // 白い内円
     val innerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = android.graphics.Color.WHITE }
     canvas.drawCircle(cx, r, r * 0.52f, innerPaint)
-    // ルート番号
+    // ルート番号または配達状態
     val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         this.color = color
-        textSize = if (number >= 10) 26f else 30f
+        textSize = r * if (label.length >= 2) 0.72f else 0.83f
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
     }
     val textY = r - (textPaint.descent() + textPaint.ascent()) / 2f
-    canvas.drawText(number.toString(), cx, textY, textPaint)
+    canvas.drawText(label, cx, textY, textPaint)
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
@@ -2373,7 +2375,7 @@ private fun DeliveryGoogleMap(
                         Marker(
                             state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
                             title = "$routeNumber. ${item.recipient}",
-                            snippet = "${item.timeWindow.label} / ${item.address}",
+                            snippet = "${item.deliveryTimeWindow.label} / ${item.address}",
                             icon = deliveryMarkerIcon(routeNumber, item),
                             anchor = Offset(0.5f, 1f),
                             onClick = {
@@ -2411,7 +2413,7 @@ private fun DeliveryGoogleMap(
                 }
             }
             routeStops.firstOrNull()?.deliveryPackage?.let {
-                Text(stringResource(R.string.next_candidate, it.recipient, it.timeWindow.label), color = MutedText)
+                Text(stringResource(R.string.next_candidate, it.recipient, it.deliveryTimeWindow.label), color = MutedText)
             }
         }
     }
@@ -2433,7 +2435,7 @@ private fun PackageDetail(deliveryPackage: DeliveryPackage, onStatusChange: (Del
             StatusPill(deliveryPackage.status)
         }
         Text(stringResource(R.string.package_info, deliveryPackage.trackingCode, deliveryPackage.size, deliveryPackage.colorLabel, deliveryPackage.packageType))
-        Text(stringResource(R.string.package_time_cod_locker, deliveryPackage.timeWindow.label, yesNo(deliveryPackage.cod), yesNo(deliveryPackage.hasLocker)))
+        Text(stringResource(R.string.package_time_cod_locker, deliveryPackage.deliveryTimeWindow.label, yesNo(deliveryPackage.cod), yesNo(deliveryPackage.hasLocker)))
         Text(deliveryPackage.memo, color = MutedText)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { onStatusChange(DeliveryStatus.Completed) }) { Text(stringResource(R.string.status_complete)) }
@@ -2558,7 +2560,7 @@ private fun PackageEditScreen(
     var selectedStatus by remember { mutableStateOf(deliveryPackage.status) }
     var recipient by remember { mutableStateOf(deliveryPackage.recipient) }
     var memo by remember { mutableStateOf(deliveryPackage.memo) }
-    var selectedTimeWindow by remember { mutableStateOf(deliveryPackage.timeWindow) }
+    var selectedTimeWindow by remember { mutableStateOf(deliveryPackage.deliveryTimeWindow) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -2597,7 +2599,7 @@ private fun PackageEditScreen(
                 }
                 WhiteCard {
                     Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
-                    SegmentedRow(TimeWindow.entries, selectedTimeWindow, { it.label }) { selectedTimeWindow = it }
+                    SegmentedRow(RegistrationTimeWindow.entries, selectedTimeWindow, { it.label }) { selectedTimeWindow = it }
                 }
                 WhiteCard {
                     Text(stringResource(R.string.navigation_title), fontWeight = FontWeight.Bold)
@@ -2623,7 +2625,8 @@ private fun PackageEditScreen(
                         recipient = recipient,
                         memo = memo,
                         status = selectedStatus,
-                        timeWindow = selectedTimeWindow
+                        timeWindow = selectedTimeWindow.toTimeWindow(),
+                        deliveryTimeWindow = selectedTimeWindow
                     )
                 )
             },
@@ -2660,6 +2663,7 @@ private fun PackageRegistrationScreen(
     var manualInput by remember { mutableStateOf("") }
     var targetCourseCode by remember { mutableStateOf<String?>(null) }
     var courseSavedMessage by remember { mutableStateOf("") }
+    var selectedTimeWindow by remember { mutableStateOf(RegistrationTimeWindow.None) }
 
     var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
@@ -2728,7 +2732,9 @@ private fun PackageRegistrationScreen(
             if (!geocodedLocations.containsKey(addr) && addr.isNotBlank()) {
                 scope.launch {
                     val (lat, lng) = geocodeAddressPublic(addr)
-                    if (lat != 0.0 || lng != 0.0) geocodedLocations[addr] = LatLng(lat, lng)
+                    if ((lat != 0.0 || lng != 0.0) && addr in addresses) {
+                        geocodedLocations[addr] = LatLng(lat, lng)
+                    }
                 }
             }
         }
@@ -2786,11 +2792,26 @@ private fun PackageRegistrationScreen(
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                     TextButton(onClick = { onOpenMap(addr) }) { Text(stringResource(R.string.open_map)) }
-                                    TextButton(onClick = { addresses.removeAt(index) }) { Text(stringResource(R.string.delete), color = Color(0xFFE53935)) }
+                                    TextButton(
+                                        onClick = {
+                                            addresses.removeAt(index)
+                                            geocodedLocations.remove(addr)
+                                            pinOverrides.remove(addr)
+                                        }
+                                    ) { Text(stringResource(R.string.delete), color = Color(0xFFE53935)) }
                                 }
                             }
                         }
                     }
+                }
+
+                WhiteCard {
+                    Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
+                    SegmentedRow(
+                        RegistrationTimeWindow.entries,
+                        selectedTimeWindow,
+                        { it.label }
+                    ) { selectedTimeWindow = it }
                 }
 
                 // 住所入力エリア（5件未満のとき表示）
@@ -2931,7 +2952,7 @@ private fun PackageRegistrationScreen(
             }
             if (addresses.isNotEmpty()) {
                 RegistrationMapPreview(
-                    addresses = addresses,
+                    addresses = addresses.toList(),
                     geocodedLocations = geocodedLocations,
                     pinOverrides = pinOverrides,
                     modifier = Modifier
@@ -2956,7 +2977,7 @@ private fun PackageRegistrationScreen(
                             recipientName = "",
                             phoneNumber = "",
                             status = DeliveryStatus.Pending,
-                            timeWindow = RegistrationTimeWindow.None,
+                            timeWindow = selectedTimeWindow,
                             shape = PackageShape.SmallBox,
                             colorType = PackageColorType.Kraft,
                             size = PackageSizeOption.Medium,
@@ -3013,7 +3034,7 @@ private fun RegistrationMapPreview(
             )
         ) {
             validPins.forEach { (index, addr, initialLatLng) ->
-                key(addr) {
+                key(index, addr) {
                     val markerState = remember { MarkerState(position = initialLatLng) }
                     LaunchedEffect(markerState) {
                         snapshotFlow { markerState.position }
@@ -3247,59 +3268,17 @@ private fun TimeWindow.markerHue(): Float = when (this) {
     TimeWindow.All -> BitmapDescriptorFactory.HUE_RED
 }
 
-private fun deliveryMarkerIcon(routeNumber: Int, deliveryPackage: DeliveryPackage) =
-    when (deliveryPackage.status) {
-        DeliveryStatus.Absent -> labeledMarkerIcon("不", AbsentMarkerArgb)
-        DeliveryStatus.Redelivery -> labeledMarkerIcon("再", RedeliveryMarkerArgb)
-        else -> labeledMarkerIcon(routeNumber.toString(), deliveryPackage.timeWindow.markerArgb())
+private fun deliveryMarkerIcon(routeNumber: Int, deliveryPackage: DeliveryPackage) = when {
+    deliveryPackage.timeWindow == TimeWindow.Unspecified -> {
+        standardPinMarkerIcon(routeNumber.toString(), android.graphics.Color.BLACK)
     }
-
-private fun labeledMarkerIcon(label: String, markerColor: Int) =
-    BitmapDescriptorFactory.fromBitmap(createLabeledMarkerBitmap(label, markerColor))
-
-private fun createLabeledMarkerBitmap(label: String, markerColor: Int): Bitmap {
-    val width = 104
-    val height = 128
-    val centerX = width / 2f
-    val circleRadius = 42f
-    val circleCenterY = 48f
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    val canvas = AndroidCanvas(bitmap)
-    val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = markerColor
-        style = Paint.Style.FILL
+    deliveryPackage.status == DeliveryStatus.Absent -> {
+        standardPinMarkerIcon("不", AbsentMarkerArgb)
     }
-    val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = android.graphics.Color.WHITE
-        style = Paint.Style.STROKE
-        strokeWidth = 6f
+    deliveryPackage.status == DeliveryStatus.Redelivery -> {
+        standardPinMarkerIcon("再", RedeliveryMarkerArgb)
     }
-    val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0x33000000
-        style = Paint.Style.FILL
-    }
-    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = android.graphics.Color.WHITE
-        textAlign = Paint.Align.CENTER
-        textSize = if (label.length <= 2) 34f else 28f
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-    }
-    val pointer = android.graphics.Path().apply {
-        moveTo(centerX - 18f, 82f)
-        lineTo(centerX, height - 8f)
-        lineTo(centerX + 18f, 82f)
-        close()
-    }
-
-    canvas.drawCircle(centerX + 3f, circleCenterY + 5f, circleRadius, shadowPaint)
-    canvas.drawPath(pointer, fillPaint)
-    canvas.drawCircle(centerX, circleCenterY, circleRadius, fillPaint)
-    canvas.drawCircle(centerX, circleCenterY, circleRadius, strokePaint)
-
-    val textY = circleCenterY - (textPaint.descent() + textPaint.ascent()) / 2
-    canvas.drawText(label, centerX, textY, textPaint)
-
-    return bitmap
+    else -> standardPinMarkerIcon(routeNumber.toString(), deliveryPackage.timeWindow.markerArgb())
 }
 
 private fun TimeWindow.markerArgb(): Int = when (this) {
@@ -3307,7 +3286,7 @@ private fun TimeWindow.markerArgb(): Int = when (this) {
     TimeWindow.Afternoon -> android.graphics.Color.rgb(224, 138, 30)
     TimeWindow.Evening -> android.graphics.Color.rgb(122, 75, 216)
     TimeWindow.Unspecified,
-    TimeWindow.All -> android.graphics.Color.rgb(32, 36, 44)
+    TimeWindow.All -> android.graphics.Color.BLACK
 }
 
 private fun DeliveryStatus.statusColor(): Color = when (this) {

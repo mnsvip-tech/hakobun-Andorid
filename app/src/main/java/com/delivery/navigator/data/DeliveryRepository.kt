@@ -12,6 +12,8 @@ import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RouteStop
 import com.delivery.navigator.model.TimeWindow
+import com.delivery.navigator.model.toRegistrationTimeWindow
+import com.delivery.navigator.model.toTimeWindow
 import java.util.Calendar
 import java.util.Locale
 
@@ -26,6 +28,7 @@ fun samplePackages(): List<DeliveryPackage> = listOf(
         recipient = "山田 太郎",
         address = "東京都千代田区丸の内1-1-1",
         timeWindow = TimeWindow.Morning,
+        deliveryTimeWindow = RegistrationTimeWindow.Morning,
         size = "80",
         colorLabel = "クラフト",
         packageType = "小箱",
@@ -41,6 +44,7 @@ fun samplePackages(): List<DeliveryPackage> = listOf(
         recipient = "佐藤 花子",
         address = "東京都中央区銀座4-5-6",
         timeWindow = TimeWindow.Afternoon,
+        deliveryTimeWindow = RegistrationTimeWindow.Afternoon,
         size = "60",
         colorLabel = "白",
         packageType = "封筒",
@@ -56,6 +60,7 @@ fun samplePackages(): List<DeliveryPackage> = listOf(
         recipient = "鈴木 一郎",
         address = "東京都港区芝公園4-2-8",
         timeWindow = TimeWindow.Evening,
+        deliveryTimeWindow = RegistrationTimeWindow.Evening,
         size = "100",
         colorLabel = "冷蔵",
         packageType = "冷蔵",
@@ -71,6 +76,7 @@ fun samplePackages(): List<DeliveryPackage> = listOf(
         recipient = "田中 二郎",
         address = "東京都台東区浅草2-3-1",
         timeWindow = TimeWindow.Unspecified,
+        deliveryTimeWindow = RegistrationTimeWindow.None,
         size = "80",
         colorLabel = "不明",
         packageType = "袋物",
@@ -128,6 +134,7 @@ fun createPackagesFromCourse(course: RegularCourse, existingCount: Int): List<De
             recipient = address.recipient,
             address = address.address,
             timeWindow = address.timeWindow,
+            deliveryTimeWindow = address.timeWindow.toRegistrationTimeWindow(),
             size = "80",
             colorLabel = course.displayName,
             packageType = "定期",
@@ -177,7 +184,8 @@ suspend fun createDeliveryPackageFromRegistration(
         trackingCode = result.trackingNumber.ifBlank { "HB-${1000 + generatedNumber}" },
         recipient = result.recipientName.ifBlank { "届け先未入力" },
         address = result.address,
-        timeWindow = result.timeWindow.toRouteTimeWindow(),
+        timeWindow = result.timeWindow.toTimeWindow(),
+        deliveryTimeWindow = result.timeWindow,
         size = result.size.label,
         colorLabel = result.colorType.label,
         packageType = result.shape.label,
@@ -288,7 +296,7 @@ fun exportPackages(packages: List<DeliveryPackage>): String {
             item.trackingCode,
             item.recipient,
             item.address,
-            item.timeWindow.label,
+            item.deliveryTimeWindow.label,
             item.memo
         ).joinToString(",") { value -> value.replace(",", " ") }
     }
@@ -305,11 +313,13 @@ fun importPackages(source: String, existingCount: Int): List<DeliveryPackage> {
                 null
             } else {
                 val generatedNumber = existingCount + index + 1
+                val deliveryTimeWindow = parseDeliveryTimeWindow(parts.getOrNull(3).orEmpty())
                 DeliveryPackage(
                     trackingCode = parts.getOrNull(0).orEmpty().ifBlank { "IMPORT-${1000 + generatedNumber}" },
                     recipient = parts.getOrNull(1).orEmpty().ifBlank { "インポート先" },
                     address = parts.getOrNull(2).orEmpty(),
-                    timeWindow = parseTimeWindow(parts.getOrNull(3).orEmpty()),
+                    timeWindow = deliveryTimeWindow.toTimeWindow(),
+                    deliveryTimeWindow = deliveryTimeWindow,
                     size = "80",
                     colorLabel = "インポート",
                     packageType = "住所データ",
@@ -456,24 +466,13 @@ fun DeliveryStatus.hidesMapPin(): Boolean {
     return this == DeliveryStatus.Completed || this == DeliveryStatus.ReturnToCompany
 }
 
-private fun RegistrationTimeWindow.toRouteTimeWindow(): TimeWindow {
-    return when (this) {
-        RegistrationTimeWindow.None -> TimeWindow.Unspecified
-        RegistrationTimeWindow.Morning -> TimeWindow.Morning
-        RegistrationTimeWindow.Noon,
-        RegistrationTimeWindow.Afternoon,
-        RegistrationTimeWindow.LateAfternoon -> TimeWindow.Afternoon
-        RegistrationTimeWindow.Evening,
-        RegistrationTimeWindow.Night,
-        RegistrationTimeWindow.LateNight -> TimeWindow.Evening
-    }
-}
-
-private fun parseTimeWindow(value: String): TimeWindow {
+private fun parseDeliveryTimeWindow(value: String): RegistrationTimeWindow {
     return when (value) {
-        TimeWindow.Morning.label, "午前中" -> TimeWindow.Morning
-        TimeWindow.Afternoon.label, "12-14時", "14-16時", "16-18時" -> TimeWindow.Afternoon
-        TimeWindow.Evening.label, "18-20時", "19-21時", "20-21時" -> TimeWindow.Evening
-        else -> TimeWindow.Unspecified
+        RegistrationTimeWindow.Morning.label, "午前中" -> RegistrationTimeWindow.Morning
+        RegistrationTimeWindow.Afternoon.label, TimeWindow.Afternoon.label, "12-14時" -> RegistrationTimeWindow.Afternoon
+        RegistrationTimeWindow.LateAfternoon.label -> RegistrationTimeWindow.LateAfternoon
+        RegistrationTimeWindow.Evening.label, TimeWindow.Evening.label, "20-21時" -> RegistrationTimeWindow.Evening
+        RegistrationTimeWindow.Night.label -> RegistrationTimeWindow.Night
+        else -> RegistrationTimeWindow.None
     }
 }

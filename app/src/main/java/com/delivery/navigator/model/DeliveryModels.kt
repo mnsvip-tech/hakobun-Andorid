@@ -21,13 +21,28 @@ enum class TimeWindow(val label: String) {
 
 enum class RegistrationTimeWindow(val label: String) {
     None("なし"),
-    Morning("午前中"),
-    Noon("12-14時"),
+    Morning("午前"),
     Afternoon("14-16時"),
     LateAfternoon("16-18時"),
     Evening("18-20時"),
-    Night("19-21時"),
-    LateNight("20-21時")
+    Night("19-21時")
+}
+
+fun RegistrationTimeWindow.toTimeWindow(): TimeWindow = when (this) {
+    RegistrationTimeWindow.None -> TimeWindow.Unspecified
+    RegistrationTimeWindow.Morning -> TimeWindow.Morning
+    RegistrationTimeWindow.Afternoon,
+    RegistrationTimeWindow.LateAfternoon -> TimeWindow.Afternoon
+    RegistrationTimeWindow.Evening,
+    RegistrationTimeWindow.Night -> TimeWindow.Evening
+}
+
+fun TimeWindow.toRegistrationTimeWindow(): RegistrationTimeWindow = when (this) {
+    TimeWindow.Morning -> RegistrationTimeWindow.Morning
+    TimeWindow.Afternoon -> RegistrationTimeWindow.Afternoon
+    TimeWindow.Evening -> RegistrationTimeWindow.Evening
+    TimeWindow.All,
+    TimeWindow.Unspecified -> RegistrationTimeWindow.None
 }
 
 enum class PackageShape(val label: String, val symbol: String) {
@@ -83,6 +98,7 @@ data class DeliveryPackage(
     val recipient: String,
     val address: String,
     val timeWindow: TimeWindow,
+    val deliveryTimeWindow: RegistrationTimeWindow,
     val size: String,
     val colorLabel: String,
     val packageType: String,
