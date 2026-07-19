@@ -2515,24 +2515,42 @@ private fun PackageRegistrationScreen(
     var targetCourseCode by remember { mutableStateOf<String?>(null) }
     var courseSavedMessage by remember { mutableStateOf("") }
 
+    var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
-            recognizeAddressFromBitmap(
-                bitmap = bitmap,
-                onSuccess = { candidate = it },
-                onFailure = {
-                    candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            ocrImageUri?.let { uri ->
+                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                } else {
+                    @Suppress("DEPRECATION")
+                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                 }
-            )
+                recognizeAddressFromBitmap(
+                    bitmap = bitmap,
+                    onSuccess = { candidate = it },
+                    onFailure = {
+                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                    }
+                )
+            }
         }
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) cameraOcrLauncher.launch(null)
-        else candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
+        if (granted) {
+            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                .also { it.parentFile?.mkdirs() }
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "${context.packageName}.fileprovider", file
+            )
+            ocrImageUri = uri
+            cameraOcrLauncher.launch(uri)
+        } else {
+            candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
+        }
     }
     val voiceInputLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -2548,6 +2566,17 @@ private fun PackageRegistrationScreen(
     val canAddMore = addresses.size < 5
     val geocodedLocations = remember { mutableStateMapOf<String, LatLng>() }
     val pinOverrides = remember { mutableStateMapOf<String, LatLng>() }
+    LaunchedEffect(candidate) {
+        val c = candidate ?: return@LaunchedEffect
+        val validAddress = c.address.isNotBlank()
+            && !c.address.contains("読み取れませんでした")
+            && !c.address.contains("権限が許可")
+            && !c.address.contains("取得できませんでした")
+        if (validAddress) {
+            manualInput = c.address
+            if (c.postalCode.isNotBlank()) postalCode = c.postalCode
+        }
+    }
     LaunchedEffect(addresses.size) {
         addresses.forEach { addr ->
             if (!geocodedLocations.containsKey(addr) && addr.isNotBlank()) {
@@ -2632,8 +2661,17 @@ private fun PackageRegistrationScreen(
                                     onClick = {
                                         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
                                             PackageManager.PERMISSION_GRANTED
-                                        ) cameraOcrLauncher.launch(null)
-                                        else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                        ) {
+                                            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                                                .also { it.parentFile?.mkdirs() }
+                                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                                context, "${context.packageName}.fileprovider", file
+                                            )
+                                            ocrImageUri = uri
+                                            cameraOcrLauncher.launch(uri)
+                                        } else {
+                                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                        }
                                     },
                                     modifier = Modifier.height(36.dp)
                                 ) { Text(stringResource(R.string.camera)) }
