@@ -325,11 +325,15 @@ fun importPackages(source: String, existingCount: Int): List<DeliveryPackage> {
         .toList()
 }
 
-fun calculateNearestRoute(packages: List<DeliveryPackage>): List<RouteStop> {
+fun calculateNearestRoute(
+    packages: List<DeliveryPackage>,
+    originLat: Double = CURRENT_LATITUDE,
+    originLng: Double = CURRENT_LONGITUDE
+): List<RouteStop> {
     val remaining = packages.toMutableList()
     val ordered = mutableListOf<RouteStop>()
-    var currentLatitude = CURRENT_LATITUDE
-    var currentLongitude = CURRENT_LONGITUDE
+    var currentLatitude = originLat
+    var currentLongitude = originLng
 
     while (remaining.isNotEmpty()) {
         val next = remaining.minBy { item ->

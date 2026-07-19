@@ -560,7 +560,9 @@ fun HakobunApp() {
 
 private fun assignFixedRouteNumbers(
     fixedRouteNumbers: MutableMap<String, Int>,
-    packages: List<DeliveryPackage>
+    packages: List<DeliveryPackage>,
+    originLat: Double = 35.681236,
+    originLng: Double = 139.767125
 ) {
     val currentCodes = packages.map { it.trackingCode }.toSet()
     fixedRouteNumbers.keys.retainAll(currentCodes)
@@ -569,7 +571,7 @@ private fun assignFixedRouteNumbers(
     if (unnumberedPackages.isEmpty()) return
 
     val nextRouteNumber = (fixedRouteNumbers.values.maxOrNull() ?: 0) + 1
-    calculateNearestRoute(unnumberedPackages).forEachIndexed { index, routeStop ->
+    calculateNearestRoute(unnumberedPackages, originLat, originLng).forEachIndexed { index, routeStop ->
         fixedRouteNumbers[routeStop.deliveryPackage.trackingCode] = nextRouteNumber + index
     }
 }
@@ -812,7 +814,10 @@ private fun FullScreenDeliveryMap(
     onNavigate: (DeliveryPackage) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val routeStops = calculateNearestRoute(packages)
+    val effectiveOrigin = currentLocation ?: origin
+    val routeStops = remember(packages, effectiveOrigin) {
+        calculateNearestRoute(packages, effectiveOrigin.latitude, effectiveOrigin.longitude)
+    }
     val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(origin, 12.5f)
@@ -2162,7 +2167,7 @@ private fun DeliveryGoogleMap(
     onSelect: (String) -> Unit,
     onNavigate: (DeliveryPackage) -> Unit
 ) {
-    val routeStops = calculateNearestRoute(packages)
+    val routeStops = calculateNearestRoute(packages, origin.latitude, origin.longitude)
     val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(origin, 12.5f)
