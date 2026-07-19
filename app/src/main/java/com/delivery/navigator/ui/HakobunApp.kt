@@ -132,13 +132,13 @@ fun HakobunApp() {
     val packages = remember(deliveryStore) {
         mutableStateListOf<DeliveryPackage>().apply {
             val savedPackages = deliveryStore.loadPackages()
-            addAll(savedPackages.ifEmpty { samplePackages() })
+            addAll(savedPackages)
         }
     }
     val regularCourseList = remember(deliveryStore) {
         mutableStateListOf<RegularCourse>().apply {
             val savedCourses = deliveryStore.loadRegularCourses()
-            addAll(savedCourses.ifEmpty { regularCourses() })
+            addAll(savedCourses)
         }
     }
     var selectedWindow by remember { mutableStateOf(TimeWindow.All) }
@@ -174,23 +174,48 @@ fun HakobunApp() {
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    DisposableEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+
+    fun startLocationUpdates() {
+        val priority = if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
-        ) {
-            val request = com.google.android.gms.location.LocationRequest.Builder(
-                com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, 5000L
-            ).setMinUpdateIntervalMillis(2000L).build()
-            val callback = object : com.google.android.gms.location.LocationCallback() {
-                override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
-                    result.lastLocation?.let { currentLocation = LatLng(it.latitude, it.longitude) }
-                }
-            }
-            fusedLocationClient.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
-            onDispose { fusedLocationClient.removeLocationUpdates(callback) }
-        } else {
-            onDispose {}
+        ) com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+        else com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+            loc?.let { currentLocation = LatLng(it.latitude, it.longitude) }
         }
+        val request = com.google.android.gms.location.LocationRequest.Builder(priority, 5000L)
+            .setMinUpdateIntervalMillis(2000L).build()
+        val callback = object : com.google.android.gms.location.LocationCallback() {
+            override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+                result.lastLocation?.let { currentLocation = LatLng(it.latitude, it.longitude) }
+            }
+        }
+        fusedLocationClient.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        val hasAny = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (hasAny) startLocationUpdates()
+    }
+
+    DisposableEffect(Unit) {
+        val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (hasFine || hasCoarse) {
+            startLocationUpdates()
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+        onDispose {}
     }
     val persistPackages = { deliveryStore.savePackages(packages) }
     val persistRegularCourses = { deliveryStore.saveRegularCourses(regularCourseList) }
@@ -442,6 +467,7 @@ fun HakobunApp() {
                     origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second),
                     onSelect = { selectedPackageCode = it },
                     currentLocation = currentLocation,
+                    fusedLocationClient = fusedLocationClient,
                     onNavigate = {
                         context.startActivity(
                             openNavigationIntent(
@@ -821,6 +847,7 @@ private fun FullScreenDeliveryMap(
     origin: LatLng,
     onSelect: (String) -> Unit,
     currentLocation: LatLng? = null,
+    fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient? = null,
     onNavigate: (DeliveryPackage) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -830,13 +857,21 @@ private fun FullScreenDeliveryMap(
     }
     val selectedPackage = routeStops.firstOrNull { it.deliveryPackage.trackingCode == selectedCode }?.deliveryPackage
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(origin, 12.5f)
+        position = CameraPosition.fromLatLngZoom(effectiveOrigin, 12.5f)
     }
+    val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
     var mapBearing by remember { mutableStateOf(0f) }
     var drivingRoutePoints by remember { mutableStateOf<List<LatLng>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val activeRouteDestination = selectedPackage ?: routeStops.firstOrNull()?.deliveryPackage
+    var initialCameraMoved by remember { mutableStateOf(false) }
+    LaunchedEffect(mapLoaded, currentLocation) {
+        if (!mapLoaded || initialCameraMoved) return@LaunchedEffect
+        val target = currentLocation ?: return@LaunchedEffect
+        initialCameraMoved = true
+        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 14f))
+    }
     LaunchedEffect(selectedPackage?.trackingCode) {
         if (mapLoaded) {
             selectedPackage?.let {
@@ -866,9 +901,17 @@ private fun FullScreenDeliveryMap(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = false),
+            properties = MapProperties(
+                isMyLocationEnabled = ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ),
             uiSettings = MapUiSettings(
                 compassEnabled = true,
+                myLocationButtonEnabled = false,
                 zoomControlsEnabled = false,
                 tiltGesturesEnabled = true,
                 rotationGesturesEnabled = true,
@@ -877,12 +920,6 @@ private fun FullScreenDeliveryMap(
             ),
             onMapLoaded = { mapLoaded = true }
         ) {
-            Marker(
-                state = rememberUpdatedMarkerState(position = origin),
-                title = "現在地",
-                snippet = "ルート計算の基準点",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-            ) // marker title/snippet are shown in Google Maps UI (not Composable Text), kept as-is
             if (drivingRoutePoints.isNotEmpty()) {
                 Polyline(
                     points = drivingRoutePoints,
@@ -899,12 +936,18 @@ private fun FullScreenDeliveryMap(
             routeStops.forEach { stop ->
                 val item = stop.deliveryPackage
                 val routeNumber = stop.routeNumber
+                val pinColor = when (item.timeWindow) {
+                    TimeWindow.Morning -> android.graphics.Color.parseColor("#4FC3F7")
+                    TimeWindow.Afternoon -> android.graphics.Color.parseColor("#FF9800")
+                    TimeWindow.Evening -> android.graphics.Color.parseColor("#9C27B0")
+                    else -> android.graphics.Color.BLACK
+                }
+                val markerIcon = numberedMarkerIcon(routeNumber, pinColor)
                 Marker(
                     state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
                     title = "$routeNumber. ${item.recipient}",
                     snippet = "${item.timeWindow.label} / ${item.address}",
-                    icon = deliveryMarkerIcon(routeNumber, item),
-                    anchor = Offset(0.5f, 1f),
+                    icon = markerIcon,
                     onClick = {
                         onSelect(item.trackingCode)
                         false
@@ -917,10 +960,30 @@ private fun FullScreenDeliveryMap(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             FloatingMapButton(stringResource(R.string.current_location)) {
-                if (mapLoaded) {
-                    val target = currentLocation ?: origin
+                if (!mapLoaded) return@FloatingMapButton
+                val hasFine = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val hasCoarse = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val client = fusedLocationClient
+                if ((hasFine || hasCoarse) && client != null) {
+                    val priority = if (hasFine)
+                        com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+                    else
+                        com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
+                    client.getCurrentLocation(priority, null).addOnSuccessListener { loc ->
+                        val target = loc?.let { LatLng(it.latitude, it.longitude) } ?: currentLocation
+                        if (target != null) {
+                            coroutineScope.launch {
+                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 15f))
+                            }
+                        }
+                    }
+                } else if (currentLocation != null) {
                     coroutineScope.launch {
-                        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 15f))
+                        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 15f))
                     }
                 }
             }
@@ -1595,6 +1658,38 @@ private fun FaqContent() {
             }
         }
     }
+}
+
+private fun numberedMarkerIcon(number: Int, color: Int): com.google.android.gms.maps.model.BitmapDescriptor {
+    val width = 72
+    val height = 105
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = AndroidCanvas(bitmap)
+    val cx = width / 2f
+    val r = width / 2f
+    // ピン本体
+    val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color }
+    canvas.drawCircle(cx, r, r, bodyPaint)
+    val tailPath = android.graphics.Path().apply {
+        moveTo(cx - r * 0.45f, r * 1.3f)
+        lineTo(cx + r * 0.45f, r * 1.3f)
+        lineTo(cx, height.toFloat())
+        close()
+    }
+    canvas.drawPath(tailPath, bodyPaint)
+    // 白い内円
+    val innerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = android.graphics.Color.WHITE }
+    canvas.drawCircle(cx, r, r * 0.52f, innerPaint)
+    // ルート番号
+    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        this.color = color
+        textSize = if (number >= 10) 26f else 30f
+        typeface = Typeface.DEFAULT_BOLD
+        textAlign = Paint.Align.CENTER
+    }
+    val textY = r - (textPaint.descent() + textPaint.ascent()) / 2f
+    canvas.drawText(number.toString(), cx, textY, textPaint)
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
 @Composable
