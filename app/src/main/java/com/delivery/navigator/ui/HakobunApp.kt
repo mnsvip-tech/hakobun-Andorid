@@ -1421,6 +1421,144 @@ private fun UserAccountScreen(
 }
 
 @Composable
+private fun TermsSection(title: String, body: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            title,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyMedium,
+            color = BrandPurple
+        )
+        Text(
+            body,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color(0xFF333333),
+            lineHeight = MaterialTheme.typography.bodySmall.lineHeight
+        )
+    }
+}
+
+@Composable
+private fun TermsContent() {
+    val lastUpdated = "2026年7月19日"
+    val contactEmail = "support@hakobun.example"
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+        // ヘッダー
+        WhiteCard {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    "HAKOBUN ご利用規約・プライバシーポリシー",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "最終更新日：$lastUpdated",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MutedText
+                )
+                Text(
+                    "本アプリをご利用になる前に、以下の規約をお読みください。利用を開始した時点で、本規約に同意したものとみなします。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF333333)
+                )
+            }
+        }
+
+        // 第1条 サービス概要
+        WhiteCard {
+            TermsSection(
+                "第1条　サービス概要",
+                "HAKOBUN（以下「本アプリ」）は、配送ドライバーの業務効率化を目的とした配達管理支援アプリです。荷物の登録・ルート管理・配達状況の記録・住所のOCR読み取りなどの機能を提供します。\n\n本アプリは業務補助ツールであり、実際の配送業務における法令遵守・安全運転・配送会社の規定遵守はご利用者ご自身の責任となります。"
+            )
+        }
+
+        // 第2条 利用資格
+        WhiteCard {
+            TermsSection(
+                "第2条　利用資格",
+                "本アプリは18歳以上の方を対象としています。配送業務に従事する方、または業務管理者としてご利用ください。\n\n本アプリをご利用いただくには、Google アカウントが必要な場合があります。虚偽の情報による登録は禁止します。"
+            )
+        }
+
+        // 第3条 サブスクリプション・課金
+        WhiteCard {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                TermsSection(
+                    "第3条　サブスクリプション・課金",
+                    "【無料トライアル】\n初回ご登録時に1ヶ月間の無料トライアルを提供します。無料期間中はすべての機能をご利用いただけます。無料期間終了の24時間前までにキャンセルしない場合、自動的に有料プランへ移行します。\n\n【有料プラン（プレミアム）】\n料金：¥980 / 月（税込）\n請求：Google Play を通じて毎月自動更新\nキャンセル：Google Playストア「定期購入」画面からいつでも解約可能。解約後も当月末まで利用できます。\n\n【返金ポリシー】\nGoogle Play の返金ポリシーに従います。購入後48時間以内のキャンセルについては、Google Play を通じてご申請ください。\n\n【価格変更】\n価格改定の際は30日前までにアプリ内またはメールにてお知らせします。"
+                )
+            }
+        }
+
+        // 第4条 収集する情報とその利用目的
+        WhiteCard {
+            TermsSection(
+                "第4条　収集する情報とその利用目的",
+                "■ 位置情報（GPS）\n目的：配達先へのナビゲーション・現在地表示・配達ルートの最適化\n取得タイミング：アプリ使用中のみ（バックグラウンド取得なし）\n\n■ カメラ・画像\n目的：荷物の送り状OCR読み取りによる住所・氏名の自動入力\n保存先：デバイス内のみ（クラウドへの送信なし）\n\n■ 音声（マイク）\n目的：音声入力による住所・メモの文字起こし\n保存先：デバイス内のみ\n\n■ 入力情報（氏名・住所・電話番号・メールアドレス）\n目的：配達業務の管理・ドライバープロフィールの設定\n保存先：デバイス内の暗号化ストレージ（AES-256-GCM）\n外部送信：なし"
+            )
+        }
+
+        // 第5条 第三者サービス
+        WhiteCard {
+            TermsSection(
+                "第5条　第三者サービスの利用",
+                "■ Google Maps Platform\nマップ表示・ナビゲーション・住所のジオコーディングに使用します。Google のプライバシーポリシー（https://policies.google.com/privacy）が適用されます。\n\n■ Google Play Billing\nサブスクリプション決済に使用します。決済情報はGoogle が管理し、本アプリは保持しません。\n\n■ Google ML Kit（テキスト認識）\nOCR処理はデバイス上でのみ実行され、外部サーバーへのデータ送信は行いません。\n\n■ Google 位置情報サービス\nGPS取得に使用します。"
+            )
+        }
+
+        // 第6条 データの保管・セキュリティ
+        WhiteCard {
+            TermsSection(
+                "第6条　データの保管・セキュリティ",
+                "ご入力いただいた個人情報・業務データは、デバイス内の暗号化ストレージ（Android EncryptedSharedPreferences / AES-256-GCM）に保存されます。\n\nデータの外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールした場合、すべてのデータはデバイスから削除されます。\n\nバックアップ機能をご利用の場合、エクスポートデータの管理はご利用者ご自身の責任となります。"
+            )
+        }
+
+        // 第7条 禁止事項
+        WhiteCard {
+            TermsSection(
+                "第7条　禁止事項",
+                "以下の行為を禁止します。\n\n・本アプリのリバースエンジニアリング・改ざん・再配布\n・他者の個人情報を無断で入力・利用する行為\n・法令に違反する目的での利用\n・本アプリのサーバー・インフラへの過負荷をかける行為\n・虚偽の情報による登録・課金回避を目的とした不正利用"
+            )
+        }
+
+        // 第8条 免責事項
+        WhiteCard {
+            TermsSection(
+                "第8条　免責事項",
+                "本アプリは現状有姿で提供されます。以下について、運営は責任を負いません。\n\n・地図情報・ルート案内の正確性（必ず道路標識・交通法規を優先してください）\n・OCR読み取り結果の正確性\n・アプリの不具合・通信障害によるデータ損失\n・第三者サービスの障害・仕様変更\n・業務上の損失・配達ミス\n\n重要な配達情報は必ずご自身で確認してください。"
+            )
+        }
+
+        // 第9条 規約の変更
+        WhiteCard {
+            TermsSection(
+                "第9条　規約の変更",
+                "本規約は予告なく変更される場合があります。重要な変更がある場合はアプリ内通知またはメールでお知らせします。変更後も本アプリを継続利用した場合、改定後の規約に同意したものとみなします。"
+            )
+        }
+
+        // 第10条 準拠法・管轄
+        WhiteCard {
+            TermsSection(
+                "第10条　準拠法・管轄裁判所",
+                "本規約は日本法に準拠します。本規約に関する紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。"
+            )
+        }
+
+        // お問い合わせ
+        WhiteCard {
+            TermsSection(
+                "お問い合わせ",
+                "規約・プライバシーに関するご質問は下記までお問い合わせください。\n\nメール：$contactEmail\n\n※ Google Play のデータセキュリティフォームに記載した内容と本ポリシーは整合しています。"
+            )
+        }
+    }
+}
+
+@Composable
 private fun NotificationToggleRow() {
     val context = LocalContext.current
     var enabled by remember { mutableStateOf(isNotificationEnabled(context)) }
@@ -1585,6 +1723,7 @@ private fun AccountMenuDetailScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -1639,9 +1778,7 @@ private fun AccountMenuDetailScreen(
                         InfoRow(stringResource(R.string.help_emergency), stringResource(R.string.help_emergency_text))
                     }
                     AccountMenuItem.Terms -> {
-                        Text(stringResource(R.string.terms_purpose))
-                        Text(stringResource(R.string.terms_privacy))
-                        Text(stringResource(R.string.terms_maps))
+                        TermsContent()
                     }
                 }
             }
