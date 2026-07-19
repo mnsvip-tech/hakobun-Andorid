@@ -2375,7 +2375,7 @@ private fun PackageList(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onEdit(item.trackingCode) },
+                    .clickable { onSelect(item.trackingCode) },
                 colors = CardDefaults.cardColors(
                     containerColor = if (item.trackingCode == selectedCode) Color(0xFFEAF0FF) else Color.White
                 ),
@@ -2397,6 +2397,10 @@ private fun PackageList(
                         Text(item.address, color = MutedText)
                     }
                     StatusPill(item.status)
+                    TextButton(
+                        onClick = { onEdit(item.trackingCode) },
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) { Text(stringResource(R.string.edit), style = MaterialTheme.typography.labelSmall) }
                 }
             }
         }
