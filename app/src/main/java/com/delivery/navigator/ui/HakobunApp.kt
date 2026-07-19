@@ -253,6 +253,13 @@ fun HakobunApp() {
     }.filter {
         selectedSummaryFilter?.matches(it) ?: true
     }
+    val gpsOrigin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second)
+    val gpsRouteStops = remember(packages, gpsOrigin) {
+        calculateNearestRoute(packages.filterNot { it.status.hidesMapPin() }, gpsOrigin.latitude, gpsOrigin.longitude)
+    }
+    val gpsRouteNumberMap = remember(gpsRouteStops) {
+        gpsRouteStops.associate { it.deliveryPackage.trackingCode to it.routeNumber }
+    }
     val visibleMapPackages = visiblePackages
         .filterNot { it.status.hidesMapPin() }
         .filter { selectedMapTimeWindow == TimeWindow.All || it.timeWindow == selectedMapTimeWindow }
@@ -360,6 +367,7 @@ fun HakobunApp() {
         if (homePanel == HomePanel.Packages) {
             PackageListScreen(
                 packages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages,
+                routeNumberMap = gpsRouteNumberMap,
                 selectedCode = selectedPackage?.trackingCode,
                 onBack = { homePanel = null },
                 onSelectPackage = onPackageSelected,
@@ -469,6 +477,7 @@ fun HakobunApp() {
                     HomePanelSheet(
                         panel = panel,
                         packages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages,
+                        routeNumberMap = gpsRouteNumberMap,
                         courses = regularCourseList,
                         selectedCode = selectedPackage?.trackingCode,
                         backupText = backupText,
@@ -762,6 +771,7 @@ private fun SideMenuCard(title: String, description: String, mark: String, onCli
 private fun HomePanelSheet(
     panel: HomePanel,
     packages: List<DeliveryPackage>,
+    routeNumberMap: Map<String, Int> = emptyMap(),
     courses: List<RegularCourse>,
     selectedCode: String?,
     backupText: String,
@@ -795,7 +805,7 @@ private fun HomePanelSheet(
                 TextButton(onClick = onClose) { Text(stringResource(R.string.close)) }
             }
             when (panel) {
-                HomePanel.Packages -> PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
+                HomePanel.Packages -> PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
                 HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onAddCourseAddress)
                 HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClose)
             }
@@ -888,7 +898,7 @@ private fun FullScreenDeliveryMap(
             }
             routeStops.forEach { stop ->
                 val item = stop.deliveryPackage
-                val routeNumber = fixedRouteNumbers[item.trackingCode] ?: stop.routeNumber
+                val routeNumber = stop.routeNumber
                 Marker(
                     state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
                     title = "$routeNumber. ${item.recipient}",
@@ -2264,7 +2274,7 @@ private fun DeliveryGoogleMap(
                     }
                     routeStops.forEach { stop ->
                         val item = stop.deliveryPackage
-                        val routeNumber = fixedRouteNumbers[item.trackingCode] ?: stop.routeNumber
+                        val routeNumber = stop.routeNumber
                         Marker(
                             state = rememberUpdatedMarkerState(position = LatLng(item.latitude, item.longitude)),
                             title = "$routeNumber. ${item.recipient}",
@@ -2352,6 +2362,7 @@ private fun PackageDetail(deliveryPackage: DeliveryPackage, onStatusChange: (Del
 @Composable
 private fun PackageListScreen(
     packages: List<DeliveryPackage>,
+    routeNumberMap: Map<String, Int> = emptyMap(),
     selectedCode: String?,
     onBack: () -> Unit,
     onSelectPackage: (String) -> Unit,
@@ -2380,7 +2391,7 @@ private fun PackageListScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                PackageList(packages, selectedCode, onSelectPackage, onEditPackage)
+                PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
             }
         }
     }
@@ -2389,12 +2400,14 @@ private fun PackageListScreen(
 @Composable
 private fun PackageList(
     packages: List<DeliveryPackage>,
+    routeNumberMap: Map<String, Int> = emptyMap(),
     selectedCode: String?,
     onSelect: (String) -> Unit,
     onEdit: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         packages.forEach { item ->
+            val routeNum = routeNumberMap[item.trackingCode]
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -2409,12 +2422,22 @@ private fun PackageList(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(item.status.statusColor())
-                    )
+                    if (routeNum != null) {
+                        Text(
+                            "$routeNum",
+                            fontWeight = FontWeight.Bold,
+                            color = BrandBlue,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.widthIn(min = 24.dp)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(item.status.statusColor())
+                        )
+                    }
                     Column(modifier = Modifier.weight(1f)) {
                         Text("${item.trackingCode}  ${item.recipient}", fontWeight = FontWeight.Bold)
                         Text(item.address, color = MutedText)
