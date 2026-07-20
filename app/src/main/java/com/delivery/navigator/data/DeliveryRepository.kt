@@ -12,10 +12,15 @@ import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RouteStop
 import com.delivery.navigator.model.TimeWindow
+import com.delivery.navigator.model.hourRange
 import com.delivery.navigator.model.toRegistrationTimeWindow
 import com.delivery.navigator.model.toTimeWindow
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private const val CURRENT_LATITUDE = 35.681236
 private const val CURRENT_LONGITUDE = 139.767125
@@ -340,23 +345,73 @@ fun importPackages(source: String, existingCount: Int): List<DeliveryPackage> {
         .toList()
 }
 
+/** 平均走行速度(km/h)。ラッシュ時間帯は渋滞を想定し低めの値を使う簡易補正。 */
+private fun estimatedSpeedKmhForHour(hour: Int): Double = when (hour) {
+    in 7..9, in 17..19 -> 15.0
+    in 10..16 -> 22.0
+    else -> 28.0
+}
+
+private fun haversineMeters(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+    val earthRadiusM = 6_371_000.0
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLng = Math.toRadians(lng2 - lng1)
+    val a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLng / 2) * sin(dLng / 2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return earthRadiusM * c
+}
+
+/** 出発時刻からの経過分を加味し、区間の走行時間(分)を渋滞想定込みで見積もる。 */
+private fun estimatedTravelMinutes(distanceMeters: Double, atHour: Int): Double {
+    val speedKmh = estimatedSpeedKmhForHour(atHour)
+    val distanceKm = distanceMeters / 1000.0
+    return (distanceKm / speedKmh) * 60.0
+}
+
+private const val LATENESS_PENALTY_PER_MINUTE = 3.0
+
+/**
+ * 渋滞(時間帯別の平均速度補正)と各荷物の時間指定(timeWindow)を考慮して配送順を決定する。
+ * 総移動時間が最短になることを優先し、時間指定は守れない場合でも後続の荷物として組み込む(ソフト制約)。
+ */
 fun calculateNearestRoute(
     packages: List<DeliveryPackage>,
     originLat: Double = CURRENT_LATITUDE,
-    originLng: Double = CURRENT_LONGITUDE
+    originLng: Double = CURRENT_LONGITUDE,
+    startTime: Calendar = Calendar.getInstance()
 ): List<RouteStop> {
     val remaining = packages.toMutableList()
     val ordered = mutableListOf<RouteStop>()
     var currentLatitude = originLat
     var currentLongitude = originLng
+    var elapsedMinutes = 0.0
+    val startHour = startTime.get(Calendar.HOUR_OF_DAY)
 
     while (remaining.isNotEmpty()) {
+        val currentHour = (startHour + (elapsedMinutes / 60.0).toInt()) % 24
         val next = remaining.minBy { item ->
-            val latitudeDiff = item.latitude - currentLatitude
-            val longitudeDiff = item.longitude - currentLongitude
-            latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff
+            val distanceMeters = haversineMeters(currentLatitude, currentLongitude, item.latitude, item.longitude)
+            val travelMinutes = estimatedTravelMinutes(distanceMeters, currentHour)
+            val arrivalHour = (startHour + ((elapsedMinutes + travelMinutes) / 60.0).toInt()) % 24
+            val latenessPenalty = item.deliveryTimeWindow.hourRange()?.let { (_, endHour) ->
+                val overHours = arrivalHour - endHour
+                if (overHours > 0) overHours * 60.0 * LATENESS_PENALTY_PER_MINUTE else 0.0
+            } ?: 0.0
+            travelMinutes + latenessPenalty
         }
         remaining.remove(next)
+
+        val distanceMeters = haversineMeters(currentLatitude, currentLongitude, next.latitude, next.longitude)
+        val travelMinutes = estimatedTravelMinutes(distanceMeters, currentHour)
+        elapsedMinutes += travelMinutes
+        next.deliveryTimeWindow.hourRange()?.let { (startWindowHour, _) ->
+            val arrivalHour = startHour + (elapsedMinutes / 60.0)
+            if (arrivalHour < startWindowHour) {
+                elapsedMinutes = (startWindowHour - startHour) * 60.0
+            }
+        }
+
         ordered.add(RouteStop(next, ordered.size + 1))
         currentLatitude = next.latitude
         currentLongitude = next.longitude

@@ -45,6 +45,16 @@ fun TimeWindow.toRegistrationTimeWindow(): RegistrationTimeWindow = when (this) 
     TimeWindow.Unspecified -> RegistrationTimeWindow.None
 }
 
+/** 時間帯指定を「開始時, 終了時(24h表記)」に変換。指定なしは null。 */
+fun RegistrationTimeWindow.hourRange(): Pair<Int, Int>? = when (this) {
+    RegistrationTimeWindow.None -> null
+    RegistrationTimeWindow.Morning -> 8 to 12
+    RegistrationTimeWindow.Afternoon -> 14 to 16
+    RegistrationTimeWindow.LateAfternoon -> 16 to 18
+    RegistrationTimeWindow.Evening -> 18 to 20
+    RegistrationTimeWindow.Night -> 19 to 21
+}
+
 enum class PackageShape(val label: String, val symbol: String) {
     SmallBox("小箱", "□"),
     Envelope("封筒", "▭"),
