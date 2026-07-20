@@ -224,6 +224,8 @@
     <string name="billing_not_available">Não foi possível iniciar o Google Play Billing</string>
     <string name="plan_not_found">Plano não encontrado（verifique as configurações do Play Console）</string>
     <string name="debug_section_title">Para depuração (visível somente em builds de desenvolvimento)</string>
+    <string name="debug_expire_trial_button">Voltar para o plano Gratuito (para teste)</string>
+    <string name="debug_reset_trial_button">Ativar Premium localmente (para teste, sem cobrança real)</string>
 
     <!-- Diálogo de paywall -->
     <string name="paywall_title">Período gratuito encerrado</string>

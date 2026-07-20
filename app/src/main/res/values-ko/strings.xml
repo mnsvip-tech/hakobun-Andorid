@@ -224,6 +224,8 @@
     <string name="billing_not_available">Google Play Billing을 실행할 수 없습니다</string>
     <string name="plan_not_found">플랜을 찾을 수 없습니다（Play Console 설정을 확인하세요）</string>
     <string name="debug_section_title">디버그용（개발 빌드에서만 표시）</string>
+    <string name="debug_expire_trial_button">무료 플랜으로 되돌리기（테스트용）</string>
+    <string name="debug_reset_trial_button">로컬에서 프리미엄 활성화（테스트용, 실제 결제 없음）</string>
 
     <!-- 페이월 다이얼로그 -->
     <string name="paywall_title">무료 기간이 종료되었습니다</string>

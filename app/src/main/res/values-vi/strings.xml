@@ -224,6 +224,8 @@
     <string name="billing_not_available">Không thể khởi động Google Play Billing</string>
     <string name="plan_not_found">Không tìm thấy gói（vui lòng kiểm tra cài đặt Play Console）</string>
     <string name="debug_section_title">Dành cho gỡ lỗi (chỉ hiển thị trong bản dựng phát triển)</string>
+    <string name="debug_expire_trial_button">Quay lại gói Miễn phí (dùng để kiểm tra)</string>
+    <string name="debug_reset_trial_button">Bật Premium cục bộ (dùng để kiểm tra, không tính phí thực)</string>
 
     <!-- Hộp thoại giới hạn trả phí -->
     <string name="paywall_title">Hết thời gian dùng thử miễn phí</string>

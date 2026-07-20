@@ -180,6 +180,8 @@
     <string name="clear_course_from_map_button">地図から削除</string>
     <string name="complete_all_button">全て配達完了にする</string>
     <string name="debug_section_title">デバッグ用（開発ビルドのみ表示）</string>
+    <string name="debug_expire_trial_button">プレミアムを解除して無料プランに戻す（テスト用）</string>
+    <string name="debug_reset_trial_button">ローカルでプレミアムを有効にする（テスト用・実課金なし）</string>
 
     <!-- アドレス入力パネル（旧UI） -->
     <string name="address_input_title">住所入力</string>

@@ -224,6 +224,8 @@
     <string name="billing_not_available">Unable to launch Google Play Billing</string>
     <string name="plan_not_found">Plan not found (please check Play Console settings)</string>
     <string name="debug_section_title">Debug (visible in development builds only)</string>
+    <string name="debug_expire_trial_button">Revert to Free plan (for testing)</string>
+    <string name="debug_reset_trial_button">Enable Premium locally (for testing, no real charge)</string>
 
     <!-- Paywall Dialog -->
     <string name="paywall_title">Free Trial Ended</string>

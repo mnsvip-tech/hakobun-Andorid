@@ -1631,6 +1631,20 @@ private fun UserAccountScreen(
                         color = if (subscribeMessage.contains("完了")) SuccessGreen else Color(0xFFE53935)
                     )
                 }
+                if (com.delivery.navigator.BuildConfig.DEBUG && userProfile.isRegistered) {
+                    Text(stringResource(R.string.debug_section_title), color = MutedText, style = MaterialTheme.typography.labelSmall)
+                    if (isPremium) {
+                        OutlinedButton(
+                            onClick = { onSaveProfile(userProfile.copy(plan = MembershipPlan.Free)) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.debug_expire_trial_button)) }
+                    } else {
+                        OutlinedButton(
+                            onClick = { onSaveProfile(userProfile.copy(plan = MembershipPlan.Premium)) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.debug_reset_trial_button)) }
+                    }
+                }
             }
         }
     }
