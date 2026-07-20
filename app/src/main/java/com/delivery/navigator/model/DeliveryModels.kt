@@ -107,7 +107,11 @@ data class DeliveryPackage(
     val memo: String,
     val latitude: Double,
     val longitude: Double,
-    val status: DeliveryStatus
+    val status: DeliveryStatus,
+    val nameplate: String = "",
+    val packageMemo: String = "",
+    val phoneNumber: String = "",
+    val shape: PackageShape = PackageShape.SmallBox
 )
 
 @Immutable

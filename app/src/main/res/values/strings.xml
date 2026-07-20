@@ -162,6 +162,22 @@
     <string name="add_address_first">住所を1件以上追加してください</string>
     <string name="geocoding_hint">住所をジオコーディング中...</string>
     <string name="drag_pin_hint">ピンをドラッグして位置を調整できます</string>
+    <string name="has_locker_label">建物に宅配BOXあり</string>
+    <string name="nameplate_label">表札</string>
+    <string name="nameplate_placeholder">表札情報を入力できます</string>
+    <string name="delivery_memo_label">メモ</string>
+    <string name="delivery_memo_placeholder">届け先メモを入力できます</string>
+    <string name="package_memo_label">荷物メモ</string>
+    <string name="package_memo_placeholder">荷姿の情報等を入力できます</string>
+    <string name="slip_info_title">伝票情報</string>
+    <string name="slip_number_label">伝票番号</string>
+    <string name="slip_number_placeholder">例）0123-4567-8910-1112</string>
+    <string name="recipient_name_placeholder">例）着信 太郎</string>
+    <string name="phone_number_label">電話番号</string>
+    <string name="phone_number_placeholder">例）09012345678</string>
+    <string name="package_shape_title">荷姿</string>
+    <string name="add_course_address_title">コースへ住所を追加</string>
+    <string name="clear_course_from_map_button">地図から削除</string>
 
     <!-- アドレス入力パネル（旧UI） -->
     <string name="address_input_title">住所入力</string>

@@ -7,6 +7,7 @@ import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
 import com.delivery.navigator.model.MembershipPlan
+import com.delivery.navigator.model.PackageShape
 import com.delivery.navigator.model.RegistrationTimeWindow
 import com.delivery.navigator.model.RegularCourse
 import com.delivery.navigator.model.TimeWindow
@@ -123,7 +124,11 @@ class LocalDeliveryStore(context: Context) {
             memo = optString("memo"),
             latitude = optDouble("latitude", 0.0),
             longitude = optDouble("longitude", 0.0),
-            status = enumValueOrDefault(optString("status"), DeliveryStatus.Pending)
+            status = enumValueOrDefault(optString("status"), DeliveryStatus.Pending),
+            nameplate = optString("nameplate"),
+            packageMemo = optString("packageMemo"),
+            phoneNumber = optString("phoneNumber"),
+            shape = enumValueOrDefault(optString("shape"), PackageShape.SmallBox)
         )
     }
 
@@ -143,6 +148,10 @@ class LocalDeliveryStore(context: Context) {
             .put("latitude", latitude)
             .put("longitude", longitude)
             .put("status", status.name)
+            .put("nameplate", nameplate)
+            .put("packageMemo", packageMemo)
+            .put("phoneNumber", phoneNumber)
+            .put("shape", shape.name)
     }
 
     private fun JSONObject.toRegularCourse(): RegularCourse {

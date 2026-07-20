@@ -64,6 +64,7 @@ import com.delivery.navigator.data.createDeliveryPackageFromRegistration
 import com.delivery.navigator.data.createEndOfDayCalendarIntent
 import com.delivery.navigator.data.createPackagesFromCourse
 import com.delivery.navigator.data.currentRouteOrigin
+import com.delivery.navigator.data.defaultRegularCourses
 import com.delivery.navigator.data.geocodeAddressPublic
 import com.delivery.navigator.data.exportPackages
 import com.delivery.navigator.data.fetchDrivingRoutePoints
@@ -139,7 +140,10 @@ fun HakobunApp() {
     val regularCourseList = remember(deliveryStore) {
         mutableStateListOf<RegularCourse>().apply {
             val savedCourses = deliveryStore.loadRegularCourses()
-            addAll(savedCourses)
+            val merged = defaultRegularCourses().map { default ->
+                savedCourses.firstOrNull { it.code == default.code } ?: default
+            }
+            addAll(merged)
         }
     }
     var selectedWindow by remember { mutableStateOf(TimeWindow.All) }
@@ -428,26 +432,9 @@ fun HakobunApp() {
                 ?: "東京都千代田区丸の内1-1-1"
             PackageRegistrationScreen(
                 initialAddress = registrationAddress,
-                courses = regularCourseList,
                 onBack = { isRegisteringPackage = false },
                 onOpenMap = { addr -> context.startActivity(openMapIntent(addr)) },
                 onOpenNavigation = { addr -> context.startActivity(openNavigationIntent(addr)) },
-                onAddCourseAddress = { courseCode, address ->
-                    coroutineScope.launch {
-                        val newAddress = createCourseAddressFromInput(
-                            recipient = "",
-                            address = address,
-                            timeWindow = TimeWindow.Unspecified,
-                            memo = "荷物登録画面から追加"
-                        )
-                        val index = regularCourseList.indexOfFirst { it.code == courseCode }
-                        if (index >= 0) {
-                            val course = regularCourseList[index]
-                            regularCourseList[index] = course.copy(addresses = course.addresses + newAddress)
-                            persistRegularCourses()
-                        }
-                    }
-                },
                 onRegister = { results ->
                     coroutineScope.launch {
                         results.forEach { result ->
@@ -455,7 +442,6 @@ fun HakobunApp() {
                         }
                         selectedPackageCode = packages.last().trackingCode
                         persistPackages()
-                        isRegisteringPackage = false
                     }
                 }
             )
@@ -470,6 +456,7 @@ fun HakobunApp() {
                     selectedCode = selectedPackage?.takeUnless { it.status.hidesMapPin() }?.trackingCode,
                     origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second),
                     onSelect = { selectedPackageCode = it },
+                    onEditPackage = { code -> editingPackageCode = code },
                     currentLocation = currentLocation,
                     fusedLocationClient = fusedLocationClient,
                     onNavigate = {
@@ -556,6 +543,16 @@ fun HakobunApp() {
                             selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
                             persistPackages()
                             homePanel = null
+                        },
+                        onClearCourseFromMap = { course ->
+                            val prefix = "COURSE-${course.code}-"
+                            val removedCodes = packages.filter { it.trackingCode.startsWith(prefix) }.map { it.trackingCode }
+                            packages.removeAll { it.trackingCode.startsWith(prefix) }
+                            removedCodes.forEach { fixedRouteNumbers.remove(it) }
+                            if (selectedPackageCode in removedCodes) {
+                                selectedPackageCode = packages.lastOrNull()?.trackingCode ?: ""
+                            }
+                            persistPackages()
                         },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
@@ -817,6 +814,7 @@ private fun HomePanelSheet(
     onImport: () -> Unit,
     onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit,
     onLoadCourse: (RegularCourse) -> Unit,
+    onClearCourseFromMap: (RegularCourse) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -839,7 +837,7 @@ private fun HomePanelSheet(
             }
             when (panel) {
                 HomePanel.Packages -> PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
-                HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onAddCourseAddress)
+                HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onClearCourseFromMap, onAddCourseAddress)
                 HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClose)
             }
         }
@@ -853,6 +851,7 @@ private fun FullScreenDeliveryMap(
     selectedCode: String?,
     origin: LatLng,
     onSelect: (String) -> Unit,
+    onEditPackage: (String) -> Unit,
     currentLocation: LatLng? = null,
     fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient? = null,
     onNavigate: (DeliveryPackage) -> Unit,
@@ -951,6 +950,7 @@ private fun FullScreenDeliveryMap(
                     anchor = Offset(0.5f, 1f),
                     onClick = {
                         onSelect(item.trackingCode)
+                        onEditPackage(item.trackingCode)
                         false
                     }
                 )
@@ -2090,11 +2090,77 @@ private fun EndOfDayPanel(
 private fun RegularCoursePanel(
     courses: List<RegularCourse>,
     onLoadCourse: (RegularCourse) -> Unit,
+    onClearCourseFromMap: (RegularCourse) -> Unit,
     onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit
 ) {
+    val context = LocalContext.current
     var selectedCourseCode by remember { mutableStateOf(courses.firstOrNull()?.code ?: "A") }
     val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode } ?: courses.firstOrNull()
-    remember(onAddCourseAddress) { onAddCourseAddress }
+    var newRecipient by remember { mutableStateOf("") }
+    var newAddress by remember { mutableStateOf("") }
+    var newTimeWindow by remember { mutableStateOf(TimeWindow.Unspecified) }
+    var newMemo by remember { mutableStateOf("") }
+    var postalCode by remember { mutableStateOf("") }
+    var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+
+    var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val cameraOcrLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            ocrImageUri?.let { uri ->
+                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                } else {
+                    @Suppress("DEPRECATION")
+                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                }
+                recognizeAddressFromBitmap(
+                    bitmap = bitmap,
+                    onSuccess = { candidate = it },
+                    onFailure = {
+                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                    }
+                )
+            }
+        }
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                .also { it.parentFile?.mkdirs() }
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "${context.packageName}.fileprovider", file
+            )
+            ocrImageUri = uri
+            cameraOcrLauncher.launch(uri)
+        } else {
+            candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
+        }
+    }
+    val voiceInputLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val spoken = result.data
+            ?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull().orEmpty()
+        if (spoken.isNotBlank()) candidate = createAddressCandidateFromText("音声入力", spoken)
+    }
+    LaunchedEffect(candidate) {
+        val c = candidate ?: return@LaunchedEffect
+        val validAddress = c.address.isNotBlank()
+            && !c.address.contains("読み取れませんでした")
+            && !c.address.contains("権限が許可")
+            && !c.address.contains("取得できませんでした")
+        if (validAddress) {
+            newAddress = c.address
+            if (c.postalCode.isNotBlank()) postalCode = c.postalCode
+        }
+    }
 
     WhiteCard {
         Text(stringResource(R.string.regular_courses_title), fontWeight = FontWeight.Bold)
@@ -2111,16 +2177,111 @@ private fun RegularCoursePanel(
         }
         selectedCourse?.let { course ->
             Text(stringResource(R.string.course_summary, course.displayName, course.addresses.size), fontWeight = FontWeight.Bold)
-            Button(
-                onClick = { onLoadCourse(course) },
-                enabled = course.addresses.isNotEmpty(),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.load_course_button, course.code))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = { onLoadCourse(course) },
+                    enabled = course.addresses.isNotEmpty(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.load_course_button, course.code))
+                }
+                OutlinedButton(
+                    onClick = { onClearCourseFromMap(course) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.clear_course_from_map_button))
+                }
             }
             course.addresses.takeLast(5).forEach { item ->
                 TextBox("${item.recipient}\n${item.address}\n${item.timeWindow.label} / ${item.memo}")
             }
+        }
+    }
+
+    WhiteCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.add_course_address_title), fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                            PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                                .also { it.parentFile?.mkdirs() }
+                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                context, "${context.packageName}.fileprovider", file
+                            )
+                            ocrImageUri = uri
+                            cameraOcrLauncher.launch(uri)
+                        } else {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                    modifier = Modifier.height(36.dp)
+                ) { Text(stringResource(R.string.camera)) }
+                Button(
+                    onClick = { voiceInputLauncher.launch(createVoiceAddressIntent()) },
+                    modifier = Modifier.height(36.dp)
+                ) { Text(stringResource(R.string.voice)) }
+            }
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = postalCode,
+                onValueChange = { postalCode = it.filter(Char::isDigit).take(7) },
+                modifier = Modifier.weight(1f),
+                label = { Text(stringResource(R.string.postal_code_label)) },
+                placeholder = { Text(stringResource(R.string.postal_placeholder)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Button(
+                onClick = {
+                    postalSearchJob?.cancel()
+                    postalSearchJob = scope.launch {
+                        val result = searchPostalCode(postalCode)
+                        candidate = result
+                        val isValid = result.address.isNotBlank() &&
+                            !result.address.contains("見つかりません") &&
+                            !result.address.contains("エラー")
+                        if (isValid) newAddress = result.address
+                    }
+                },
+                enabled = postalCode.length == 7
+            ) { Text(stringResource(R.string.search)) }
+        }
+        candidate?.let { c ->
+            if (c.address.isNotBlank()) {
+                TextBox("${c.sourceLabel} / ${c.confidenceLabel}\n${c.address}")
+            }
+        }
+        LabeledField(stringResource(R.string.manual_input_label), stringResource(R.string.manual_placeholder), newAddress) { newAddress = it }
+        LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_name_placeholder), newRecipient) { newRecipient = it }
+        Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
+        TimeWindowFilters(selected = newTimeWindow) { newTimeWindow = it }
+        LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), newMemo) { newMemo = it }
+        Button(
+            onClick = {
+                onAddCourseAddress(selectedCourseCode, newRecipient, newAddress, newTimeWindow, newMemo)
+                newRecipient = ""
+                newAddress = ""
+                newTimeWindow = TimeWindow.Unspecified
+                newMemo = ""
+                postalCode = ""
+                candidate = null
+            },
+            enabled = newAddress.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.add_to_course_button, selectedCourseCode))
         }
     }
 }
@@ -2561,6 +2722,12 @@ private fun PackageEditScreen(
     var recipient by remember { mutableStateOf(deliveryPackage.recipient) }
     var memo by remember { mutableStateOf(deliveryPackage.memo) }
     var selectedTimeWindow by remember { mutableStateOf(deliveryPackage.deliveryTimeWindow) }
+    var hasLocker by remember { mutableStateOf(deliveryPackage.hasLocker) }
+    var nameplate by remember { mutableStateOf(deliveryPackage.nameplate) }
+    var packageMemo by remember { mutableStateOf(deliveryPackage.packageMemo) }
+    var trackingCode by remember { mutableStateOf(deliveryPackage.trackingCode) }
+    var phoneNumber by remember { mutableStateOf(deliveryPackage.phoneNumber) }
+    var selectedShape by remember { mutableStateOf(deliveryPackage.shape) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -2588,18 +2755,56 @@ private fun PackageEditScreen(
             ) {
                 WhiteCard {
                     Text(stringResource(R.string.recipient_info_title), fontWeight = FontWeight.Bold)
-                    InfoRow(stringResource(R.string.tracking_code_label), deliveryPackage.trackingCode)
                     InfoRow(stringResource(R.string.address_label), deliveryPackage.address)
-                    LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_placeholder), recipient) { recipient = it }
-                    LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), memo) { memo = it }
-                }
-                WhiteCard {
-                    Text(stringResource(R.string.delivery_status_title), fontWeight = FontWeight.Bold)
-                    SegmentedRow(DeliveryStatus.entries, selectedStatus, { it.label }) { selectedStatus = it }
+                    LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_name_placeholder), recipient) { recipient = it }
                 }
                 WhiteCard {
                     Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
                     SegmentedRow(RegistrationTimeWindow.entries, selectedTimeWindow, { it.label }) { selectedTimeWindow = it }
+                }
+                WhiteCard {
+                    Text(stringResource(R.string.slip_info_title), fontWeight = FontWeight.Bold)
+                    LabeledField(stringResource(R.string.slip_number_label), stringResource(R.string.slip_number_placeholder), trackingCode) { trackingCode = it }
+                    LabeledField(stringResource(R.string.phone_number_label), stringResource(R.string.phone_number_placeholder), phoneNumber) { phoneNumber = it }
+                }
+                WhiteCard {
+                    Text(stringResource(R.string.package_shape_title), fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PackageShape.entries.forEach { shape ->
+                            val selected = selectedShape == shape
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (selected) BrandBlue else Color(0xFFF6F7F9))
+                                    .clickable { selectedShape = shape }
+                                    .padding(vertical = 10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(shape.symbol, color = if (selected) Color.White else Color(0xFF445064), fontWeight = FontWeight.Bold)
+                                Text(shape.label, color = if (selected) Color.White else Color(0xFF445064), style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+                }
+                WhiteCard {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { hasLocker = !hasLocker },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.has_locker_label), fontWeight = FontWeight.Bold)
+                        Checkbox(checked = hasLocker, onCheckedChange = { hasLocker = it })
+                    }
+                    LabeledField(stringResource(R.string.nameplate_label), stringResource(R.string.nameplate_placeholder), nameplate) { nameplate = it }
+                    LabeledField(stringResource(R.string.delivery_memo_label), stringResource(R.string.delivery_memo_placeholder), memo) { memo = it }
+                    LabeledField(stringResource(R.string.package_memo_label), stringResource(R.string.package_memo_placeholder), packageMemo) { packageMemo = it }
+                }
+                WhiteCard {
+                    Text(stringResource(R.string.delivery_status_title), fontWeight = FontWeight.Bold)
+                    SegmentedRow(DeliveryStatus.entries, selectedStatus, { it.label }) { selectedStatus = it }
                 }
                 WhiteCard {
                     Text(stringResource(R.string.navigation_title), fontWeight = FontWeight.Bold)
@@ -2626,7 +2831,13 @@ private fun PackageEditScreen(
                         memo = memo,
                         status = selectedStatus,
                         timeWindow = selectedTimeWindow.toTimeWindow(),
-                        deliveryTimeWindow = selectedTimeWindow
+                        deliveryTimeWindow = selectedTimeWindow,
+                        hasLocker = hasLocker,
+                        nameplate = nameplate,
+                        packageMemo = packageMemo,
+                        trackingCode = trackingCode,
+                        phoneNumber = phoneNumber,
+                        shape = selectedShape
                     )
                 )
             },
@@ -2640,14 +2851,24 @@ private fun PackageEditScreen(
     }
 }
 
+private data class PackageRegistrationDetail(
+    val hasLocker: Boolean,
+    val nameplate: String,
+    val deliveryMemo: String,
+    val packageMemo: String,
+    val status: DeliveryStatus,
+    val trackingNumber: String,
+    val recipientName: String,
+    val phoneNumber: String,
+    val shape: PackageShape
+)
+
 @Composable
 private fun PackageRegistrationScreen(
     initialAddress: String,
-    courses: List<RegularCourse>,
     onBack: () -> Unit,
     onOpenMap: (String) -> Unit,
     onOpenNavigation: (String) -> Unit,
-    onAddCourseAddress: (String, String) -> Unit,
     onRegister: (List<PackageRegistrationResult>) -> Unit
 ) {
     val context = LocalContext.current
@@ -2661,9 +2882,17 @@ private fun PackageRegistrationScreen(
     var postalCode by remember { mutableStateOf("") }
     var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
     var manualInput by remember { mutableStateOf("") }
-    var targetCourseCode by remember { mutableStateOf<String?>(null) }
-    var courseSavedMessage by remember { mutableStateOf("") }
     var selectedTimeWindow by remember { mutableStateOf(RegistrationTimeWindow.None) }
+    var hasLocker by remember { mutableStateOf(false) }
+    var nameplate by remember { mutableStateOf("") }
+    var deliveryMemo by remember { mutableStateOf("") }
+    var packageMemo by remember { mutableStateOf("") }
+    var selectedStatus by remember { mutableStateOf(DeliveryStatus.Pending) }
+    var trackingNumber by remember { mutableStateOf("") }
+    var recipientName by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var selectedShape by remember { mutableStateOf(PackageShape.SmallBox) }
+    val addressDetails = remember { mutableStateMapOf<String, PackageRegistrationDetail>() }
 
     var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
@@ -2763,57 +2992,6 @@ private fun PackageRegistrationScreen(
                     .padding(bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // 登録済み住所リスト
-                WhiteCard {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(stringResource(R.string.delivery_addresses_title), fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.address_count_fraction, addresses.size), color = BrandBlue, fontWeight = FontWeight.Bold)
-                    }
-                    if (addresses.isEmpty()) {
-                        Text(stringResource(R.string.add_address_hint), color = MutedText)
-                    } else {
-                        addresses.forEachIndexed { index, addr ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFFF6F7F9))
-                                    .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.address_index_label, index + 1), color = BrandBlue, style = MaterialTheme.typography.labelSmall)
-                                    Text(addr, fontWeight = FontWeight.Bold)
-                                }
-                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    TextButton(onClick = { onOpenMap(addr) }) { Text(stringResource(R.string.open_map)) }
-                                    TextButton(
-                                        onClick = {
-                                            addresses.removeAt(index)
-                                            geocodedLocations.remove(addr)
-                                            pinOverrides.remove(addr)
-                                        }
-                                    ) { Text(stringResource(R.string.delete), color = Color(0xFFE53935)) }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                WhiteCard {
-                    Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
-                    SegmentedRow(
-                        RegistrationTimeWindow.entries,
-                        selectedTimeWindow,
-                        { it.label }
-                    ) { selectedTimeWindow = it }
-                }
-
                 // 住所入力エリア（5件未満のとき表示）
                 if (canAddMore) {
                     WhiteCard {
@@ -2848,42 +3026,7 @@ private fun PackageRegistrationScreen(
                                 ) { Text(stringResource(R.string.voice)) }
                             }
                         }
-                        Text(stringResource(R.string.registration_target), fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(
-                                selected = targetCourseCode == null,
-                                onClick = {
-                                    targetCourseCode = null
-                                    courseSavedMessage = ""
-                                },
-                                label = { Text(stringResource(R.string.normal_package)) }
-                            )
-                        }
-                        courses.chunked(2).forEach { rowCourses ->
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                rowCourses.forEach { course ->
-                                    FilterChip(
-                                        selected = targetCourseCode == course.code,
-                                        onClick = {
-                                            targetCourseCode = course.code
-                                            courseSavedMessage = ""
-                                        },
-                                        label = { Text(stringResource(R.string.course_chip_label, course.code)) },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                                if (rowCourses.size == 1) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                        Text(
-                            targetCourseCode?.let { stringResource(R.string.course_target_hint, it) }
-                                ?: stringResource(R.string.normal_target_hint),
-                            color = MutedText,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        // 郵便番号検索
+                        // 1. 郵便番号検索
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -2918,7 +3061,7 @@ private fun PackageRegistrationScreen(
                                 TextBox("${c.sourceLabel} / ${c.confidenceLabel}\n${c.address}")
                             }
                         }
-                        // 直接入力
+                        // 2. 直接入力
                         OutlinedTextField(
                             value = manualInput,
                             onValueChange = { manualInput = it },
@@ -2926,39 +3069,116 @@ private fun PackageRegistrationScreen(
                             label = { Text(stringResource(R.string.manual_input_label)) },
                             placeholder = { Text(stringResource(R.string.manual_placeholder)) }
                         )
+                        // 3. お届け先名
+                        OutlinedTextField(
+                            value = recipientName,
+                            onValueChange = { recipientName = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text(stringResource(R.string.recipient_field_label)) },
+                            placeholder = { Text(stringResource(R.string.recipient_name_placeholder)) }
+                        )
                         Button(
                             onClick = {
                                 if (manualInput.isNotBlank()) {
-                                    val selectedCourse = targetCourseCode
-                                    if (selectedCourse == null) {
-                                        addresses.add(manualInput)
-                                    } else {
-                                        onAddCourseAddress(selectedCourse, manualInput)
-                                        courseSavedMessage = "${selectedCourse}コースへ住所を追加しました"
-                                    }
+                                    addresses.add(manualInput)
+                                    addressDetails[manualInput] = PackageRegistrationDetail(
+                                        hasLocker = hasLocker,
+                                        nameplate = nameplate,
+                                        deliveryMemo = deliveryMemo,
+                                        packageMemo = packageMemo,
+                                        status = selectedStatus,
+                                        trackingNumber = trackingNumber,
+                                        recipientName = recipientName,
+                                        phoneNumber = phoneNumber,
+                                        shape = selectedShape
+                                    )
                                     manualInput = ""
+                                    hasLocker = false
+                                    nameplate = ""
+                                    deliveryMemo = ""
+                                    packageMemo = ""
+                                    selectedStatus = DeliveryStatus.Pending
+                                    trackingNumber = ""
+                                    recipientName = ""
+                                    phoneNumber = ""
+                                    selectedShape = PackageShape.SmallBox
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = manualInput.isNotBlank()
                         ) {
-                            Text(targetCourseCode?.let { stringResource(R.string.add_to_course_button, it) } ?: stringResource(R.string.add_manual_button))
-                        }
-                        if (courseSavedMessage.isNotBlank()) {
-                            Text(courseSavedMessage, color = SuccessGreen, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.add_manual_button))
                         }
                     }
                 }
-            }
-            if (addresses.isNotEmpty()) {
-                RegistrationMapPreview(
-                    addresses = addresses.toList(),
-                    geocodedLocations = geocodedLocations,
-                    pinOverrides = pinOverrides,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                )
+
+                WhiteCard {
+                    Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
+                    SegmentedRow(
+                        RegistrationTimeWindow.entries,
+                        selectedTimeWindow,
+                        { it.label }
+                    ) { selectedTimeWindow = it }
+                }
+
+                if (addresses.isNotEmpty()) {
+                    RegistrationMapPreview(
+                        addresses = addresses.toList(),
+                        geocodedLocations = geocodedLocations,
+                        pinOverrides = pinOverrides,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp)
+                    )
+                }
+
+                WhiteCard {
+                    Text(stringResource(R.string.slip_info_title), fontWeight = FontWeight.Bold)
+                    LabeledField(stringResource(R.string.slip_number_label), stringResource(R.string.slip_number_placeholder), trackingNumber) { trackingNumber = it }
+                    LabeledField(stringResource(R.string.phone_number_label), stringResource(R.string.phone_number_placeholder), phoneNumber) { phoneNumber = it }
+                }
+
+                WhiteCard {
+                    Text(stringResource(R.string.package_shape_title), fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PackageShape.entries.forEach { shape ->
+                            val selected = selectedShape == shape
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (selected) BrandBlue else Color(0xFFF6F7F9))
+                                    .clickable { selectedShape = shape }
+                                    .padding(vertical = 10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(shape.symbol, color = if (selected) Color.White else Color(0xFF445064), fontWeight = FontWeight.Bold)
+                                Text(shape.label, color = if (selected) Color.White else Color(0xFF445064), style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+                }
+
+                WhiteCard {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { hasLocker = !hasLocker },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.has_locker_label), fontWeight = FontWeight.Bold)
+                        Checkbox(checked = hasLocker, onCheckedChange = { hasLocker = it })
+                    }
+                    LabeledField(stringResource(R.string.nameplate_label), stringResource(R.string.nameplate_placeholder), nameplate) { nameplate = it }
+                    LabeledField(stringResource(R.string.delivery_memo_label), stringResource(R.string.delivery_memo_placeholder), deliveryMemo) { deliveryMemo = it }
+                    LabeledField(stringResource(R.string.package_memo_label), stringResource(R.string.package_memo_placeholder), packageMemo) { packageMemo = it }
+                }
+
+                WhiteCard {
+                    Text(stringResource(R.string.delivery_status_title), fontWeight = FontWeight.Bold)
+                    SegmentedRow(DeliveryStatus.entries, selectedStatus, { it.label }) { selectedStatus = it }
+                }
             }
             Spacer(modifier = Modifier.navigationBarsPadding().height(68.dp))
         }
@@ -2967,18 +3187,19 @@ private fun PackageRegistrationScreen(
                 onRegister(
                     addresses.map { addr ->
                         val latLng = pinOverrides[addr] ?: geocodedLocations[addr]
+                        val detail = addressDetails[addr]
                         PackageRegistrationResult(
                             address = addr,
-                            hasLocker = false,
-                            nameplate = "",
-                            deliveryMemo = "",
-                            packageMemo = "",
-                            trackingNumber = "",
-                            recipientName = "",
-                            phoneNumber = "",
-                            status = DeliveryStatus.Pending,
+                            hasLocker = detail?.hasLocker ?: false,
+                            nameplate = detail?.nameplate.orEmpty(),
+                            deliveryMemo = detail?.deliveryMemo.orEmpty(),
+                            packageMemo = detail?.packageMemo.orEmpty(),
+                            trackingNumber = detail?.trackingNumber.orEmpty(),
+                            recipientName = detail?.recipientName.orEmpty(),
+                            phoneNumber = detail?.phoneNumber.orEmpty(),
+                            status = detail?.status ?: DeliveryStatus.Pending,
                             timeWindow = selectedTimeWindow,
-                            shape = PackageShape.SmallBox,
+                            shape = detail?.shape ?: PackageShape.SmallBox,
                             colorType = PackageColorType.Kraft,
                             size = PackageSizeOption.Medium,
                             latitude = latLng?.latitude ?: 0.0,
@@ -2986,6 +3207,25 @@ private fun PackageRegistrationScreen(
                         )
                     }
                 )
+                addresses.forEach { addr ->
+                    geocodedLocations.remove(addr)
+                    pinOverrides.remove(addr)
+                    addressDetails.remove(addr)
+                }
+                addresses.clear()
+                postalCode = ""
+                candidate = null
+                manualInput = ""
+                selectedTimeWindow = RegistrationTimeWindow.None
+                hasLocker = false
+                nameplate = ""
+                deliveryMemo = ""
+                packageMemo = ""
+                selectedStatus = DeliveryStatus.Pending
+                trackingNumber = ""
+                recipientName = ""
+                phoneNumber = ""
+                selectedShape = PackageShape.SmallBox
             },
             enabled = addresses.isNotEmpty(),
             modifier = Modifier

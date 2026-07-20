@@ -89,6 +89,10 @@ fun samplePackages(): List<DeliveryPackage> = listOf(
     )
 )
 
+fun defaultRegularCourses(): List<RegularCourse> = listOf("A", "B", "C", "D").map { code ->
+    RegularCourse(code = code, displayName = "${code}コース", addresses = emptyList())
+}
+
 fun regularCourses(): List<RegularCourse> = listOf(
     RegularCourse(
         code = "A",
@@ -170,10 +174,7 @@ suspend fun createDeliveryPackageFromRegistration(
     existingCount: Int
 ): DeliveryPackage {
     val generatedNumber = existingCount + 1
-    val memo = listOf(result.nameplate, result.deliveryMemo, result.packageMemo)
-        .filter { it.isNotBlank() }
-        .joinToString(" / ")
-        .ifBlank { "登録画面から追加" }
+    val memo = result.deliveryMemo.ifBlank { "登録画面から追加" }
     val (lat, lng) = if (result.latitude != 0.0 || result.longitude != 0.0) {
         result.latitude to result.longitude
     } else {
@@ -194,7 +195,11 @@ suspend fun createDeliveryPackageFromRegistration(
         memo = memo,
         latitude = lat,
         longitude = lng,
-        status = result.status
+        status = result.status,
+        nameplate = result.nameplate,
+        packageMemo = result.packageMemo,
+        phoneNumber = result.phoneNumber,
+        shape = result.shape
     )
 }
 
