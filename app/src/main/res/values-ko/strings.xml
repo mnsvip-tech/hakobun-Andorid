@@ -211,15 +211,15 @@
     <string name="premium_plan">✓ 프리미엄 플랜</string>
     <string name="premium_features">모든 기능을 이용할 수 있습니다.</string>
     <string name="free_trial_expired">프리미엄 미등록</string>
-    <string name="trial_after_register">프리미엄 플랜은 첫 1개월 무료 체험이 가능하며 Google Play가 자동으로 관리합니다. 무료 기간 종료 후 자동으로 결제가 시작됩니다.</string>
+    <string name="trial_after_register">프리미엄 플랜은 첫 2주 무료 체험이 가능하며 Google Play가 자동으로 관리합니다. 무료 기간 종료 후 자동으로 결제가 시작됩니다.</string>
     <string name="free_plan_name">무료</string>
-    <string name="free_trial_period">1개월 체험</string>
-    <string name="free_features">・전체 기능이 30일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
+    <string name="free_trial_period">2주 체험</string>
+    <string name="free_features">・전체 기능이 14일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
     <string name="premium_plan_name">프리미엄</string>
     <string name="premium_price">¥980 / 월</string>
     <string name="premium_features_list">· 전체 기능\n· 무제한 등록\n· 우선 지원</string>
     <string name="subscribe_google_pay">Google Pay로 프리미엄 등록</string>
-    <string name="subscription_terms">첫 달 무료, 이후 월 ¥980（세금 포함）. 언제든지 취소 가능.</string>
+    <string name="subscription_terms">첫 2주 무료, 이후 월 ¥980（세금 포함）. 언제든지 취소 가능.</string>
     <string name="subscribe_complete">프리미엄 플랜으로 이전이 완료되었습니다</string>
     <string name="billing_not_available">Google Play Billing을 실행할 수 없습니다</string>
     <string name="plan_not_found">플랜을 찾을 수 없습니다（Play Console 설정을 확인하세요）</string>
@@ -229,7 +229,7 @@
 
     <!-- 페이월 다이얼로그 -->
     <string name="paywall_title">무료 기간이 종료되었습니다</string>
-    <string name="paywall_message">새 화물을 등록하려면 프리미엄 플랜으로 이전해야 합니다.\n\n첫 달은 무료로 체험하실 수 있습니다.</string>
+    <string name="paywall_message">새 화물을 등록하려면 프리미엄 플랜으로 이전해야 합니다.\n\n첫 2주는 무료로 체험하실 수 있습니다.</string>
     <string name="go_premium">프리미엄 등록</string>
 
     <!-- 재배송 다이얼로그 -->
@@ -284,6 +284,8 @@
     <string name="camera_no_permission">카메라 권한이 허용되지 않았습니다</string>
     <string name="camera_permission_check">권한 확인</string>
     <string name="voice_prompt">배송지 주소를 말씀해 주세요</string>
+    <string name="voice_status_unrecognized">"%1$s"에서 배송 상태를 인식할 수 없습니다. 다시 시도해 주세요.</string>
+    <string name="voice_next_stop_none">다음 배송지를 찾을 수 없습니다.</string>
     <string name="memo_added_from_registration">화물 등록 화면에서 추가</string>
 
     <!-- 범례 -->
@@ -311,7 +313,7 @@
     <string name="faq_q_01">화물은 어떻게 등록하나요?</string>
     <string name="faq_a_01">홈 화면 우측 상단의 「등록」 버튼, 또는 사이드 메뉴 → 「화물 등록」에서 등록할 수 있습니다.\n\n① 우편번호 검색·직접 입력·카메라 OCR·음성 입력 중 하나로 주소를 입력\n② 수령인 이름을 입력（OCR로 「〇〇님」 등의 기재가 있으면 자동으로 입력됩니다）\n③ 「추가」를 누르면 주소 목록에 추가되고 지도 미리보기에 핀이 표시됩니다（이 시점에서는 아직 실제 배송 지도에는 반영되지 않습니다）\n④ 시간 지정·송장 정보（송장 번호／전화번호）·포장 형태·건물 택배함 유무·문패·메모·택배 메모·배송 상태를 입력\n⑤ 같은 방법으로 주소를 최대 5건까지 추가할 수 있습니다\n⑥ 「〇건을 지도에 등록」 버튼을 누르면 추가한 주소가 한꺼번에 실제 배송 지도에 반영되고, 입력란과 주소 목록은 자동으로 초기화됩니다</string>
     <string name="faq_q_02">무료 회원과 유료（프리미엄）회원의 차이는?</string>
-    <string name="faq_a_02">【무료 회원（체험 기간 중）】\n사용자 등록일로부터 30일간, 화물 등록·OCR／음성 입력·정기 코스·지도 표시 등 전체 기능을 무료로 이용하실 수 있습니다.\n\n【체험 종료 후（미가입 시）】\n신규 화물 등록만 잠깁니다. 「등록」 버튼을 누르면 프리미엄 안내가 표시됩니다. 기존 화물 데이터의 열람·편집·지도 표시·배송 상태 업데이트는 계속 무료로 이용하실 수 있습니다.\n\n【유료 회원（프리미엄 ¥980/월）】\n기간 제한 없이 언제든지 화물 등록을 포함한 전체 기능을 이용하실 수 있습니다.\n\n※화물 등록 화면에서 한 번에 추가할 수 있는 주소는 최대 5건까지이며, 이는 플랜과 관계없이 모든 사용자에게 공통되는 입력 상한으로 무료／유료의 차이가 아닙니다.</string>
+    <string name="faq_a_02">【무료 회원（체험 기간 중）】\n사용자 등록일로부터 14일간, 화물 등록·OCR／음성 입력·정기 코스·지도 표시 등 전체 기능을 무료로 이용하실 수 있습니다.\n\n【체험 종료 후（미가입 시）】\n신규 화물 등록만 잠깁니다. 「등록」 버튼을 누르면 프리미엄 안내가 표시됩니다. 기존 화물 데이터의 열람·편집·지도 표시·배송 상태 업데이트는 계속 무료로 이용하실 수 있습니다.\n\n【유료 회원（프리미엄 ¥980/월）】\n기간 제한 없이 언제든지 화물 등록을 포함한 전체 기능을 이용하실 수 있습니다.\n\n※화물 등록 화면에서 한 번에 추가할 수 있는 주소는 최대 5건까지이며, 이는 플랜과 관계없이 모든 사용자에게 공통되는 입력 상한으로 무료／유료의 차이가 아닙니다.</string>
     <string name="faq_q_03">화물 배송 상태를 업데이트하려면?</string>
     <string name="faq_a_03">홈 화면 지도의 핀, 또는 배송 목록의 카드를 탭하면 화물 편집 화면이 열립니다.\n\n수령인 이름·시간 지정·송장 정보·포장 형태·택배함 유무·문패·메모·배송 상태（「완료」「부재」「재배송」「회사 반납」 등）를 한꺼번에 편집·저장할 수 있습니다.</string>
     <string name="faq_q_04">지도 핀이 올바른 위치에 표시되지 않아요</string>
@@ -327,7 +329,7 @@
     <string name="faq_q_09">알림을 끄고 싶어요</string>
     <string name="faq_a_09">앱 내: 사이드 메뉴 → 알림 → 설정 항목 → 알림 토글을 OFF로 설정하세요.\n\nAndroid 설정 → 앱 → HAKOBUN → 알림에서도 비활성화할 수 있습니다.</string>
     <string name="faq_q_10">무료 체험은 언제 종료되나요?</string>
-    <string name="faq_a_10">사용자 등록일로부터 30일간이 무료 체험 기간입니다.\n\n앱 내 사용자 계정 화면(사이드 메뉴 → 사용자 계정 정보)에서 남은 일수를 확인할 수 있습니다.\n\n체험 종료 24시간 전까지 취소하면 요금이 발생하지 않습니다.</string>
+    <string name="faq_a_10">사용자 등록일로부터 14일간이 무료 체험 기간입니다.\n\n앱 내 사용자 계정 화면(사이드 메뉴 → 사용자 계정 정보)에서 남은 일수를 확인할 수 있습니다.\n\n체험 종료 24시간 전까지 취소하면 요금이 발생하지 않습니다.</string>
     <string name="faq_q_11">구독을 취소하려면?</string>
     <string name="faq_a_11">Google Play 스토어 → 계정 아이콘 → 「구독」→ HAKOBUN → 「구독 취소」에서 진행하세요.\n\n취소 후에도 당월 말까지 이용할 수 있습니다. 앱 내 취소 기능은 현재 준비 중입니다.</string>
     <string name="faq_q_12">결제에 실패했어요</string>
@@ -352,7 +354,7 @@
     <string name="terms_s02_title">제2조　이용 자격</string>
     <string name="terms_s02_body">본 앱은 18세 이상 배송 업무 종사자 또는 업무 관리자를 대상으로 합니다.\n\n본 앱 이용을 위해 Google 계정이 필요할 수 있습니다. 허위 정보를 이용한 등록은 금지합니다.</string>
     <string name="terms_s03_title">제3조　구독 및 결제</string>
-    <string name="terms_s03_body">[무료 체험]\n최초 등록 시 1개월 무료 체험을 제공합니다. 체험 기간 중 모든 기능을 이용할 수 있습니다. 체험 종료 24시간 전까지 취소하지 않으면 자동으로 유료 플랜으로 전환됩니다.\n\n[유료 플랜(프리미엄)]\n요금: ¥980 / 월 (세금 포함)\n청구: Google Play를 통해 매월 자동 갱신\n취소: Google Play 스토어 「구독」 화면에서 언제든지 취소 가능. 취소 후 당월 말까지 이용 가능.\n\n[환불 정책]\nGoogle Play 환불 정책을 따릅니다. 구매 후 48시간 이내 취소는 Google Play를 통해 신청하세요.\n\n[가격 변경]\n가격 변경 시 30일 전까지 앱 내 또는 이메일로 안내합니다.</string>
+    <string name="terms_s03_body">[무료 체험]\n최초 등록 시 2주 무료 체험을 제공합니다. 체험 기간 중 모든 기능을 이용할 수 있습니다. 체험 종료 24시간 전까지 취소하지 않으면 자동으로 유료 플랜으로 전환됩니다.\n\n[유료 플랜(프리미엄)]\n요금: ¥980 / 월 (세금 포함)\n청구: Google Play를 통해 매월 자동 갱신\n취소: Google Play 스토어 「구독」 화면에서 언제든지 취소 가능. 취소 후 당월 말까지 이용 가능.\n\n[환불 정책]\nGoogle Play 환불 정책을 따릅니다. 구매 후 48시간 이내 취소는 Google Play를 통해 신청하세요.\n\n[가격 변경]\n가격 변경 시 30일 전까지 앱 내 또는 이메일로 안내합니다.</string>
     <string name="terms_s04_title">제4조　수집 정보 및 이용 목적</string>
     <string name="terms_s04_body">■ 위치 정보(GPS)\n목적: 배송지 내비게이션, 현재 위치 표시, 배송 경로 최적화\n수집 시점: 앱 사용 중에만 (백그라운드 수집 없음)\n\n■ 카메라/이미지\n목적: 송장 OCR을 통한 주소·성명 자동 입력\n저장처: 기기 내부만 (클라우드 전송 없음)\n\n■ 음성(마이크)\n목적: 음성 입력을 통한 주소·메모 전사\n저장처: 기기 내부만\n\n■ 입력 정보(성명, 주소, 전화, 이메일)\n목적: 배송 업무 관리 및 기사 프로필 설정\n저장처: 기기 내 암호화 저장소(AES-256-GCM)\n외부 전송: 없음</string>
     <string name="terms_s05_title">제5조　제3자 서비스 이용</string>

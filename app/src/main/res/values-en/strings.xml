@@ -211,15 +211,15 @@
     <string name="premium_plan">✓ Premium Plan</string>
     <string name="premium_features">All features are available.</string>
     <string name="free_trial_expired">Not Subscribed to Premium</string>
-    <string name="trial_after_register">The Premium plan includes a 1-month free trial, managed automatically by Google Play. Billing starts automatically once the trial ends.</string>
+    <string name="trial_after_register">The Premium plan includes a 2-week free trial, managed automatically by Google Play. Billing starts automatically once the trial ends.</string>
     <string name="free_plan_name">Free</string>
-    <string name="free_trial_period">1-Month Trial</string>
-    <string name="free_features">· All features free for 30 days\n· After the period ends, only new registrations are locked\n· Backup</string>
+    <string name="free_trial_period">2-Week Trial</string>
+    <string name="free_features">· All features free for 14 days\n· After the period ends, only new registrations are locked\n· Backup</string>
     <string name="premium_plan_name">Premium</string>
     <string name="premium_price">¥980 / month</string>
     <string name="premium_features_list">· All features\n· Unlimited registrations\n· Priority support</string>
     <string name="subscribe_google_pay">Subscribe via Google Pay</string>
-    <string name="subscription_terms">First month free, then ¥980/month (tax included). Cancel anytime.</string>
+    <string name="subscription_terms">First 2 weeks free, then ¥980/month (tax included). Cancel anytime.</string>
     <string name="subscribe_complete">Successfully upgraded to Premium plan</string>
     <string name="billing_not_available">Unable to launch Google Play Billing</string>
     <string name="plan_not_found">Plan not found (please check Play Console settings)</string>
@@ -229,7 +229,7 @@
 
     <!-- Paywall Dialog -->
     <string name="paywall_title">Free Trial Ended</string>
-    <string name="paywall_message">A Premium plan is required to register new packages.\n\nThe first month is free.</string>
+    <string name="paywall_message">A Premium plan is required to register new packages.\n\nThe first 2 weeks are free.</string>
     <string name="go_premium">Go Premium</string>
 
     <!-- Redelivery Dialog -->
@@ -284,6 +284,8 @@
     <string name="camera_no_permission">Camera permission not granted</string>
     <string name="camera_permission_check">Permission check</string>
     <string name="voice_prompt">Please say the delivery address</string>
+    <string name="voice_status_unrecognized">Could not recognize a delivery status from "%1$s". Please try again.</string>
+    <string name="voice_next_stop_none">No next delivery stop found.</string>
     <string name="memo_added_from_registration">Added from package registration screen</string>
 
     <!-- Legend -->
@@ -311,7 +313,7 @@
     <string name="faq_q_01">How do I register a package?</string>
     <string name="faq_a_01">You can register a package from the "Register" button at the top right of the Home screen, or from the side menu → "Register Package".\n\n① Enter the address by postal code search, manual entry, camera OCR, or voice input\n② Enter the recipient\'s name (if OCR detects a name such as "様", it will be entered automatically)\n③ Tap "Add" to add it to the address list, where a pin appears in the map preview (this is not yet reflected on the actual delivery map)\n④ Enter the time window, slip information (slip number / phone number), package type, whether the building has a delivery locker, nameplate, note, package memo, and delivery status\n⑤ You can add up to 5 addresses this way\n⑥ Tapping the "Register N item(s) on Map" button reflects all added addresses on the actual delivery map at once, and clears the input fields and address list automatically</string>
     <string name="faq_q_02">What\'s the difference between the free and paid (Premium) plans?</string>
-    <string name="faq_a_02">[Free (during trial)]\nFor 30 days from your registration date, you can use all features free of charge, including package registration, OCR/voice input, regular routes, and the map.\n\n[After the trial ends (not subscribed)]\nOnly new package registration is locked. Tapping "Register" will show a prompt to go Premium. You can still view, edit, and update the delivery status of existing package data, and use the map, free of charge.\n\n[Premium (¥980/month)]\nUse all features, including package registration, with no time limit.\n\n* On the package registration screen you can add up to 5 addresses at a time, but this limit applies to all users regardless of plan — it is not a difference between free and paid.</string>
+    <string name="faq_a_02">[Free (during trial)]\nFor 14 days from your registration date, you can use all features free of charge, including package registration, OCR/voice input, regular routes, and the map.\n\n[After the trial ends (not subscribed)]\nOnly new package registration is locked. Tapping "Register" will show a prompt to go Premium. You can still view, edit, and update the delivery status of existing package data, and use the map, free of charge.\n\n[Premium (¥980/month)]\nUse all features, including package registration, with no time limit.\n\n* On the package registration screen you can add up to 5 addresses at a time, but this limit applies to all users regardless of plan — it is not a difference between free and paid.</string>
     <string name="faq_q_03">How do I update a delivery status?</string>
     <string name="faq_a_03">Tap a pin on the Home map, or tap a card in the delivery list, to open the package edit screen.\n\nYou can edit and save the recipient\'s name, time window, slip information, package type, whether there\'s a delivery locker, nameplate, note, and delivery status ("Delivered," "Absent," "Redeliver," "Return to Office," etc.) all together.</string>
     <string name="faq_q_04">The map pin is not in the right location</string>
@@ -327,7 +329,7 @@
     <string name="faq_q_09">How do I turn off notifications?</string>
     <string name="faq_a_09">In the app: side menu → Notices → Settings → toggle Notifications to OFF.\n\nYou can also disable them via Android Settings → Apps → HAKOBUN → Notifications.</string>
     <string name="faq_q_10">When does my free trial end?</string>
-    <string name="faq_a_10">The free trial lasts 30 days from the date you registered.\n\nCheck the remaining days on your User Account screen (side menu → User Account).\n\nCancel at least 24 hours before the trial ends to avoid being charged.</string>
+    <string name="faq_a_10">The free trial lasts 14 days from the date you registered.\n\nCheck the remaining days on your User Account screen (side menu → User Account).\n\nCancel at least 24 hours before the trial ends to avoid being charged.</string>
     <string name="faq_q_11">How do I cancel my subscription?</string>
     <string name="faq_a_11">Go to Google Play Store → Account icon → "Subscriptions" → HAKOBUN → "Cancel subscription."\n\nYou can continue using the app until the end of the current billing period. In-app cancellation is coming soon.</string>
     <string name="faq_q_12">My payment failed</string>
@@ -352,7 +354,7 @@
     <string name="terms_s02_title">Article 2 – Eligibility</string>
     <string name="terms_s02_body">The App is intended for users aged 18 and over who are engaged in delivery operations or act as operations managers.\n\nA Google account may be required to use certain features. Registration with false information is prohibited.</string>
     <string name="terms_s03_title">Article 3 – Subscription &amp; Billing</string>
-    <string name="terms_s03_body">[Free Trial]\nA 1-month free trial is provided upon first registration. All features are available during the trial period. If you do not cancel at least 24 hours before the trial ends, you will automatically be moved to the paid plan.\n\n[Paid Plan (Premium)]\nPrice: ¥980 / month (tax included)\nBilling: Monthly auto-renewal via Google Play\nCancellation: Cancel anytime from "Subscriptions" in the Google Play Store. Access continues until the end of the current billing period.\n\n[Refund Policy]\nRefunds follow Google Play\'s refund policy. For cancellations within 48 hours of purchase, please apply through Google Play.\n\n[Price Changes]\nYou will be notified at least 30 days in advance of any price changes via in-app notice or email.</string>
+    <string name="terms_s03_body">[Free Trial]\nA 2-week free trial is provided upon first registration. All features are available during the trial period. If you do not cancel at least 24 hours before the trial ends, you will automatically be moved to the paid plan.\n\n[Paid Plan (Premium)]\nPrice: ¥980 / month (tax included)\nBilling: Monthly auto-renewal via Google Play\nCancellation: Cancel anytime from "Subscriptions" in the Google Play Store. Access continues until the end of the current billing period.\n\n[Refund Policy]\nRefunds follow Google Play\'s refund policy. For cancellations within 48 hours of purchase, please apply through Google Play.\n\n[Price Changes]\nYou will be notified at least 30 days in advance of any price changes via in-app notice or email.</string>
     <string name="terms_s04_title">Article 4 – Data Collected and How It Is Used</string>
     <string name="terms_s04_body">■ Location (GPS)\nPurpose: Navigation to delivery destinations, current location display, route optimization\nCollection: Only while the app is in use (no background collection)\n\n■ Camera / Images\nPurpose: Automatic address entry via OCR of shipping labels\nStorage: On-device only (no cloud upload)\n\n■ Voice (Microphone)\nPurpose: Transcription of addresses and notes via voice input\nStorage: On-device only\n\n■ Input Data (name, address, phone, email)\nPurpose: Delivery management and driver profile setup\nStorage: Encrypted on-device storage (AES-256-GCM)\nExternal transmission: None</string>
     <string name="terms_s05_title">Article 5 – Third-Party Services</string>

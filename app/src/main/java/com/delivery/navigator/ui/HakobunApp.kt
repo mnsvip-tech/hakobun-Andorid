@@ -365,6 +365,31 @@ fun HakobunApp() {
     val gpsRouteNumberMap = remember(gpsRouteStops) {
         gpsRouteStops.associate { it.deliveryPackage.trackingCode to it.routeNumber }
     }
+    var nextStopVoiceHint by remember { mutableStateOf<String?>(null) }
+    val nextStopVoiceLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val spoken = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+            .orEmpty()
+        if (isNextDeliveryCommand(spoken)) {
+            val currentIndex = gpsRouteStops.indexOfFirst { it.deliveryPackage.trackingCode == selectedPackageCode }
+            val next = if (currentIndex >= 0 && currentIndex + 1 < gpsRouteStops.size) {
+                gpsRouteStops[currentIndex + 1].deliveryPackage
+            } else {
+                gpsRouteStops.firstOrNull()?.deliveryPackage
+            }
+            if (next != null) {
+                nextStopVoiceHint = null
+                selectedPackageCode = next.trackingCode
+            } else {
+                nextStopVoiceHint = context.getString(R.string.voice_next_stop_none)
+            }
+        } else if (spoken.isNotBlank()) {
+            nextStopVoiceHint = context.getString(R.string.voice_status_unrecognized, spoken)
+        }
+    }
     val visibleMapPackages = visiblePackages
         .filterNot { it.status.hidesMapPin() }
         .filter { selectedMapTimeWindow == TimeWindow.All || it.timeWindow == selectedMapTimeWindow }
@@ -642,6 +667,11 @@ fun HakobunApp() {
                     onOpenSupport = { isSupportHubOpen = true },
                     onRegisterPackage = { onRegisterPackageAttempt() },
                     onToggleMapControls = { showMapControls = !showMapControls },
+                    onVoiceNextStop = {
+                        nextStopVoiceHint = null
+                        nextStopVoiceLauncher.launch(createVoiceNextStopIntent())
+                    },
+                    voiceNextStopHint = nextStopVoiceHint,
                     onFilterSelected = { filter ->
                         selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
                         homePanel = HomePanel.Packages
@@ -819,6 +849,8 @@ private fun MapHomeChrome(
     onToggleMapControls: () -> Unit,
     onFilterSelected: (PackageSummaryFilter) -> Unit,
     onMapTimeWindowSelected: (TimeWindow) -> Unit,
+    onVoiceNextStop: () -> Unit,
+    voiceNextStopHint: String?,
     modifier: Modifier = Modifier
 ) {
     val completed = packages.count { it.status == DeliveryStatus.Completed }
@@ -843,9 +875,27 @@ private fun MapHomeChrome(
                 }
             }
         }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = onVoiceNextStop, modifier = Modifier.height(36.dp)) {
+                Text(stringResource(R.string.voice))
+            }
+            Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = onToggleMapControls, modifier = Modifier.height(36.dp)) {
                 Text(if (showMapControls) stringResource(R.string.hide_summary) else stringResource(R.string.show_summary))
+            }
+        }
+        voiceNextStopHint?.let {
+            Card(colors = CardDefaults.cardColors(containerColor = Color(0xEEFFFFFF)), shape = RoundedCornerShape(10.dp)) {
+                Text(
+                    text = it,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    color = Color(0xFFE53935),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
         if (showMapControls) {
@@ -3182,6 +3232,7 @@ private fun PackageEditScreen(
 ) {
     val context = LocalContext.current
     var selectedStatus by remember { mutableStateOf(deliveryPackage.status) }
+    var statusVoiceHint by remember { mutableStateOf<String?>(null) }
     var recipient by remember { mutableStateOf(deliveryPackage.recipient) }
     var memo by remember { mutableStateOf(deliveryPackage.memo) }
     var selectedTimeWindow by remember { mutableStateOf(deliveryPackage.deliveryTimeWindow) }
@@ -3191,6 +3242,37 @@ private fun PackageEditScreen(
     var trackingCode by remember { mutableStateOf(deliveryPackage.trackingCode) }
     var phoneNumber by remember { mutableStateOf(deliveryPackage.phoneNumber) }
     var selectedShape by remember { mutableStateOf(deliveryPackage.shape) }
+
+    val statusVoiceLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val spoken = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+            .orEmpty()
+        val matched = parseSpokenDeliveryStatus(spoken)
+        if (matched != null) {
+            statusVoiceHint = null
+            selectedStatus = matched
+            onSave(
+                deliveryPackage.copy(
+                    recipient = recipient,
+                    memo = memo,
+                    status = matched,
+                    timeWindow = selectedTimeWindow.toTimeWindow(),
+                    deliveryTimeWindow = selectedTimeWindow,
+                    hasLocker = hasLocker,
+                    nameplate = nameplate,
+                    packageMemo = packageMemo,
+                    trackingCode = trackingCode,
+                    phoneNumber = phoneNumber,
+                    shape = selectedShape
+                )
+            )
+        } else if (spoken.isNotBlank()) {
+            statusVoiceHint = context.getString(R.string.voice_status_unrecognized, spoken)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -3217,9 +3299,25 @@ private fun PackageEditScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 WhiteCard {
-                    Text(stringResource(R.string.recipient_info_title), fontWeight = FontWeight.Bold)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                statusVoiceHint = null
+                                statusVoiceLauncher.launch(createVoiceStatusIntent())
+                            },
+                            modifier = Modifier.height(36.dp)
+                        ) { Text(stringResource(R.string.voice)) }
+                        Text(stringResource(R.string.recipient_info_title), fontWeight = FontWeight.Bold)
+                    }
                     InfoRow(stringResource(R.string.address_label), deliveryPackage.address)
                     LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_name_placeholder), recipient) { recipient = it }
+                    statusVoiceHint?.let {
+                        Text(it, color = Color(0xFFE53935), style = MaterialTheme.typography.bodySmall)
+                    }
                 }
                 WhiteCard {
                     Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
@@ -4138,6 +4236,46 @@ private fun createVoiceAddressIntent(): Intent {
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
         putExtra(RecognizerIntent.EXTRA_PROMPT, "届け先住所を話してください")
     }
+}
+
+private fun createVoiceStatusIntent(): Intent {
+    return Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ja-JP")
+        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+        putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
+        putExtra(RecognizerIntent.EXTRA_PROMPT, "配達状況を話してください（完了・不在・再配達など）")
+    }
+}
+
+private fun parseSpokenDeliveryStatus(spoken: String): DeliveryStatus? {
+    val text = spoken.trim()
+    if (text.isBlank()) return null
+    return when {
+        text.contains("持ち戻り") || text.contains("持帰り") || text.contains("会社へ") -> DeliveryStatus.ReturnToCompany
+        text.contains("再配達") || text.contains("再配") -> DeliveryStatus.Redelivery
+        text.contains("不在") -> DeliveryStatus.Absent
+        text.contains("配達中") || text.contains("配達開始") -> DeliveryStatus.InProgress
+        text.contains("完了") || text.contains("配達済") || text.contains("届けた") || text.contains("配り終") -> DeliveryStatus.Completed
+        text.contains("未配達") || text.contains("未配") -> DeliveryStatus.Pending
+        else -> null
+    }
+}
+
+private fun createVoiceNextStopIntent(): Intent {
+    return Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ja-JP")
+        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+        putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
+        putExtra(RecognizerIntent.EXTRA_PROMPT, "「次の配達先」と話してください")
+    }
+}
+
+private fun isNextDeliveryCommand(spoken: String): Boolean {
+    val text = spoken.trim()
+    if (text.isBlank()) return false
+    return text.contains("次") && (text.contains("配達") || text.contains("届け先") || text.contains("先"))
 }
 
 private fun yesNo(value: Boolean): String = if (value) "あり" else "なし"

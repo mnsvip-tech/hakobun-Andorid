@@ -211,15 +211,15 @@
     <string name="premium_plan">✓ Plano Premium</string>
     <string name="premium_features">Todos os recursos estão disponíveis.</string>
     <string name="free_trial_expired">Não Assinado ao Premium</string>
-    <string name="trial_after_register">O plano Premium inclui 1 mês de teste gratuito, gerenciado automaticamente pelo Google Play. A cobrança começa automaticamente após o término do teste.</string>
+    <string name="trial_after_register">O plano Premium inclui 2 semanas de teste gratuito, gerenciado automaticamente pelo Google Play. A cobrança começa automaticamente após o término do teste.</string>
     <string name="free_plan_name">Gratuito</string>
-    <string name="free_trial_period">Teste de 1 mês</string>
-    <string name="free_features">· Todos os recursos gratuitos por 30 dias\n· Após o período, apenas novos cadastros ficam bloqueados\n· Backup</string>
+    <string name="free_trial_period">Teste de 2 semanas</string>
+    <string name="free_features">· Todos os recursos gratuitos por 14 dias\n· Após o período, apenas novos cadastros ficam bloqueados\n· Backup</string>
     <string name="premium_plan_name">Premium</string>
     <string name="premium_price">¥980 / mês</string>
     <string name="premium_features_list">· Todos os recursos\n· Registros ilimitados\n· Suporte prioritário</string>
     <string name="subscribe_google_pay">Assinar Premium via Google Pay</string>
-    <string name="subscription_terms">Primeiro mês grátis, depois ¥980/mês（imposto incluído）. Cancele quando quiser.</string>
+    <string name="subscription_terms">Primeiras 2 semanas grátis, depois ¥980/mês（imposto incluído）. Cancele quando quiser.</string>
     <string name="subscribe_complete">Transferência para o plano Premium concluída</string>
     <string name="billing_not_available">Não foi possível iniciar o Google Play Billing</string>
     <string name="plan_not_found">Plano não encontrado（verifique as configurações do Play Console）</string>
@@ -229,7 +229,7 @@
 
     <!-- Diálogo de paywall -->
     <string name="paywall_title">Período gratuito encerrado</string>
-    <string name="paywall_message">É necessário um plano Premium para registrar novos pacotes.\n\nO primeiro mês é gratuito.</string>
+    <string name="paywall_message">É necessário um plano Premium para registrar novos pacotes.\n\nAs primeiras 2 semanas são gratuitas.</string>
     <string name="go_premium">Assinar Premium</string>
 
     <!-- Diálogo de reentrega -->
@@ -284,6 +284,8 @@
     <string name="camera_no_permission">Permissão de câmera não concedida</string>
     <string name="camera_permission_check">Verificação de permissão</string>
     <string name="voice_prompt">Por favor, diga o endereço de entrega</string>
+    <string name="voice_status_unrecognized">Não foi possível reconhecer o status de entrega em "%1$s". Tente novamente.</string>
+    <string name="voice_next_stop_none">Nenhuma próxima entrega encontrada.</string>
     <string name="memo_added_from_registration">Adicionado pela tela de registro de pacotes</string>
 
     <!-- Legenda -->
@@ -311,7 +313,7 @@
     <string name="faq_q_01">Como faço para cadastrar um pacote?</string>
     <string name="faq_a_01">Toque no botão「Cadastrar」no canto superior direito da tela inicial, ou acesse o menu lateral → 「Cadastrar pacote」.\n\n① Digite o endereço usando busca por CEP, entrada manual, OCR pela câmera ou entrada por voz\n② Informe o nome do destinatário (se o OCR detectar algo como "Sr(a). 〇〇", ele será preenchido automaticamente)\n③ Ao tocar em「Adicionar」, o endereço é incluído na lista e um alfinete aparece na pré-visualização do mapa (isso ainda não é refletido no mapa de entregas real)\n④ Informe o horário desejado, as informações do recibo (número do recibo / número de telefone), o formato da embalagem, se o prédio possui armário de entregas, a placa de nome, a observação, a observação do pacote e o status de entrega\n⑤ Você pode adicionar até 5 endereços seguindo o mesmo processo\n⑥ Ao tocar no botão「Registrar X itens no mapa」, todos os endereços adicionados são refletidos de uma só vez no mapa de entregas real, e o campo de entrada e a lista de endereços são limpos automaticamente</string>
     <string name="faq_q_02">Qual é a diferença entre o plano gratuito e o plano pago (Premium)?</string>
-    <string name="faq_a_02">【Plano gratuito (período de teste)】\nDurante os 30 dias a partir da data de cadastro do usuário, todos os recursos estão disponíveis gratuitamente: cadastro de pacotes, entrada por OCR/voz, rotas fixas, exibição do mapa, entre outros.\n\n【Após o término do teste (sem assinatura)】\nApenas o cadastro de novos pacotes fica bloqueado. Ao tocar no botão「Cadastrar」, será exibida uma indicação para assinar o Premium. A visualização, edição e exibição no mapa dos pacotes já cadastrados, além da atualização do status de entrega, continuam disponíveis gratuitamente.\n\n【Plano pago (Premium ¥980/mês)】\nTodos os recursos, incluindo o cadastro de pacotes, ficam disponíveis a qualquer momento, sem limite de período.\n\n※ Na tela de cadastro de pacote, é possível adicionar no máximo 5 endereços de uma só vez, mas esse é um limite de entrada comum a todos os usuários, independentemente do plano — não é uma diferença entre gratuito e pago.</string>
+    <string name="faq_a_02">【Plano gratuito (período de teste)】\nDurante os 14 dias a partir da data de cadastro do usuário, todos os recursos estão disponíveis gratuitamente: cadastro de pacotes, entrada por OCR/voz, rotas fixas, exibição do mapa, entre outros.\n\n【Após o término do teste (sem assinatura)】\nApenas o cadastro de novos pacotes fica bloqueado. Ao tocar no botão「Cadastrar」, será exibida uma indicação para assinar o Premium. A visualização, edição e exibição no mapa dos pacotes já cadastrados, além da atualização do status de entrega, continuam disponíveis gratuitamente.\n\n【Plano pago (Premium ¥980/mês)】\nTodos os recursos, incluindo o cadastro de pacotes, ficam disponíveis a qualquer momento, sem limite de período.\n\n※ Na tela de cadastro de pacote, é possível adicionar no máximo 5 endereços de uma só vez, mas esse é um limite de entrada comum a todos os usuários, independentemente do plano — não é uma diferença entre gratuito e pago.</string>
     <string name="faq_q_03">Como atualizo o status de entrega de um pacote?</string>
     <string name="faq_a_03">Toque em um alfinete no mapa da tela inicial, ou em um cartão na lista de entregas, para abrir a tela de edição do pacote.\n\nVocê pode editar e salvar de uma vez o nome do destinatário, o horário desejado, as informações do recibo, o formato da embalagem, se há armário de entregas, a placa de nome, a observação e o status de entrega (「Entregue」「Ausente」「Reentrega」「Devolver à empresa」, entre outros).</string>
     <string name="faq_q_04">O alfinete no mapa não aparece no local correto</string>
@@ -327,7 +329,7 @@
     <string name="faq_q_09">Como desativar as notificações?</string>
     <string name="faq_a_09">No aplicativo: menu lateral → Avisos → Configurações → desative o botão de Notificações.\n\nTambém é possível desativar em Configurações do Android → Aplicativos → HAKOBUN → Notificações.</string>
     <string name="faq_q_10">Quando termina o período de teste gratuito?</string>
-    <string name="faq_a_10">O período de teste gratuito dura 30 dias a partir da data de cadastro.\n\nVocê pode verificar os dias restantes na tela de Conta do usuário (menu lateral → Informações da conta do usuário).\n\nCancele com pelo menos 24 horas de antecedência ao fim do teste para não ser cobrado.</string>
+    <string name="faq_a_10">O período de teste gratuito dura 14 dias a partir da data de cadastro.\n\nVocê pode verificar os dias restantes na tela de Conta do usuário (menu lateral → Informações da conta do usuário).\n\nCancele com pelo menos 24 horas de antecedência ao fim do teste para não ser cobrado.</string>
     <string name="faq_q_11">Como cancelar a assinatura?</string>
     <string name="faq_a_11">Acesse a Google Play Store → ícone de conta →「Assinaturas」→ HAKOBUN →「Cancelar assinatura」.\n\nApós o cancelamento, você pode continuar usando até o final do período de cobrança atual. A função de cancelamento no aplicativo está em desenvolvimento.</string>
     <string name="faq_q_12">O pagamento falhou</string>
@@ -352,7 +354,7 @@
     <string name="terms_s02_title">Artigo 2　Elegibilidade</string>
     <string name="terms_s02_body">O Aplicativo é destinado a pessoas com 18 anos ou mais que atuam em operações de entrega ou como gestores operacionais.\n\nUma conta Google pode ser necessária para usar o Aplicativo. É proibido se cadastrar com informações falsas.</string>
     <string name="terms_s03_title">Artigo 3　Assinatura e cobrança</string>
-    <string name="terms_s03_body">[Período de teste gratuito]\nUm teste gratuito de 1 mês é oferecido no primeiro cadastro. Todos os recursos estão disponíveis durante o teste. Se não cancelar com pelo menos 24 horas antes do término do teste, você será automaticamente migrado para o plano pago.\n\n[Plano pago (Premium)]\nPreço: ¥980 / mês (impostos incluídos)\nCobrança: Renovação automática mensal via Google Play\nCancelamento: Pode ser feito a qualquer momento em「Assinaturas」na Google Play Store. O acesso continua até o fim do período de cobrança atual.\n\n[Política de reembolso]\nSeguimos a política de reembolso do Google Play. Para cancelamentos dentro de 48 horas após a compra, solicite pelo Google Play.\n\n[Alteração de preço]\nVocê será notificado com pelo menos 30 dias de antecedência sobre mudanças de preço, por meio de avisos no aplicativo ou e-mail.</string>
+    <string name="terms_s03_body">[Período de teste gratuito]\nUm teste gratuito de 2 semanas é oferecido no primeiro cadastro. Todos os recursos estão disponíveis durante o teste. Se não cancelar com pelo menos 24 horas antes do término do teste, você será automaticamente migrado para o plano pago.\n\n[Plano pago (Premium)]\nPreço: ¥980 / mês (impostos incluídos)\nCobrança: Renovação automática mensal via Google Play\nCancelamento: Pode ser feito a qualquer momento em「Assinaturas」na Google Play Store. O acesso continua até o fim do período de cobrança atual.\n\n[Política de reembolso]\nSeguimos a política de reembolso do Google Play. Para cancelamentos dentro de 48 horas após a compra, solicite pelo Google Play.\n\n[Alteração de preço]\nVocê será notificado com pelo menos 30 dias de antecedência sobre mudanças de preço, por meio de avisos no aplicativo ou e-mail.</string>
     <string name="terms_s04_title">Artigo 4　Dados coletados e como são usados</string>
     <string name="terms_s04_body">■ Localização (GPS)\nFinalidade: Navegação até os destinos de entrega, exibição de localização atual, otimização de rotas\nColeta: Somente enquanto o aplicativo está em uso (sem coleta em segundo plano)\n\n■ Câmera/Imagens\nFinalidade: Preenchimento automático de endereços via OCR de etiquetas\nArmazenamento: Somente no dispositivo (sem envio para a nuvem)\n\n■ Voz (Microfone)\nFinalidade: Transcrição de endereços e notas por entrada de voz\nArmazenamento: Somente no dispositivo\n\n■ Dados inseridos (nome, endereço, telefone, e-mail)\nFinalidade: Gerenciamento de entregas e configuração do perfil do entregador\nArmazenamento: Armazenamento criptografado no dispositivo (AES-256-GCM)\nTransmissão externa: Nenhuma</string>
     <string name="terms_s05_title">Artigo 5　Serviços de terceiros</string>
