@@ -67,6 +67,7 @@
 
     <!-- 配送列表画面 -->
     <string name="package_count">%1$d件</string>
+    <string name="complete_all_button">全部标记为已完成</string>
     <string name="summary_list_title">%1$s列表</string>
     <string name="showing_count">显示 %1$d 件</string>
     <string name="no_packages">没有符合条件的包裹。</string>
@@ -93,6 +94,8 @@
     <string name="course_chip_label">%1$s路线</string>
     <string name="course_summary">%1$s / 已注册地址 %2$d件</string>
     <string name="load_course_button">将%1$s路线加载到今日配送</string>
+    <string name="add_course_address_title">添加地址到路线</string>
+    <string name="clear_course_from_map_button">从地图中删除</string>
 
     <!-- 备份 -->
     <string name="backup_data_title">地址数据管理</string>
@@ -162,6 +165,20 @@
     <string name="add_address_first">请至少添加一个地址</string>
     <string name="geocoding_hint">正在地理编码地址...</string>
     <string name="drag_pin_hint">拖动图钉可调整位置</string>
+    <string name="has_locker_label">建筑内设有快递柜</string>
+    <string name="nameplate_label">门牌</string>
+    <string name="nameplate_placeholder">可输入门牌信息</string>
+    <string name="delivery_memo_label">备注</string>
+    <string name="delivery_memo_placeholder">可输入收件人备注</string>
+    <string name="package_memo_label">包裹备注</string>
+    <string name="package_memo_placeholder">可输入包裹外观等信息</string>
+    <string name="slip_info_title">单据信息</string>
+    <string name="slip_number_label">单据编号</string>
+    <string name="slip_number_placeholder">例：0123-4567-8910-1112</string>
+    <string name="recipient_name_placeholder">例：李 小明</string>
+    <string name="phone_number_label">电话号码</string>
+    <string name="phone_number_placeholder">例：09012345678</string>
+    <string name="package_shape_title">包裹外观</string>
 
     <!-- 地址输入面板 -->
     <string name="address_input_title">地址输入</string>
@@ -193,14 +210,11 @@
     <string name="plan_billing_title">套餐与账单</string>
     <string name="premium_plan">✓ 高级套餐</string>
     <string name="premium_features">所有功能均可使用。</string>
-    <string name="free_trial_expired">⚠ 免费试用已结束</string>
-    <string name="free_trial_active">免费试用中</string>
-    <string name="trial_remaining_days">剩余 %1$d 天</string>
-    <string name="trial_auto_upgrade">试用结束后将自动升级到高级套餐。</string>
-    <string name="trial_after_register">注册后可免费使用1个月。</string>
+    <string name="free_trial_expired">未订阅高级版</string>
+    <string name="trial_after_register">高级套餐首月免费试用，由 Google Play 自动管理。试用期结束后将自动开始计费。</string>
     <string name="free_plan_name">免费</string>
     <string name="free_trial_period">1个月试用</string>
-    <string name="free_features">· 基本功能\n· 最多5件包裹注册\n· 备份</string>
+    <string name="free_features">・全部功能30天内免费\n・试用期结束后仅新登记功能被锁定\n・备份</string>
     <string name="premium_plan_name">高级版</string>
     <string name="premium_price">¥980 / 月</string>
     <string name="premium_features_list">· 全部功能\n· 无限注册\n· 优先支持</string>
@@ -209,6 +223,7 @@
     <string name="subscribe_complete">已成功升级到高级套餐</string>
     <string name="billing_not_available">无法启动Google Play Billing</string>
     <string name="plan_not_found">未找到套餐（请检查Play Console设置）</string>
+    <string name="debug_section_title">调试用（仅在开发版本中显示）</string>
 
     <!-- 付费墙对话框 -->
     <string name="paywall_title">免费试用已结束</string>
@@ -291,16 +306,16 @@
     <string name="faq_cat_other">其他</string>
 
     <!-- FAQ 问答 -->
-    <string name="faq_q_01">如何登记包裹？</string>
-    <string name="faq_a_01">点击首页右上角的「登记」按钮，或通过侧边菜单 →「包裹登记」进行登记。\n\n共有三种登记方式：\n① 手动输入地址\n② 用相机拍摄快递单，自动OCR识别\n③ 语音输入地址\n\n登记后，首页地图上将显示图钉。</string>
-    <string name="faq_q_02">每天可以登记多少个包裹？</string>
-    <string name="faq_a_02">免费套餐（含1个月试用期）每天最多登记5个包裹。\n\n高级套餐（¥980/月）不限登记数量。\n\n达到上限后，点击登记按钮时将提示升级套餐。</string>
-    <string name="faq_q_03">如何更新包裹配送状态？</string>
-    <string name="faq_a_03">点击首页地图上的图钉，或点击配送列表中的卡片，即可打开详情页。\n\n可将状态更改为「已送达」「无人在家」「重新配送」「带回公司」等。</string>
+    <string name="faq_q_01">包裹要如何登记？</string>
+    <string name="faq_a_01">可通过首页右上角的「登记」按钮，或侧边菜单 →「包裹登记」进行登记。\n\n① 通过邮政编码搜索、手动输入、相机OCR或语音输入等任一方式输入地址\n② 输入收件人姓名（如OCR识别到「〇〇先生/女士」等字样，将自动填入）\n③ 点击「添加」后，该地址将加入地址列表，并在地图预览中显示图钉（此时尚未反映到实际配送地图）\n④ 输入时段指定、单据信息（单据编号／电话号码）、包裹外观、建筑内是否设有快递柜、门牌、备注、包裹备注及配送状态\n⑤ 按同样流程最多可添加5个地址\n⑥ 点击「将〇件注册到地图」按钮后，已添加的地址将统一反映到实际配送地图，输入栏和地址列表将自动清空</string>
+    <string name="faq_q_02">免费会员与付费（高级）会员有什么区别？</string>
+    <string name="faq_a_02">【免费会员（试用期内）】\n自用户注册之日起30天内，包裹登记、OCR／语音输入、定期路线、地图显示等全部功能均可免费使用。\n\n【试用期结束后（未订阅时）】\n仅新包裹登记功能将被锁定。点击「登记」按钮时将显示高级套餐的相关介绍。已有包裹数据的查看、编辑、地图显示及配送状态更新仍可继续免费使用。\n\n【付费会员（高级套餐 ¥980/月）】\n不限期限，随时可使用包括包裹登记在内的全部功能。\n\n※在包裹登记页面一次最多可添加5个地址，这是所有用户共通的输入上限，与套餐无关，并非免费与付费的差异。</string>
+    <string name="faq_q_03">如何更新包裹的配送状态？</string>
+    <string name="faq_a_03">点击首页地图上的图钉，或点击配送列表中的卡片，即可打开包裹编辑页面。\n\n可在此统一编辑并保存收件人姓名、时段指定、单据信息、包裹外观、是否设有快递柜、门牌、备注、配送状态（「已完成」「不在家」「重新配送」「带回公司」等）。</string>
     <string name="faq_q_04">地图图钉显示位置不正确</string>
-    <string name="faq_a_04">图钉位置的精度取决于地理编码（地址→经纬度转换）。\n\n在包裹登记页面底部的地图上，长按图钉并拖动到正确位置即可手动修正。修正后的位置将被保存。</string>
-    <string name="faq_q_05">如何使用定期路线（揽收）？</string>
-    <string name="faq_a_05">通过侧边菜单 →「揽收 / 定期路线」，可将预先登记的路线（A〜D）批量导入今日配送列表。\n\n路线的登记与编辑可在同一页面的「路线管理」中进行。</string>
+    <string name="faq_a_04">图钉位置的精度取决于地址的地理编码（地址→经纬度转换）。\n\n在包裹登记页面添加地址后显示的地图预览（与实际配送地图不同）中，长按图钉并拖动即可手动修正位置。以修正后的位置点击「注册到地图」后，该位置将反映到实际配送地图中。</string>
+    <string name="faq_q_05">定期路线（揽收）该如何使用？</string>
+    <string name="faq_a_05">通过侧边菜单 →「揽收 / 定期路线」，系统预先提供了A〜D共4条路线。\n\n在「添加地址到路线」表单（支持邮政编码搜索、语音输入、相机OCR）中为各路线登记地址，点击「呼叫路线」按钮后，该路线的包裹将统一反映到配送地图。\n\n如只想将已呼叫的包裹从地图中清除，可使用旁边的「从地图中删除」按钮，一并删除该路线的对应数据。</string>
     <string name="faq_q_06">相机扫描快递单后文字识别有误</string>
     <string name="faq_a_06">请尝试以下方法：\n\n· 在光线充足的环境下拍摄\n· 确保整张快递单在取景框内\n· 用双手固定手机，避免抖动\n· 检查快递单是否有污迹、折叠或反光\n\nOCR识别后的各字段可手动修正。识别精度受光线和打印质量影响。</string>
     <string name="faq_q_07">语音输入无法识别</string>

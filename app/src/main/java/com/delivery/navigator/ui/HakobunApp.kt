@@ -77,6 +77,7 @@ import com.delivery.navigator.data.searchPostalCode
 import kotlinx.coroutines.launch
 import com.delivery.navigator.model.AccountMenuItem
 import com.delivery.navigator.model.AddressCandidate
+import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
 import com.delivery.navigator.model.EndOfDaySummary
@@ -105,6 +106,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.material3.ButtonDefaults
 import kotlinx.coroutines.flow.drop
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -113,6 +116,8 @@ import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.queryProductDetails
+import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.queryPurchasesAsync
 import com.delivery.navigator.model.MembershipPlan
 import com.delivery.navigator.model.UserProfile
 import com.google.mlkit.vision.common.InputImage
@@ -156,18 +161,87 @@ fun HakobunApp() {
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
     var isSupportHubOpen by remember { mutableStateOf(false) }
     var activeMenuItem by remember { mutableStateOf<AccountMenuItem?>(null) }
-    var isLoggedIn by remember { mutableStateOf(true) }
     var userProfile by remember { mutableStateOf(deliveryStore.loadUserProfile()) }
+    val isLoggedIn = userProfile.isRegistered
+    val onLoginToggle: () -> Unit = {
+        if (userProfile.isRegistered) {
+            val loggedOut = userProfile.copy(isRegistered = false)
+            userProfile = loggedOut
+            deliveryStore.saveUserProfile(loggedOut)
+        } else {
+            activeMenuItem = AccountMenuItem.Account
+        }
+    }
+    var purchaseUpdateTick by remember { mutableStateOf(0) }
+    val billingClient = remember {
+        BillingClient.newBuilder(context)
+            .setListener { result, purchases ->
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    val hasActivePurchase = purchases?.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } == true
+                    if (hasActivePurchase) {
+                        val updated = userProfile.copy(plan = MembershipPlan.Premium)
+                        userProfile = updated
+                        deliveryStore.saveUserProfile(updated)
+                        purchaseUpdateTick++
+                    }
+                }
+            }
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
+            )
+            .build()
+    }
+    suspend fun reconcileSubscriptionStatus() {
+        val params = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+        val result = billingClient.queryPurchasesAsync(params)
+        if (result.billingResult.responseCode != BillingClient.BillingResponseCode.OK) return
+        val activePurchase = result.purchasesList.firstOrNull { purchase ->
+            purchase.products.contains(SUBSCRIPTION_PRODUCT_ID) &&
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+        }
+        if (activePurchase != null) {
+            if (!activePurchase.isAcknowledged) {
+                billingClient.acknowledgePurchase(
+                    AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(activePurchase.purchaseToken)
+                        .build()
+                )
+            }
+            if (userProfile.plan != MembershipPlan.Premium) {
+                val updated = userProfile.copy(plan = MembershipPlan.Premium)
+                userProfile = updated
+                deliveryStore.saveUserProfile(updated)
+            }
+        } else if (userProfile.plan == MembershipPlan.Premium) {
+            val updated = userProfile.copy(plan = MembershipPlan.Free)
+            userProfile = updated
+            deliveryStore.saveUserProfile(updated)
+        }
+    }
+    LaunchedEffect(purchaseUpdateTick) {
+        if (purchaseUpdateTick > 0) reconcileSubscriptionStatus()
+    }
+    DisposableEffect(Unit) {
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(result: BillingResult) {
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    coroutineScope.launch { reconcileSubscriptionStatus() }
+                }
+            }
+            override fun onBillingServiceDisconnected() {}
+        })
+        onDispose { billingClient.endConnection() }
+    }
     var showPaywallDialog by remember { mutableStateOf(false) }
-    val trialRemainingDays = if (userProfile.trialStartMillis > 0L) {
-        val elapsed = System.currentTimeMillis() - userProfile.trialStartMillis
-        (30 - (elapsed / (1000L * 60 * 60 * 24)).toInt()).coerceAtLeast(0)
-    } else 30
-    val isFreeExpired = userProfile.isRegistered &&
-        userProfile.plan != MembershipPlan.Premium &&
-        trialRemainingDays == 0
+    val isFreeExpired = userProfile.isRegistered && userProfile.plan != MembershipPlan.Premium
     val onRegisterPackageAttempt = {
-        if (isFreeExpired) showPaywallDialog = true else isRegisteringPackage = true
+        when {
+            !isLoggedIn -> activeMenuItem = AccountMenuItem.Account
+            isFreeExpired -> showPaywallDialog = true
+            else -> isRegisteringPackage = true
+        }
     }
     var backupText by remember { mutableStateOf("") }
     var importText by remember { mutableStateOf("") }
@@ -274,8 +348,9 @@ fun HakobunApp() {
             addressCandidate = createAddressCandidateFromText("音声入力", spokenAddress)
         }
     }
-    LaunchedEffect(packages.size, packages.firstOrNull()?.trackingCode, packages.lastOrNull()?.trackingCode) {
-        assignFixedRouteNumbers(fixedRouteNumbers, packages)
+    LaunchedEffect(packages.size, packages.firstOrNull()?.trackingCode, packages.lastOrNull()?.trackingCode, currentLocation) {
+        val origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second)
+        assignFixedRouteNumbers(fixedRouteNumbers, packages, origin.latitude, origin.longitude)
     }
 
     val visiblePackages = packages.filter {
@@ -354,8 +429,9 @@ fun HakobunApp() {
                 UserAccountScreen(
                     userProfile = userProfile,
                     isLoggedIn = isLoggedIn,
+                    billingClient = billingClient,
                     onBack = { activeMenuItem = null },
-                    onLoginToggle = { isLoggedIn = !isLoggedIn },
+                    onLoginToggle = onLoginToggle,
                     onSaveProfile = { updated ->
                         userProfile = updated
                         deliveryStore.saveUserProfile(updated)
@@ -366,7 +442,7 @@ fun HakobunApp() {
                     item = item,
                     isLoggedIn = isLoggedIn,
                     onBack = { activeMenuItem = null },
-                    onLoginToggle = { isLoggedIn = !isLoggedIn }
+                    onLoginToggle = onLoginToggle
                 )
             }
             return@MaterialTheme
@@ -378,7 +454,7 @@ fun HakobunApp() {
                 isLoggedIn = isLoggedIn,
                 onBack = { isSupportHubOpen = false },
                 onSelect = { activeMenuItem = it },
-                onLoginToggle = { isLoggedIn = !isLoggedIn },
+                onLoginToggle = onLoginToggle,
                 onGoToBackup = { isSupportHubOpen = false },
                 onFinishDay = { summary ->
                     runCatching {
@@ -395,8 +471,9 @@ fun HakobunApp() {
         }
 
         if (homePanel == HomePanel.Packages) {
+            val displayedPackages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages
             PackageListScreen(
-                packages = if (selectedSummaryFilter == null) visiblePackages else summaryPackages,
+                packages = displayedPackages,
                 routeNumberMap = gpsRouteNumberMap,
                 selectedCode = selectedPackage?.trackingCode,
                 onBack = { homePanel = null },
@@ -404,6 +481,91 @@ fun HakobunApp() {
                 onEditPackage = { code ->
                     homePanel = null
                     editingPackageCode = code
+                },
+                onCompleteAll = {
+                    for (i in packages.indices) {
+                        if (packages[i].status != DeliveryStatus.Completed) {
+                            packages[i] = packages[i].copy(status = DeliveryStatus.Completed)
+                        }
+                    }
+                    persistPackages()
+                }
+            )
+            return@MaterialTheme
+        }
+
+        if (homePanel == HomePanel.Courses) {
+            RegularCourseScreen(
+                courses = regularCourseList,
+                isLoggedIn = isLoggedIn,
+                isFreeExpired = isFreeExpired,
+                onRequireLogin = {
+                    homePanel = null
+                    activeMenuItem = AccountMenuItem.Account
+                },
+                onShowPaywall = { showPaywallDialog = true },
+                onBack = { homePanel = null },
+                onLoadCourse = { course ->
+                    val otherCoursePrefixes = packages
+                        .map { it.trackingCode }
+                        .filter { it.startsWith("COURSE-") && !it.startsWith("COURSE-${course.code}-") }
+                    packages.removeAll { it.trackingCode in otherCoursePrefixes }
+                    otherCoursePrefixes.forEach { fixedRouteNumbers.remove(it) }
+                    val coursePackages = createPackagesFromCourse(course, packages.size)
+                    packages.addAll(coursePackages)
+                    coursePackages.forEachIndexed { index, packageItem ->
+                        fixedRouteNumbers[packageItem.trackingCode] = index + 1
+                    }
+                    selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
+                    persistPackages()
+                    homePanel = null
+                },
+                onClearCourseFromMap = { course ->
+                    val prefix = "COURSE-${course.code}-"
+                    val removedCodes = packages.filter { it.trackingCode.startsWith(prefix) }.map { it.trackingCode }
+                    packages.removeAll { it.trackingCode.startsWith(prefix) }
+                    removedCodes.forEach { fixedRouteNumbers.remove(it) }
+                    if (selectedPackageCode in removedCodes) {
+                        selectedPackageCode = packages.lastOrNull()?.trackingCode ?: ""
+                    }
+                    persistPackages()
+                },
+                onAddCourseAddress = { courseCode, recipient, address, timeWindow, memo ->
+                    coroutineScope.launch {
+                        val newAddress = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                        val index = regularCourseList.indexOfFirst { it.code == courseCode }
+                        if (index >= 0) {
+                            val course = regularCourseList[index]
+                            regularCourseList[index] = course.copy(addresses = course.addresses + newAddress)
+                            persistRegularCourses()
+                        }
+                    }
+                },
+                onUpdateCourseAddress = { courseCode, addressIndex, recipient, address, timeWindow, memo ->
+                    coroutineScope.launch {
+                        val updated = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                        val index = regularCourseList.indexOfFirst { it.code == courseCode }
+                        if (index >= 0) {
+                            val course = regularCourseList[index]
+                            if (addressIndex in course.addresses.indices) {
+                                val newAddresses = course.addresses.toMutableList()
+                                newAddresses[addressIndex] = updated
+                                regularCourseList[index] = course.copy(addresses = newAddresses)
+                                persistRegularCourses()
+                            }
+                        }
+                    }
+                },
+                onDeleteCourseAddress = { courseCode, addressIndex ->
+                    val index = regularCourseList.indexOfFirst { it.code == courseCode }
+                    if (index >= 0) {
+                        val course = regularCourseList[index]
+                        if (addressIndex in course.addresses.indices) {
+                            val newAddresses = course.addresses.toMutableList().also { it.removeAt(addressIndex) }
+                            regularCourseList[index] = course.copy(addresses = newAddresses)
+                            persistRegularCourses()
+                        }
+                    }
                 }
             )
             return@MaterialTheme
@@ -506,12 +668,14 @@ fun HakobunApp() {
                             editingPackageCode = code
                         },
                         onExport = { backupText = exportPackages(packages) },
+                        onClearBackup = { backupText = "" },
                         onImportTextChange = { importText = it },
                         onImport = {
                             val importedPackages = importPackages(importText, packages.size)
                             packages.addAll(importedPackages)
                             selectedPackageCode = packages.lastOrNull()?.trackingCode ?: selectedPackageCode
                             persistPackages()
+                            importText = ""
                             coroutineScope.launch {
                                 importedPackages.forEach { pkg ->
                                     if (pkg.latitude == 0.0 && pkg.longitude == 0.0 && pkg.address.isNotBlank()) {
@@ -535,6 +699,11 @@ fun HakobunApp() {
                             }
                         },
                         onLoadCourse = { course ->
+                            val otherCoursePrefixes = packages
+                                .map { it.trackingCode }
+                                .filter { it.startsWith("COURSE-") && !it.startsWith("COURSE-${course.code}-") }
+                            packages.removeAll { it.trackingCode in otherCoursePrefixes }
+                            otherCoursePrefixes.forEach { fixedRouteNumbers.remove(it) }
                             val coursePackages = createPackagesFromCourse(course, packages.size)
                             packages.addAll(coursePackages)
                             coursePackages.forEachIndexed { index, packageItem ->
@@ -812,6 +981,7 @@ private fun HomePanelSheet(
     onExport: () -> Unit,
     onImportTextChange: (String) -> Unit,
     onImport: () -> Unit,
+    onClearBackup: () -> Unit,
     onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit,
     onLoadCourse: (RegularCourse) -> Unit,
     onClearCourseFromMap: (RegularCourse) -> Unit,
@@ -838,7 +1008,7 @@ private fun HomePanelSheet(
             when (panel) {
                 HomePanel.Packages -> PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
                 HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onClearCourseFromMap, onAddCourseAddress)
-                HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClose)
+                HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClearBackup, onClose)
             }
         }
     }
@@ -1210,22 +1380,11 @@ private fun SupportHubScreen(
                 Text(stringResource(R.string.support_hub_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.width(64.dp))
             }
-            Box {
-                AccountMenuPanel(
-                    isLoggedIn = isLoggedIn,
-                    onSelect = onSelect,
-                    onLoginToggle = onLoginToggle
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 4.dp, end = 2.dp)
-                        .width(18.dp)
-                        .height(108.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(BrandPurple)
-                )
-            }
+            AccountMenuPanel(
+                isLoggedIn = isLoggedIn,
+                onSelect = onSelect,
+                onLoginToggle = onLoginToggle
+            )
             EndOfDayPanel(
                 packages = packages,
                 onGoToBackup = onGoToBackup,
@@ -1244,10 +1403,10 @@ private fun AccountMenuPanel(
     WhiteCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.account_support_title), fontWeight = FontWeight.Bold)
                 Text(stringResource(R.string.account_support_desc), color = MutedText)
             }
@@ -1287,6 +1446,7 @@ private const val SUBSCRIPTION_PRODUCT_ID = "hakobun_monthly_premium"
 private fun UserAccountScreen(
     userProfile: UserProfile,
     isLoggedIn: Boolean,
+    billingClient: BillingClient,
     onBack: () -> Unit,
     onLoginToggle: () -> Unit,
     onSaveProfile: (UserProfile) -> Unit
@@ -1295,49 +1455,15 @@ private fun UserAccountScreen(
     val activity = context as? android.app.Activity
     val scope = rememberCoroutineScope()
 
-    var isEditing by remember { mutableStateOf(!userProfile.isRegistered) }
+    var isEditing by remember(userProfile.isRegistered) { mutableStateOf(!userProfile.isRegistered) }
     var driverName by remember { mutableStateOf(userProfile.driverName) }
     var base by remember { mutableStateOf(userProfile.base) }
     var contact by remember { mutableStateOf(userProfile.contact) }
     var email by remember { mutableStateOf(userProfile.email) }
-    var billingReady by remember { mutableStateOf(false) }
     var subscribeMessage by remember { mutableStateOf("") }
 
-    val trialRemainingDays = if (userProfile.trialStartMillis > 0L) {
-        val elapsed = System.currentTimeMillis() - userProfile.trialStartMillis
-        (30 - (elapsed / (1000L * 60 * 60 * 24)).toInt()).coerceAtLeast(0)
-    } else 30
-
     val isPremium = userProfile.plan == MembershipPlan.Premium
-    val isFreeExpired = !isPremium && trialRemainingDays == 0 && userProfile.isRegistered
-
-    val billingClient = remember {
-        BillingClient.newBuilder(context)
-            .setListener { result, purchases ->
-                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    purchases?.forEach { purchase ->
-                        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                            onSaveProfile(userProfile.copy(plan = MembershipPlan.Premium))
-                            subscribeMessage = "プレミアムプランへの移行が完了しました"
-                        }
-                    }
-                }
-            }
-            .enablePendingPurchases(
-                PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
-            )
-            .build()
-    }
-
-    DisposableEffect(Unit) {
-        billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(result: BillingResult) {
-                billingReady = result.responseCode == BillingClient.BillingResponseCode.OK
-            }
-            override fun onBillingServiceDisconnected() { billingReady = false }
-        })
-        onDispose { billingClient.endConnection() }
-    }
+    val isFreeExpired = !isPremium && userProfile.isRegistered
 
     fun launchSubscription() {
         if (activity == null) { subscribeMessage = "Google Play Billingを起動できません"; return }
@@ -1406,14 +1532,12 @@ private fun UserAccountScreen(
                     LabeledField(stringResource(R.string.email_label), stringResource(R.string.email_placeholder), email) { email = it }
                     Button(
                         onClick = {
-                            val trialStart = if (!userProfile.isRegistered) System.currentTimeMillis() else userProfile.trialStartMillis
                             onSaveProfile(userProfile.copy(
                                 driverName = driverName,
                                 base = base,
                                 contact = contact,
                                 email = email,
-                                isRegistered = true,
-                                trialStartMillis = trialStart
+                                isRegistered = true
                             ))
                             isEditing = false
                         },
@@ -1453,16 +1577,11 @@ private fun UserAccountScreen(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                if (isFreeExpired) stringResource(R.string.free_trial_expired) else stringResource(R.string.free_trial_active),
-                                color = if (isFreeExpired) Color(0xFFE53935) else BrandBlue,
+                                stringResource(R.string.free_trial_expired),
+                                color = if (isFreeExpired) Color(0xFFE53935) else MutedText,
                                 fontWeight = FontWeight.Bold
                             )
-                            if (userProfile.isRegistered && !isFreeExpired) {
-                                Text(stringResource(R.string.trial_remaining_days, trialRemainingDays), fontWeight = FontWeight.Bold)
-                                Text(stringResource(R.string.trial_auto_upgrade), color = MutedText, style = MaterialTheme.typography.bodySmall)
-                            } else if (!userProfile.isRegistered) {
-                                Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)
-                            }
+                            Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -2087,6 +2206,322 @@ private fun EndOfDayPanel(
 }
 
 @Composable
+private fun RegularCourseScreen(
+    courses: List<RegularCourse>,
+    isLoggedIn: Boolean,
+    isFreeExpired: Boolean,
+    onRequireLogin: () -> Unit,
+    onShowPaywall: () -> Unit,
+    onBack: () -> Unit,
+    onLoadCourse: (RegularCourse) -> Unit,
+    onClearCourseFromMap: (RegularCourse) -> Unit,
+    onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit,
+    onUpdateCourseAddress: (String, Int, String, String, TimeWindow, String) -> Unit,
+    onDeleteCourseAddress: (String, Int) -> Unit
+) {
+    val context = LocalContext.current
+    var selectedCourseCode by remember { mutableStateOf(courses.firstOrNull()?.code ?: "A") }
+    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode } ?: courses.firstOrNull()
+    var newRecipient by remember { mutableStateOf("") }
+    var newAddress by remember { mutableStateOf("") }
+    var newTimeWindow by remember { mutableStateOf(TimeWindow.Unspecified) }
+    var newMemo by remember { mutableStateOf("") }
+    var postalCode by remember { mutableStateOf("") }
+    var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+
+    var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val cameraOcrLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            ocrImageUri?.let { uri ->
+                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                } else {
+                    @Suppress("DEPRECATION")
+                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                }
+                recognizeAddressFromBitmap(
+                    bitmap = bitmap,
+                    onSuccess = { candidate = it },
+                    onFailure = {
+                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                    }
+                )
+            }
+        }
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                .also { it.parentFile?.mkdirs() }
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "${context.packageName}.fileprovider", file
+            )
+            ocrImageUri = uri
+            cameraOcrLauncher.launch(uri)
+        } else {
+            candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
+        }
+    }
+    val voiceInputLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val spoken = result.data
+            ?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull().orEmpty()
+        if (spoken.isNotBlank()) candidate = createAddressCandidateFromText("音声入力", spoken)
+    }
+    LaunchedEffect(candidate) {
+        val c = candidate ?: return@LaunchedEffect
+        val validAddress = c.address.isNotBlank()
+            && !c.address.contains("読み取れませんでした")
+            && !c.address.contains("権限が許可")
+            && !c.address.contains("取得できませんでした")
+        if (validAddress) {
+            newAddress = c.address
+            if (c.postalCode.isNotBlank()) postalCode = c.postalCode
+            if (c.recipientName.isNotBlank()) newRecipient = c.recipientName
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .statusBarsPadding()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.panel_courses), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.width(48.dp))
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .navigationBarsPadding()
+                    .padding(16.dp)
+                    .padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+    WhiteCard {
+        Text(stringResource(R.string.regular_courses_title), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.course_address_hint), color = MutedText)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            courses.forEach { course ->
+                FilterChip(
+                    selected = selectedCourseCode == course.code,
+                    onClick = { selectedCourseCode = course.code },
+                    label = { Text(stringResource(R.string.course_chip_label, course.code)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        selectedCourse?.let { course ->
+            Text(stringResource(R.string.course_summary, course.displayName, course.addresses.size), fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        when {
+                            !isLoggedIn -> onRequireLogin()
+                            isFreeExpired -> onShowPaywall()
+                            else -> onLoadCourse(course)
+                        }
+                    },
+                    enabled = course.addresses.isNotEmpty(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.load_course_button, course.code))
+                }
+                OutlinedButton(
+                    onClick = { onClearCourseFromMap(course) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.clear_course_from_map_button))
+                }
+            }
+            course.addresses.forEachIndexed { index, item ->
+                CourseAddressItem(
+                    item = item,
+                    onUpdate = { recipient, address, timeWindow, memo ->
+                        onUpdateCourseAddress(course.code, index, recipient, address, timeWindow, memo)
+                    },
+                    onDelete = { onDeleteCourseAddress(course.code, index) }
+                )
+            }
+        }
+    }
+
+    WhiteCard {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.add_course_address_title), fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                            PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val file = java.io.File(context.cacheDir, "ocr/ocr_${System.currentTimeMillis()}.jpg")
+                                .also { it.parentFile?.mkdirs() }
+                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                context, "${context.packageName}.fileprovider", file
+                            )
+                            ocrImageUri = uri
+                            cameraOcrLauncher.launch(uri)
+                        } else {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                    modifier = Modifier.height(36.dp)
+                ) { Text(stringResource(R.string.camera)) }
+                Button(
+                    onClick = { voiceInputLauncher.launch(createVoiceAddressIntent()) },
+                    modifier = Modifier.height(36.dp)
+                ) { Text(stringResource(R.string.voice)) }
+            }
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = postalCode,
+                onValueChange = { postalCode = it.filter(Char::isDigit).take(7) },
+                modifier = Modifier.weight(1f),
+                label = { Text(stringResource(R.string.postal_code_label)) },
+                placeholder = { Text(stringResource(R.string.postal_placeholder)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Button(
+                onClick = {
+                    postalSearchJob?.cancel()
+                    postalSearchJob = scope.launch {
+                        val result = searchPostalCode(postalCode)
+                        candidate = result
+                        val isValid = result.address.isNotBlank() &&
+                            !result.address.contains("見つかりません") &&
+                            !result.address.contains("エラー")
+                        if (isValid) newAddress = result.address
+                    }
+                },
+                enabled = postalCode.length == 7
+            ) { Text(stringResource(R.string.search)) }
+        }
+        candidate?.let { c ->
+            if (c.address.isNotBlank()) {
+                TextBox("${c.sourceLabel} / ${c.confidenceLabel}\n${c.address}")
+            }
+        }
+        LabeledField(stringResource(R.string.manual_input_label), stringResource(R.string.manual_placeholder), newAddress) { newAddress = it }
+        LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_name_placeholder), newRecipient) { newRecipient = it }
+        Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
+        TimeWindowFilters(selected = newTimeWindow) { newTimeWindow = it }
+        LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), newMemo) { newMemo = it }
+        Button(
+            onClick = {
+                when {
+                    !isLoggedIn -> onRequireLogin()
+                    isFreeExpired -> onShowPaywall()
+                    else -> {
+                        onAddCourseAddress(selectedCourseCode, newRecipient, newAddress, newTimeWindow, newMemo)
+                        newRecipient = ""
+                        newAddress = ""
+                        newTimeWindow = TimeWindow.Unspecified
+                        newMemo = ""
+                        postalCode = ""
+                        candidate = null
+                    }
+                }
+            },
+            enabled = newAddress.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.add_to_course_button, selectedCourseCode))
+        }
+    }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CourseAddressItem(
+    item: CourseAddress,
+    onUpdate: (String, String, TimeWindow, String) -> Unit,
+    onDelete: () -> Unit
+) {
+    var isEditing by remember { mutableStateOf(false) }
+    var recipient by remember(item) { mutableStateOf(item.recipient) }
+    var address by remember(item) { mutableStateOf(item.address) }
+    var timeWindow by remember(item) { mutableStateOf(item.timeWindow) }
+    var memo by remember(item) { mutableStateOf(item.memo) }
+
+    if (isEditing) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFFF6F7F9))
+                .padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            LabeledField(stringResource(R.string.recipient_field_label), stringResource(R.string.recipient_name_placeholder), recipient) { recipient = it }
+            LabeledField(stringResource(R.string.manual_input_label), stringResource(R.string.manual_placeholder), address) { address = it }
+            Text(stringResource(R.string.time_window_title), fontWeight = FontWeight.Bold)
+            TimeWindowFilters(selected = timeWindow) { timeWindow = it }
+            LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), memo) { memo = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        onUpdate(recipient, address, timeWindow, memo)
+                        isEditing = false
+                    },
+                    enabled = address.isNotBlank(),
+                    modifier = Modifier.weight(1f)
+                ) { Text(stringResource(R.string.save)) }
+                TextButton(onClick = { isEditing = false }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFFF6F7F9))
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(item.recipient, fontWeight = FontWeight.Bold)
+                Text(item.address, style = MaterialTheme.typography.bodySmall)
+                Text("${item.timeWindow.label} / ${item.memo}", style = MaterialTheme.typography.labelSmall, color = MutedText)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                TextButton(onClick = { isEditing = true }) { Text(stringResource(R.string.edit)) }
+                TextButton(onClick = onDelete) { Text(stringResource(R.string.delete), color = Color(0xFFE53935)) }
+            }
+        }
+    }
+}
+
+@Composable
 private fun RegularCoursePanel(
     courses: List<RegularCourse>,
     onLoadCourse: (RegularCourse) -> Unit,
@@ -2159,6 +2594,7 @@ private fun RegularCoursePanel(
         if (validAddress) {
             newAddress = c.address
             if (c.postalCode.isNotBlank()) postalCode = c.postalCode
+            if (c.recipientName.isNotBlank()) newRecipient = c.recipientName
         }
     }
 
@@ -2294,6 +2730,7 @@ private fun AddressBackupPanel(
     onExport: () -> Unit,
     onImportTextChange: (String) -> Unit,
     onImport: () -> Unit,
+    onClearBackup: () -> Unit = {},
     onClose: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -2311,7 +2748,7 @@ private fun AddressBackupPanel(
                     onClick = {
                         val clip = android.content.ClipData.newPlainText("hakobun_backup", backupText)
                         clipboard.setPrimaryClip(clip)
-                        onClose()
+                        onClearBackup()
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text(stringResource(R.string.copy)) }
@@ -2323,7 +2760,7 @@ private fun AddressBackupPanel(
                             putExtra(Intent.EXTRA_SUBJECT, "HAKOBUN 住所バックアップ")
                         }
                         context.startActivity(Intent.createChooser(shareIntent, "バックアップを共有"))
-                        onClose()
+                        onClearBackup()
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text(stringResource(R.string.share)) }
@@ -2624,7 +3061,8 @@ private fun PackageListScreen(
     selectedCode: String?,
     onBack: () -> Unit,
     onSelectPackage: (String) -> Unit,
-    onEditPackage: (String) -> Unit
+    onEditPackage: (String) -> Unit,
+    onCompleteAll: () -> Unit = {}
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF6F7F9))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -2646,12 +3084,23 @@ private fun PackageListScreen(
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .navigationBarsPadding()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .padding(bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
             }
         }
+        Button(
+            onClick = onCompleteAll,
+            enabled = packages.isNotEmpty(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+        ) { Text(stringResource(R.string.complete_all_button), fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -2954,6 +3403,7 @@ private fun PackageRegistrationScreen(
         if (validAddress) {
             manualInput = c.address
             if (c.postalCode.isNotBlank()) postalCode = c.postalCode
+            if (c.recipientName.isNotBlank()) recipientName = c.recipientName
         }
     }
     LaunchedEffect(addresses.size) {
@@ -3258,9 +3708,16 @@ private fun RegistrationMapPreview(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(validPins.firstOrNull()?.third ?: defaultCenter, 14f)
     }
-    LaunchedEffect(validPins.firstOrNull()?.third) {
-        validPins.firstOrNull()?.third?.let {
-            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 14f))
+    LaunchedEffect(validPins.map { it.second to it.third }) {
+        when {
+            validPins.size == 1 -> {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(validPins.first().third, 14f))
+            }
+            validPins.size > 1 -> {
+                val boundsBuilder = com.google.android.gms.maps.model.LatLngBounds.Builder()
+                validPins.forEach { boundsBuilder.include(it.third) }
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100))
+            }
         }
     }
     Box(modifier = modifier) {
@@ -3592,6 +4049,7 @@ private fun createAddressCandidateFromText(sourceLabel: String, sourceText: Stri
         ?.filter(Char::isDigit)
         .orEmpty()
     val address = extractLikelyAddress(sourceText)
+    val recipientName = extractLikelyName(sourceText)
 
     val fallback = sourceText
         .lineSequence()
@@ -3604,8 +4062,30 @@ private fun createAddressCandidateFromText(sourceLabel: String, sourceText: Stri
         sourceLabel = sourceLabel,
         postalCode = postalCode,
         address = address.ifBlank { fallback },
-        confidenceLabel = if (address.isNotBlank()) "住所候補" else "OCR全文"
+        confidenceLabel = if (address.isNotBlank()) "住所候補" else "OCR全文",
+        recipientName = recipientName
     )
+}
+
+private fun extractLikelyName(sourceText: String): String {
+    val lines = sourceText
+        .lineSequence()
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .toList()
+
+    val honorificSuffixes = listOf("様", "殿", "御中")
+    lines.firstOrNull { line -> honorificSuffixes.any { line.endsWith(it) } }?.let { line ->
+        var name = line
+        honorificSuffixes.forEach { name = name.removeSuffix(it) }
+        name = name.trim().trim('　', ' ')
+        if (name.isNotBlank()) return name
+    }
+
+    val namePattern = Regex("""^[ぁ-んァ-ヶ一-龠]{1,4}[\s　]+[ぁ-んァ-ヶ一-龠]{1,6}$""")
+    lines.firstOrNull { namePattern.matches(it) }?.let { return it.trim() }
+
+    return ""
 }
 
 private fun extractLikelyAddress(sourceText: String): String {

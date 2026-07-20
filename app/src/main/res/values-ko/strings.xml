@@ -67,6 +67,7 @@
 
     <!-- 배송 목록 화면 -->
     <string name="package_count">%1$d건</string>
+    <string name="complete_all_button">전체 배송 완료 처리</string>
     <string name="summary_list_title">%1$s 목록</string>
     <string name="showing_count">%1$d건 표시 중</string>
     <string name="no_packages">해당하는 화물이 없습니다.</string>
@@ -93,6 +94,8 @@
     <string name="course_chip_label">%1$s 노선</string>
     <string name="course_summary">%1$s / 등록 주소 %2$d건</string>
     <string name="load_course_button">%1$s 노선을 오늘의 배송에 불러오기</string>
+    <string name="add_course_address_title">코스에 주소 추가</string>
+    <string name="clear_course_from_map_button">지도에서 삭제</string>
 
     <!-- 백업 -->
     <string name="backup_data_title">주소 데이터 관리</string>
@@ -162,6 +165,20 @@
     <string name="add_address_first">주소를 1건 이상 추가하세요</string>
     <string name="geocoding_hint">주소 지오코딩 중...</string>
     <string name="drag_pin_hint">핀을 드래그하여 위치를 조정할 수 있습니다</string>
+    <string name="has_locker_label">건물에 택배함 있음</string>
+    <string name="nameplate_label">문패</string>
+    <string name="nameplate_placeholder">문패 정보를 입력할 수 있습니다</string>
+    <string name="delivery_memo_label">메모</string>
+    <string name="delivery_memo_placeholder">수령인 메모를 입력할 수 있습니다</string>
+    <string name="package_memo_label">택배 메모</string>
+    <string name="package_memo_placeholder">포장 형태 등의 정보를 입력할 수 있습니다</string>
+    <string name="slip_info_title">송장 정보</string>
+    <string name="slip_number_label">송장 번호</string>
+    <string name="slip_number_placeholder">예) 0123-4567-8910-1112</string>
+    <string name="recipient_name_placeholder">예) 홍길동</string>
+    <string name="phone_number_label">전화번호</string>
+    <string name="phone_number_placeholder">예) 09012345678</string>
+    <string name="package_shape_title">포장 형태</string>
 
     <!-- 주소 입력 패널 -->
     <string name="address_input_title">주소 입력</string>
@@ -193,14 +210,11 @@
     <string name="plan_billing_title">플랜 및 결제</string>
     <string name="premium_plan">✓ 프리미엄 플랜</string>
     <string name="premium_features">모든 기능을 이용할 수 있습니다.</string>
-    <string name="free_trial_expired">⚠ 무료 기간 종료</string>
-    <string name="free_trial_active">무료 체험 중</string>
-    <string name="trial_remaining_days">남은 %1$d일</string>
-    <string name="trial_auto_upgrade">종료 후 프리미엄 플랜으로 자동 이전됩니다.</string>
-    <string name="trial_after_register">등록 후 1개월간 무료로 이용하실 수 있습니다.</string>
+    <string name="free_trial_expired">프리미엄 미등록</string>
+    <string name="trial_after_register">프리미엄 플랜은 첫 1개월 무료 체험이 가능하며 Google Play가 자동으로 관리합니다. 무료 기간 종료 후 자동으로 결제가 시작됩니다.</string>
     <string name="free_plan_name">무료</string>
     <string name="free_trial_period">1개월 체험</string>
-    <string name="free_features">· 기본 기능\n· 화물 5건 등록\n· 백업</string>
+    <string name="free_features">・전체 기능이 30일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
     <string name="premium_plan_name">프리미엄</string>
     <string name="premium_price">¥980 / 월</string>
     <string name="premium_features_list">· 전체 기능\n· 무제한 등록\n· 우선 지원</string>
@@ -209,6 +223,7 @@
     <string name="subscribe_complete">프리미엄 플랜으로 이전이 완료되었습니다</string>
     <string name="billing_not_available">Google Play Billing을 실행할 수 없습니다</string>
     <string name="plan_not_found">플랜을 찾을 수 없습니다（Play Console 설정을 확인하세요）</string>
+    <string name="debug_section_title">디버그용（개발 빌드에서만 표시）</string>
 
     <!-- 페이월 다이얼로그 -->
     <string name="paywall_title">무료 기간이 종료되었습니다</string>
@@ -292,15 +307,15 @@
 
     <!-- FAQ 질답 -->
     <string name="faq_q_01">화물은 어떻게 등록하나요?</string>
-    <string name="faq_a_01">홈 화면 우측 상단의 「등록」 버튼, 또는 사이드 메뉴 → 「화물 등록」에서 등록할 수 있습니다.\n\n등록 방법은 세 가지입니다:\n① 주소 직접 입력\n② 카메라로 송장 촬영 후 OCR 자동 인식\n③ 마이크로 음성 입력\n\n등록 후 홈 지도에 핀이 표시됩니다.</string>
-    <string name="faq_q_02">하루에 등록할 수 있는 화물 수는?</string>
-    <string name="faq_a_02">무료 플랜(1개월 체험 포함)은 하루 최대 5건 등록 가능합니다.\n\n프리미엄 플랜(¥980/월)은 등록 건수가 무제한입니다.\n\n상한에 도달하면 등록 버튼을 누를 때 플랜 변경 안내가 표시됩니다.</string>
+    <string name="faq_a_01">홈 화면 우측 상단의 「등록」 버튼, 또는 사이드 메뉴 → 「화물 등록」에서 등록할 수 있습니다.\n\n① 우편번호 검색·직접 입력·카메라 OCR·음성 입력 중 하나로 주소를 입력\n② 수령인 이름을 입력（OCR로 「〇〇님」 등의 기재가 있으면 자동으로 입력됩니다）\n③ 「추가」를 누르면 주소 목록에 추가되고 지도 미리보기에 핀이 표시됩니다（이 시점에서는 아직 실제 배송 지도에는 반영되지 않습니다）\n④ 시간 지정·송장 정보（송장 번호／전화번호）·포장 형태·건물 택배함 유무·문패·메모·택배 메모·배송 상태를 입력\n⑤ 같은 방법으로 주소를 최대 5건까지 추가할 수 있습니다\n⑥ 「〇건을 지도에 등록」 버튼을 누르면 추가한 주소가 한꺼번에 실제 배송 지도에 반영되고, 입력란과 주소 목록은 자동으로 초기화됩니다</string>
+    <string name="faq_q_02">무료 회원과 유료（프리미엄）회원의 차이는?</string>
+    <string name="faq_a_02">【무료 회원（체험 기간 중）】\n사용자 등록일로부터 30일간, 화물 등록·OCR／음성 입력·정기 코스·지도 표시 등 전체 기능을 무료로 이용하실 수 있습니다.\n\n【체험 종료 후（미가입 시）】\n신규 화물 등록만 잠깁니다. 「등록」 버튼을 누르면 프리미엄 안내가 표시됩니다. 기존 화물 데이터의 열람·편집·지도 표시·배송 상태 업데이트는 계속 무료로 이용하실 수 있습니다.\n\n【유료 회원（프리미엄 ¥980/월）】\n기간 제한 없이 언제든지 화물 등록을 포함한 전체 기능을 이용하실 수 있습니다.\n\n※화물 등록 화면에서 한 번에 추가할 수 있는 주소는 최대 5건까지이며, 이는 플랜과 관계없이 모든 사용자에게 공통되는 입력 상한으로 무료／유료의 차이가 아닙니다.</string>
     <string name="faq_q_03">화물 배송 상태를 업데이트하려면?</string>
-    <string name="faq_a_03">홈 화면 지도의 핀, 또는 배송 목록의 카드를 탭하면 상세 화면이 열립니다.\n\n「완료」「부재」「재배송」「회사 반납」 등의 상태로 변경할 수 있습니다.</string>
+    <string name="faq_a_03">홈 화면 지도의 핀, 또는 배송 목록의 카드를 탭하면 화물 편집 화면이 열립니다.\n\n수령인 이름·시간 지정·송장 정보·포장 형태·택배함 유무·문패·메모·배송 상태（「완료」「부재」「재배송」「회사 반납」 등）를 한꺼번에 편집·저장할 수 있습니다.</string>
     <string name="faq_q_04">지도 핀이 올바른 위치에 표시되지 않아요</string>
-    <string name="faq_a_04">핀 위치의 정확도는 지오코딩(주소→위도경도 변환) 정밀도에 따라 달라집니다.\n\n화물 등록 화면 하단의 지도에서 핀을 길게 누른 후 올바른 위치로 드래그하여 수동으로 수정할 수 있습니다. 수정된 위치는 저장됩니다.</string>
-    <string name="faq_q_05">정기 코스(집하)는 어떻게 사용하나요?</string>
-    <string name="faq_a_05">사이드 메뉴 → 「집하 / 정기 코스」에서 미리 등록한 코스(A〜D)를 오늘의 배송 목록에 일괄 불러올 수 있습니다.\n\n코스 등록 및 편집은 같은 화면의 「코스 관리」에서 할 수 있습니다.</string>
+    <string name="faq_a_04">주소 지오코딩(주소→위도경도 변환) 정밀도에 따라 달라집니다.\n\n화물 등록 화면에서 주소를 추가하면 표시되는 지도 미리보기（실제 배송 지도와는 별개）에서 핀을 손가락으로 길게 눌러 드래그하면 위치를 수동으로 수정할 수 있습니다. 수정한 위치 그대로 「지도에 등록」을 누르면 그 위치로 실제 배송 지도에 반영됩니다.</string>
+    <string name="faq_q_05">정기 코스（집하）는 어떻게 사용하나요?</string>
+    <string name="faq_a_05">사이드 메뉴 → 「집하 / 정기 코스」에서 A〜D의 4개 코스가 처음부터 준비되어 있습니다.\n\n「코스에 주소 추가」 폼（우편번호 검색·음성 입력·카메라 OCR도 지원）에서 각 코스에 주소를 등록하고, 「코스 불러오기」 버튼을 누르면 해당 코스의 화물이 한꺼번에 배송 지도에 반영됩니다.\n\n불러온 화물만 지도에서 지우고 싶을 때는 옆의 「지도에서 삭제」 버튼으로 해당 코스만 일괄 삭제할 수 있습니다.</string>
     <string name="faq_q_06">카메라로 송장을 읽었는데 글자가 틀렸어요</string>
     <string name="faq_a_06">다음을 시도해 보세요:\n\n· 밝은 곳에서 촬영하기\n· 송장 전체가 프레임 안에 들어오도록 하기\n· 양손으로 고정하여 흔들림 방지\n· 오염, 접힘, 반사 여부 확인\n\nOCR 후 각 항목은 수동으로 수정할 수 있습니다. 인식 정확도는 조명과 인쇄 품질에 따라 달라집니다.</string>
     <string name="faq_q_07">음성 입력이 인식되지 않아요</string>

@@ -81,7 +81,6 @@ class LocalDeliveryStore(context: Context) {
                 contact = obj.optString("contact"),
                 email = obj.optString("email"),
                 plan = enumValueOrDefault(obj.optString("plan"), MembershipPlan.Free),
-                trialStartMillis = obj.optLong("trialStartMillis", 0L),
                 isRegistered = obj.optBoolean("isRegistered", false)
             )
         }.getOrDefault(UserProfile())
@@ -94,7 +93,6 @@ class LocalDeliveryStore(context: Context) {
             .put("contact", profile.contact)
             .put("email", profile.email)
             .put("plan", profile.plan.name)
-            .put("trialStartMillis", profile.trialStartMillis)
             .put("isRegistered", profile.isRegistered)
         preferences.edit().putString(KEY_USER_PROFILE, obj.toString()).apply()
     }

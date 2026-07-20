@@ -67,6 +67,7 @@
 
     <!-- Delivery List Screen -->
     <string name="package_count">%1$d items</string>
+    <string name="complete_all_button">Mark All as Delivered</string>
     <string name="summary_list_title">%1$s List</string>
     <string name="showing_count">Showing %1$d items</string>
     <string name="no_packages">No matching packages found.</string>
@@ -93,6 +94,8 @@
     <string name="course_chip_label">Route %1$s</string>
     <string name="course_summary">%1$s / %2$d addresses registered</string>
     <string name="load_course_button">Load Route %1$s into Today\'s Deliveries</string>
+    <string name="add_course_address_title">Add Address to Course</string>
+    <string name="clear_course_from_map_button">Remove from Map</string>
 
     <!-- Backup -->
     <string name="backup_data_title">Address Data Management</string>
@@ -162,6 +165,20 @@
     <string name="add_address_first">Please add at least one address</string>
     <string name="geocoding_hint">Geocoding address...</string>
     <string name="drag_pin_hint">Drag pins to adjust positions</string>
+    <string name="has_locker_label">Building has a delivery locker</string>
+    <string name="nameplate_label">Nameplate</string>
+    <string name="nameplate_placeholder">You can enter nameplate information</string>
+    <string name="delivery_memo_label">Note</string>
+    <string name="delivery_memo_placeholder">You can enter a note about the recipient</string>
+    <string name="package_memo_label">Package Memo</string>
+    <string name="package_memo_placeholder">You can enter details such as package appearance</string>
+    <string name="slip_info_title">Slip Information</string>
+    <string name="slip_number_label">Slip Number</string>
+    <string name="slip_number_placeholder">e.g. 0123-4567-8910-1112</string>
+    <string name="recipient_name_placeholder">e.g. John Smith</string>
+    <string name="phone_number_label">Phone Number</string>
+    <string name="phone_number_placeholder">e.g. 09012345678</string>
+    <string name="package_shape_title">Package Type</string>
 
     <!-- Address Input Panel -->
     <string name="address_input_title">Address Input</string>
@@ -193,14 +210,11 @@
     <string name="plan_billing_title">Plan &amp; Billing</string>
     <string name="premium_plan">✓ Premium Plan</string>
     <string name="premium_features">All features are available.</string>
-    <string name="free_trial_expired">⚠ Free Trial Ended</string>
-    <string name="free_trial_active">Free Trial Active</string>
-    <string name="trial_remaining_days">%1$d days remaining</string>
-    <string name="trial_auto_upgrade">After trial ends, you\'ll be upgraded to the Premium plan.</string>
-    <string name="trial_after_register">After registration, enjoy 1 month free.</string>
+    <string name="free_trial_expired">Not Subscribed to Premium</string>
+    <string name="trial_after_register">The Premium plan includes a 1-month free trial, managed automatically by Google Play. Billing starts automatically once the trial ends.</string>
     <string name="free_plan_name">Free</string>
     <string name="free_trial_period">1-Month Trial</string>
-    <string name="free_features">· Basic features\n· 5 package registrations\n· Backup</string>
+    <string name="free_features">· All features free for 30 days\n· After the period ends, only new registrations are locked\n· Backup</string>
     <string name="premium_plan_name">Premium</string>
     <string name="premium_price">¥980 / month</string>
     <string name="premium_features_list">· All features\n· Unlimited registrations\n· Priority support</string>
@@ -209,6 +223,7 @@
     <string name="subscribe_complete">Successfully upgraded to Premium plan</string>
     <string name="billing_not_available">Unable to launch Google Play Billing</string>
     <string name="plan_not_found">Plan not found (please check Play Console settings)</string>
+    <string name="debug_section_title">Debug (visible in development builds only)</string>
 
     <!-- Paywall Dialog -->
     <string name="paywall_title">Free Trial Ended</string>
@@ -292,15 +307,15 @@
 
     <!-- FAQ Q&A -->
     <string name="faq_q_01">How do I register a package?</string>
-    <string name="faq_a_01">Tap the "Register" button at the top right of the Home screen, or go to the side menu → "Register Package".\n\nThere are three methods:\n① Enter address manually\n② Scan a shipping label with your camera (OCR)\n③ Speak the address using voice input\n\nAfter registering, a pin will appear on the Home map.</string>
-    <string name="faq_q_02">How many packages can I register per day?</string>
-    <string name="faq_a_02">The Free plan (including the 1-month trial) allows up to 5 packages per day.\n\nThe Premium plan (¥980/month) has no registration limit.\n\nWhen you reach the limit, a plan upgrade prompt will appear when you tap the register button.</string>
+    <string name="faq_a_01">You can register a package from the "Register" button at the top right of the Home screen, or from the side menu → "Register Package".\n\n① Enter the address by postal code search, manual entry, camera OCR, or voice input\n② Enter the recipient\'s name (if OCR detects a name such as "様", it will be entered automatically)\n③ Tap "Add" to add it to the address list, where a pin appears in the map preview (this is not yet reflected on the actual delivery map)\n④ Enter the time window, slip information (slip number / phone number), package type, whether the building has a delivery locker, nameplate, note, package memo, and delivery status\n⑤ You can add up to 5 addresses this way\n⑥ Tapping the "Register N item(s) on Map" button reflects all added addresses on the actual delivery map at once, and clears the input fields and address list automatically</string>
+    <string name="faq_q_02">What\'s the difference between the free and paid (Premium) plans?</string>
+    <string name="faq_a_02">[Free (during trial)]\nFor 30 days from your registration date, you can use all features free of charge, including package registration, OCR/voice input, regular routes, and the map.\n\n[After the trial ends (not subscribed)]\nOnly new package registration is locked. Tapping "Register" will show a prompt to go Premium. You can still view, edit, and update the delivery status of existing package data, and use the map, free of charge.\n\n[Premium (¥980/month)]\nUse all features, including package registration, with no time limit.\n\n* On the package registration screen you can add up to 5 addresses at a time, but this limit applies to all users regardless of plan — it is not a difference between free and paid.</string>
     <string name="faq_q_03">How do I update a delivery status?</string>
-    <string name="faq_a_03">Tap a pin on the Home map, or tap a card in the delivery list to open the detail screen.\n\nYou can change the status to "Delivered," "Absent," "Redeliver," or "Return to Office."</string>
+    <string name="faq_a_03">Tap a pin on the Home map, or tap a card in the delivery list, to open the package edit screen.\n\nYou can edit and save the recipient\'s name, time window, slip information, package type, whether there\'s a delivery locker, nameplate, note, and delivery status ("Delivered," "Absent," "Redeliver," "Return to Office," etc.) all together.</string>
     <string name="faq_q_04">The map pin is not in the right location</string>
-    <string name="faq_a_04">Pin accuracy depends on geocoding (address-to-coordinates conversion).\n\nIn the package registration screen, long-press the pin on the map at the bottom and drag it to the correct position. The adjusted location will be saved.</string>
+    <string name="faq_a_04">Pin accuracy depends on geocoding (address-to-coordinates conversion).\n\nIn the map preview that appears when you add an address on the package registration screen (separate from the actual delivery map), long-press and drag the pin to correct its position. Tapping "Register on Map" will reflect the adjusted position on the actual delivery map.</string>
     <string name="faq_q_05">How do I use regular routes (pickup)?</string>
-    <string name="faq_a_05">Go to the side menu → "Pickup / Regular Routes" to bulk-load pre-registered routes (A–D) into today\'s delivery list.\n\nRoutes can be added and edited in the "Route Management" section on the same screen.</string>
+    <string name="faq_a_05">From the side menu → "Pickup / Regular Routes", four routes (A–D) are set up by default.\n\nUse the "Add Address to Course" form (which also supports postal code search, voice input, and camera OCR) to register addresses to each route, then tap "Load Route" to reflect that route\'s packages on the delivery map all at once.\n\nIf you only want to remove the loaded packages from the map, use the neighboring "Remove from Map" button to bulk-remove just that route.</string>
     <string name="faq_q_06">The OCR reading of the shipping label was inaccurate</string>
     <string name="faq_a_06">Try the following:\n\n· Shoot in a well-lit area\n· Make sure the entire label fits within the frame\n· Hold the phone steady with both hands\n· Check for smudges, folds, or reflections\n\nEach field can be corrected manually after OCR. Accuracy depends on lighting and print quality.</string>
     <string name="faq_q_07">Voice input is not being recognized</string>

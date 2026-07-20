@@ -178,6 +178,8 @@
     <string name="package_shape_title">荷姿</string>
     <string name="add_course_address_title">コースへ住所を追加</string>
     <string name="clear_course_from_map_button">地図から削除</string>
+    <string name="complete_all_button">全て配達完了にする</string>
+    <string name="debug_section_title">デバッグ用（開発ビルドのみ表示）</string>
 
     <!-- アドレス入力パネル（旧UI） -->
     <string name="address_input_title">住所入力</string>
@@ -209,14 +211,11 @@
     <string name="plan_billing_title">プランと請求</string>
     <string name="premium_plan">✓ プレミアムプラン</string>
     <string name="premium_features">すべての機能が利用できます。</string>
-    <string name="free_trial_expired">⚠ 無料期間終了</string>
-    <string name="free_trial_active">無料トライアル中</string>
-    <string name="trial_remaining_days">残り %1$d日</string>
-    <string name="trial_auto_upgrade">終了後、プレミアムプランへ自動移行します。</string>
-    <string name="trial_after_register">登録後、1ヶ月間無料でご利用いただけます。</string>
+    <string name="free_trial_expired">プレミアム未登録</string>
+    <string name="trial_after_register">プレミアムプランは初回1ヶ月無料でお試しいただけます（Google Playが自動管理）。無料期間終了後は自動的に課金が開始されます。</string>
     <string name="free_plan_name">無料</string>
     <string name="free_trial_period">1ヶ月トライアル</string>
-    <string name="free_features">・基本機能\n・荷物登録5件\n・バックアップ</string>
+    <string name="free_features">・全機能が30日間無料\n・期間終了後は新規登録のみロック\n・バックアップ</string>
     <string name="premium_plan_name">プレミアム</string>
     <string name="premium_price">¥980 / 月</string>
     <string name="premium_features_list">・全機能\n・無制限登録\n・優先サポート</string>
@@ -308,15 +307,15 @@
 
     <!-- FAQ Q&A -->
     <string name="faq_q_01">荷物はどうやって登録しますか？</string>
-    <string name="faq_a_01">ホーム画面右上の「登録」ボタン、またはサイドメニュー →「荷物登録」から登録できます。\n\n登録方法は3種類あります。\n① 住所を手入力\n② カメラで送り状を撮影してOCR自動読み取り\n③ マイクで音声入力\n\n登録後はホームのマップにピンが表示されます。</string>
-    <string name="faq_q_02">1日に登録できる荷物の件数は？</string>
-    <string name="faq_a_02">無料プラン（1ヶ月トライアル含む）は5件まで登録できます。\n\nプレミアムプラン（¥980/月）は件数無制限でご利用いただけます。\n\n上限に達すると登録ボタンを押したタイミングでプラン変更のご案内が表示されます。</string>
+    <string name="faq_a_01">ホーム画面右上の「登録」ボタン、またはサイドメニュー →「荷物登録」から登録できます。\n\n① 郵便番号検索・直接入力・カメラOCR・音声入力のいずれかで住所を入力\n② お届け先名を入力（OCRで「〇〇様」等の記載があれば自動入力されます）\n③「追加」を押すと住所リストに追加され、マッププレビューにピンが表示されます（この時点ではまだ実際の配達マップには反映されません）\n④ 時間指定・伝票情報（伝票番号／電話番号）・荷姿・建物の宅配BOXの有無・表札・メモ・荷物メモ・配達状況を入力\n⑤ 同じ流れで住所を最大5件まで追加できます\n⑥「〇件を地図に登録」ボタンを押すと、追加した住所がまとめて実際の配達マップに反映され、入力欄と住所リストは自動的にクリアされます</string>
+    <string name="faq_q_02">無料会員と有料（プレミアム）会員の違いは？</string>
+    <string name="faq_a_02">【無料会員（トライアル中）】\nユーザー登録日から30日間、荷物登録・OCR／音声入力・定期コース・地図表示など全機能を無料でご利用いただけます。\n\n【トライアル終了後（未加入の場合）】\n新規の荷物登録のみロックされます。「登録」ボタンを押すとプレミアムへのご案内が表示されます。既存の荷物データの閲覧・編集・地図表示・配達状況の更新は引き続き無料でご利用いただけます。\n\n【有料会員（プレミアム ¥980/月）】\n期間の制限なく、いつでも荷物登録を含む全機能をご利用いただけます。\n\n※荷物登録画面で一度に追加できる住所は最大5件までですが、これはプランに関わらず全ユーザー共通の入力上限であり、無料／有料の差ではありません。</string>
     <string name="faq_q_03">荷物の配達状況を更新するには？</string>
-    <string name="faq_a_03">ホーム画面のマップ上のピン、または配達リストのカードをタップすると詳細画面が開きます。\n\n「完了」「不在」「再配達」「会社へ持ち戻り」などのステータスに変更できます。</string>
+    <string name="faq_a_03">ホーム画面のマップ上のピン、または配達リストのカードをタップすると荷物編集画面が開きます。\n\n届け先名・時間指定・伝票情報・荷姿・宅配BOXの有無・表札・メモ・配達状況（「完了」「不在」「再配達」「会社へ持ち戻り」など）をまとめて編集・保存できます。</string>
     <string name="faq_q_04">地図のピンが正しい場所に表示されません</string>
-    <string name="faq_a_04">住所のジオコーディング（住所→緯度経度変換）の精度に依存します。\n\n荷物登録画面の下部にあるマップで、ピンを指で長押しして正しい位置にドラッグすることで手動修正できます。修正した位置は保存されます。</string>
+    <string name="faq_a_04">住所のジオコーディング（住所→緯度経度変換）の精度に依存します。\n\n荷物登録画面で住所を追加すると表示されるマッププレビュー（実際の配達マップとは別）で、ピンを指で長押ししてドラッグすると位置を手動修正できます。修正した位置のまま「地図に登録」を押すと、その位置で実際の配達マップに反映されます。</string>
     <string name="faq_q_05">定期コース（集荷）の使い方は？</string>
-    <string name="faq_a_05">サイドメニュー →「集荷 / 定期コース」から、あらかじめ登録したコース（A〜D）を今日の配達リストに一括読み込みできます。\n\nコースの登録・編集は同画面内の「コース管理」から行えます。</string>
+    <string name="faq_a_05">サイドメニュー →「集荷 / 定期コース」から、A〜Dの4コースが最初から用意されています。\n\n「コースへ住所を追加」フォーム（郵便番号検索・音声入力・カメラOCRにも対応）で各コースに住所を登録し、「コースを呼び出す」ボタンを押すとそのコースの荷物がまとめて配達マップに反映されます。\n\n呼び出した荷物だけを地図から消したい場合は、隣の「地図から削除」ボタンで該当コース分だけ一括削除できます。</string>
     <string name="faq_q_06">カメラで送り状を読み取ったら文字がずれました</string>
     <string name="faq_a_06">以下の点をお試しください。\n\n・明るい場所で撮影する\n・送り状全体がフレームに収まるようにする\n・手ブレしないよう両手で固定する\n・汚れ・折れ・反射がないか確認する\n\nOCR後の各フィールドは手動で修正できます。認識精度は照明・印刷品質に依存します。</string>
     <string name="faq_q_07">音声入力が認識されません</string>

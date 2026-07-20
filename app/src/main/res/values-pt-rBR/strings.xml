@@ -67,6 +67,7 @@
 
     <!-- Tela de lista de entregas -->
     <string name="package_count">%1$d itens</string>
+    <string name="complete_all_button">Marcar tudo como entregue</string>
     <string name="summary_list_title">Lista de %1$s</string>
     <string name="showing_count">Exibindo %1$d itens</string>
     <string name="no_packages">Nenhum pacote encontrado.</string>
@@ -93,6 +94,8 @@
     <string name="course_chip_label">Rota %1$s</string>
     <string name="course_summary">%1$s / %2$d endereços registrados</string>
     <string name="load_course_button">Carregar rota %1$s nas entregas de hoje</string>
+    <string name="add_course_address_title">Adicionar endereço à rota</string>
+    <string name="clear_course_from_map_button">Remover do mapa</string>
 
     <!-- Backup -->
     <string name="backup_data_title">Gerenciamento de dados de endereço</string>
@@ -162,6 +165,20 @@
     <string name="add_address_first">Adicione pelo menos 1 endereço</string>
     <string name="geocoding_hint">Geocodificando endereço...</string>
     <string name="drag_pin_hint">Arraste os alfinetes para ajustar a posição</string>
+    <string name="has_locker_label">Prédio possui armário de entregas</string>
+    <string name="nameplate_label">Placa de nome</string>
+    <string name="nameplate_placeholder">Você pode inserir informações da placa de nome</string>
+    <string name="delivery_memo_label">Observação</string>
+    <string name="delivery_memo_placeholder">Você pode inserir uma observação sobre o destinatário</string>
+    <string name="package_memo_label">Observação do pacote</string>
+    <string name="package_memo_placeholder">Você pode inserir informações como o formato da embalagem</string>
+    <string name="slip_info_title">Informações do recibo</string>
+    <string name="slip_number_label">Número do recibo</string>
+    <string name="slip_number_placeholder">Ex.: 0123-4567-8910-1112</string>
+    <string name="recipient_name_placeholder">Ex.: João da Silva</string>
+    <string name="phone_number_label">Número de telefone</string>
+    <string name="phone_number_placeholder">Ex.: 09012345678</string>
+    <string name="package_shape_title">Formato da embalagem</string>
 
     <!-- Painel de entrada de endereço -->
     <string name="address_input_title">Entrada de endereço</string>
@@ -193,14 +210,11 @@
     <string name="plan_billing_title">Plano &amp; Faturamento</string>
     <string name="premium_plan">✓ Plano Premium</string>
     <string name="premium_features">Todos os recursos estão disponíveis.</string>
-    <string name="free_trial_expired">⚠ Período gratuito encerrado</string>
-    <string name="free_trial_active">Teste gratuito ativo</string>
-    <string name="trial_remaining_days">%1$d dias restantes</string>
-    <string name="trial_auto_upgrade">Após o término, você será automaticamente transferido para o plano Premium.</string>
-    <string name="trial_after_register">Após o registro, aproveite 1 mês gratuitamente.</string>
+    <string name="free_trial_expired">Não Assinado ao Premium</string>
+    <string name="trial_after_register">O plano Premium inclui 1 mês de teste gratuito, gerenciado automaticamente pelo Google Play. A cobrança começa automaticamente após o término do teste.</string>
     <string name="free_plan_name">Gratuito</string>
     <string name="free_trial_period">Teste de 1 mês</string>
-    <string name="free_features">· Recursos básicos\n· 5 registros de pacotes\n· Backup</string>
+    <string name="free_features">· Todos os recursos gratuitos por 30 dias\n· Após o período, apenas novos cadastros ficam bloqueados\n· Backup</string>
     <string name="premium_plan_name">Premium</string>
     <string name="premium_price">¥980 / mês</string>
     <string name="premium_features_list">· Todos os recursos\n· Registros ilimitados\n· Suporte prioritário</string>
@@ -209,6 +223,7 @@
     <string name="subscribe_complete">Transferência para o plano Premium concluída</string>
     <string name="billing_not_available">Não foi possível iniciar o Google Play Billing</string>
     <string name="plan_not_found">Plano não encontrado（verifique as configurações do Play Console）</string>
+    <string name="debug_section_title">Para depuração (visível somente em builds de desenvolvimento)</string>
 
     <!-- Diálogo de paywall -->
     <string name="paywall_title">Período gratuito encerrado</string>
@@ -291,16 +306,16 @@
     <string name="faq_cat_other">Outros</string>
 
     <!-- FAQ Perguntas e Respostas -->
-    <string name="faq_q_01">Como cadastrar um pacote?</string>
-    <string name="faq_a_01">Toque no botão「Cadastrar」no canto superior direito da tela inicial, ou acesse o menu lateral → 「Cadastrar pacote」.\n\nHá três formas de cadastro:\n① Digitar o endereço manualmente\n② Fotografar a etiqueta com a câmera (OCR automático)\n③ Falar o endereço por voz\n\nApós o cadastro, um marcador aparecerá no mapa da tela inicial.</string>
-    <string name="faq_q_02">Quantos pacotes posso cadastrar por dia?</string>
-    <string name="faq_a_02">O plano gratuito (incluindo o período de teste de 1 mês) permite até 5 pacotes por dia.\n\nO plano Premium (¥980/mês) não tem limite de cadastros.\n\nAo atingir o limite, uma notificação de upgrade de plano será exibida ao tocar no botão de cadastro.</string>
-    <string name="faq_q_03">Como atualizar o status de entrega?</string>
-    <string name="faq_a_03">Toque em um marcador no mapa da tela inicial, ou em um cartão na lista de entregas, para abrir a tela de detalhes.\n\nVocê pode alterar o status para「Entregue」「Ausente」「Reentrega」「Devolver ao depósito」, entre outros.</string>
-    <string name="faq_q_04">O marcador no mapa não está no lugar certo</string>
-    <string name="faq_a_04">A precisão depende do geocoding (conversão de endereço em coordenadas).\n\nNa tela de cadastro de pacote, mantenha pressionado o marcador no mapa no final da página e arraste-o para a posição correta. A posição ajustada será salva.</string>
-    <string name="faq_q_05">Como usar as rotas fixas (coleta)?</string>
-    <string name="faq_a_05">Acesse o menu lateral → 「Coleta / Rotas fixas」para carregar em lote as rotas pré-cadastradas (A〜D) na lista de entregas do dia.\n\nAs rotas podem ser cadastradas e editadas em「Gerenciar rotas」na mesma tela.</string>
+    <string name="faq_q_01">Como faço para cadastrar um pacote?</string>
+    <string name="faq_a_01">Toque no botão「Cadastrar」no canto superior direito da tela inicial, ou acesse o menu lateral → 「Cadastrar pacote」.\n\n① Digite o endereço usando busca por CEP, entrada manual, OCR pela câmera ou entrada por voz\n② Informe o nome do destinatário (se o OCR detectar algo como "Sr(a). 〇〇", ele será preenchido automaticamente)\n③ Ao tocar em「Adicionar」, o endereço é incluído na lista e um alfinete aparece na pré-visualização do mapa (isso ainda não é refletido no mapa de entregas real)\n④ Informe o horário desejado, as informações do recibo (número do recibo / número de telefone), o formato da embalagem, se o prédio possui armário de entregas, a placa de nome, a observação, a observação do pacote e o status de entrega\n⑤ Você pode adicionar até 5 endereços seguindo o mesmo processo\n⑥ Ao tocar no botão「Registrar X itens no mapa」, todos os endereços adicionados são refletidos de uma só vez no mapa de entregas real, e o campo de entrada e a lista de endereços são limpos automaticamente</string>
+    <string name="faq_q_02">Qual é a diferença entre o plano gratuito e o plano pago (Premium)?</string>
+    <string name="faq_a_02">【Plano gratuito (período de teste)】\nDurante os 30 dias a partir da data de cadastro do usuário, todos os recursos estão disponíveis gratuitamente: cadastro de pacotes, entrada por OCR/voz, rotas fixas, exibição do mapa, entre outros.\n\n【Após o término do teste (sem assinatura)】\nApenas o cadastro de novos pacotes fica bloqueado. Ao tocar no botão「Cadastrar」, será exibida uma indicação para assinar o Premium. A visualização, edição e exibição no mapa dos pacotes já cadastrados, além da atualização do status de entrega, continuam disponíveis gratuitamente.\n\n【Plano pago (Premium ¥980/mês)】\nTodos os recursos, incluindo o cadastro de pacotes, ficam disponíveis a qualquer momento, sem limite de período.\n\n※ Na tela de cadastro de pacote, é possível adicionar no máximo 5 endereços de uma só vez, mas esse é um limite de entrada comum a todos os usuários, independentemente do plano — não é uma diferença entre gratuito e pago.</string>
+    <string name="faq_q_03">Como atualizo o status de entrega de um pacote?</string>
+    <string name="faq_a_03">Toque em um alfinete no mapa da tela inicial, ou em um cartão na lista de entregas, para abrir a tela de edição do pacote.\n\nVocê pode editar e salvar de uma vez o nome do destinatário, o horário desejado, as informações do recibo, o formato da embalagem, se há armário de entregas, a placa de nome, a observação e o status de entrega (「Entregue」「Ausente」「Reentrega」「Devolver à empresa」, entre outros).</string>
+    <string name="faq_q_04">O alfinete no mapa não aparece no local correto</string>
+    <string name="faq_a_04">Isso depende da precisão do geocoding (conversão de endereço em latitude/longitude).\n\nNa pré-visualização do mapa exibida ao adicionar um endereço na tela de cadastro de pacote (diferente do mapa de entregas real), você pode corrigir manualmente a posição mantendo o alfinete pressionado e arrastando-o. Ao tocar em「Registrar no mapa」com a posição corrigida, ela será refletida nessa posição no mapa de entregas real.</string>
+    <string name="faq_q_05">Como uso as rotas fixas (coleta)?</string>
+    <string name="faq_a_05">No menu lateral → 「Coleta / Rotas fixas」, quatro rotas (A a D) já estão disponíveis desde o início.\n\nNo formulário「Adicionar endereço à rota」(compatível com busca por CEP, entrada por voz e OCR pela câmera), cadastre os endereços de cada rota. Ao tocar no botão「Carregar rota」, todos os pacotes dessa rota são refletidos de uma só vez no mapa de entregas.\n\nSe quiser remover do mapa apenas os pacotes de uma rota carregada, use o botão「Remover do mapa」ao lado, que exclui em lote apenas os itens dessa rota.</string>
     <string name="faq_q_06">O OCR da etiqueta ficou incorreto</string>
     <string name="faq_a_06">Tente o seguinte:\n\n· Fotografar em local bem iluminado\n· Garantir que toda a etiqueta esteja dentro do enquadramento\n· Segurar o celular com as duas mãos para evitar tremores\n· Verificar se há sujeira, dobras ou reflexos\n\nCada campo pode ser corrigido manualmente após o OCR. A precisão depende da iluminação e da qualidade da impressão.</string>
     <string name="faq_q_07">A entrada por voz não está sendo reconhecida</string>

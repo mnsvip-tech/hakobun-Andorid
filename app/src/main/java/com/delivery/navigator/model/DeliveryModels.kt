@@ -79,7 +79,6 @@ data class UserProfile(
     val contact: String = "",
     val email: String = "",
     val plan: MembershipPlan = MembershipPlan.Free,
-    val trialStartMillis: Long = 0L,
     val isRegistered: Boolean = false
 )
 
@@ -119,7 +118,8 @@ data class AddressCandidate(
     val sourceLabel: String,
     val postalCode: String,
     val address: String,
-    val confidenceLabel: String
+    val confidenceLabel: String,
+    val recipientName: String = ""
 )
 
 @Immutable
