@@ -195,6 +195,7 @@ fun HakobunApp() {
             .enablePendingPurchases(
                 PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
             )
+            .enableAutoServiceReconnection()
             .build()
     }
     suspend fun reconcileSubscriptionStatus() {
