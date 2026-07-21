@@ -103,6 +103,14 @@ fun UserProfile.isFreeTrialExpired(nowMillis: Long = System.currentTimeMillis())
     return nowMillis >= trialEndMillis
 }
 
+@Immutable
+data class Announcement(
+    val id: String,
+    val title: String,
+    val body: String,
+    val publishedAt: String
+)
+
 enum class AccountMenuItem(val title: String, val description: String) {
     Feedback("ユーザーからのフィードバック", "改善要望や不具合報告を運営へ送信"),
     Announcements("運営側からのお知らせ", "重要なお知らせ・メンテナンス情報"),

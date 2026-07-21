@@ -3,6 +3,7 @@ package com.delivery.navigator.data
 import android.content.Intent
 import android.provider.CalendarContract
 import com.delivery.navigator.model.AddressCandidate
+import com.delivery.navigator.model.Announcement
 import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
@@ -255,6 +256,35 @@ suspend fun createDeliveryPackageFromRegistration(
         phoneNumber = result.phoneNumber,
         shape = result.shape
     )
+}
+
+private const val ANNOUNCEMENTS_URL =
+    "https://raw.githubusercontent.com/mnsvip-tech/hakobun-Andorid/main/docs/announcements.json"
+
+suspend fun fetchAnnouncements(): List<Announcement> {
+    return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val url = java.net.URL(ANNOUNCEMENTS_URL)
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 8000
+            connection.readTimeout = 8000
+            val json = try {
+                connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+            } finally {
+                connection.disconnect()
+            }
+            val array = org.json.JSONArray(json)
+            (0 until array.length()).map { i ->
+                val obj = array.getJSONObject(i)
+                Announcement(
+                    id = obj.optString("id"),
+                    title = obj.optString("title"),
+                    body = obj.optString("body"),
+                    publishedAt = obj.optString("publishedAt")
+                )
+            }
+        }.getOrElse { emptyList() }
+    }
 }
 
 suspend fun geocodeAddressPublic(address: String): Pair<Double, Double> = geocodeAddress(address)

@@ -68,6 +68,7 @@ import com.delivery.navigator.data.currentRouteOrigin
 import com.delivery.navigator.data.defaultRegularCourses
 import com.delivery.navigator.data.geocodeAddressPublic
 import com.delivery.navigator.data.exportPackages
+import com.delivery.navigator.data.fetchAnnouncements
 import com.delivery.navigator.data.fetchDrivingRoutePointsCached
 import com.delivery.navigator.data.generateDebugTestPackages
 import com.delivery.navigator.data.hidesMapPin
@@ -2234,6 +2235,18 @@ private fun AccountMenuDetailScreen(
 ) {
     var feedbackText by remember { mutableStateOf("") }
     var feedbackSubmitted by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val deliveryStore = remember { LocalDeliveryStore(context) }
+    var announcements by remember { mutableStateOf(deliveryStore.loadAnnouncements()) }
+    LaunchedEffect(item) {
+        if (item == AccountMenuItem.Announcements) {
+            val fetched = fetchAnnouncements()
+            if (fetched.isNotEmpty()) {
+                announcements = fetched
+                deliveryStore.saveAnnouncements(fetched)
+            }
+        }
+    }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
         Column(
@@ -2279,8 +2292,14 @@ private fun AccountMenuDetailScreen(
                         }
                     }
                     AccountMenuItem.Announcements -> {
-                        InfoRow(stringResource(R.string.announcement_important), stringResource(R.string.announcement_important_text))
-                        InfoRow(stringResource(R.string.announcement_update), stringResource(R.string.announcement_update_text))
+                        if (announcements.isEmpty()) {
+                            InfoRow(stringResource(R.string.announcement_important), stringResource(R.string.announcement_important_text))
+                            InfoRow(stringResource(R.string.announcement_update), stringResource(R.string.announcement_update_text))
+                        } else {
+                            announcements.forEach { announcement ->
+                                InfoRow(announcement.title, announcement.body)
+                            }
+                        }
                         InfoRow(stringResource(R.string.announcement_guide), stringResource(R.string.announcement_guide_text))
                     }
                     AccountMenuItem.Account -> { /* UserAccountScreen で処理 */ }

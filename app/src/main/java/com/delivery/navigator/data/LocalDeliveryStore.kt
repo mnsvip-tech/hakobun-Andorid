@@ -3,6 +3,7 @@ package com.delivery.navigator.data
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.delivery.navigator.model.Announcement
 import com.delivery.navigator.model.CourseAddress
 import com.delivery.navigator.model.DeliveryPackage
 import com.delivery.navigator.model.DeliveryStatus
@@ -98,6 +99,42 @@ class LocalDeliveryStore(context: Context) {
             .put("isRegistered", profile.isRegistered)
             .put("registeredAt", profile.registeredAt)
         preferences.edit().putString(KEY_USER_PROFILE, obj.toString()).apply()
+    }
+
+    fun loadAnnouncements(): List<Announcement> {
+        val source = preferences.getString(KEY_ANNOUNCEMENTS, null).orEmpty()
+        if (source.isBlank()) return emptyList()
+        return runCatching {
+            val array = JSONArray(source)
+            buildList {
+                for (index in 0 until array.length()) {
+                    add(array.getJSONObject(index).toAnnouncement())
+                }
+            }
+        }.getOrDefault(emptyList())
+    }
+
+    fun saveAnnouncements(announcements: List<Announcement>) {
+        val array = JSONArray()
+        announcements.forEach { item -> array.put(item.toJson()) }
+        preferences.edit().putString(KEY_ANNOUNCEMENTS, array.toString()).apply()
+    }
+
+    private fun JSONObject.toAnnouncement(): Announcement {
+        return Announcement(
+            id = optString("id"),
+            title = optString("title"),
+            body = optString("body"),
+            publishedAt = optString("publishedAt")
+        )
+    }
+
+    private fun Announcement.toJson(): JSONObject {
+        return JSONObject()
+            .put("id", id)
+            .put("title", title)
+            .put("body", body)
+            .put("publishedAt", publishedAt)
     }
 
     fun clear() {
@@ -213,5 +250,6 @@ class LocalDeliveryStore(context: Context) {
         const val KEY_PACKAGES = "packages"
         const val KEY_REGULAR_COURSES = "regular_courses"
         const val KEY_USER_PROFILE = "user_profile"
+        const val KEY_ANNOUNCEMENTS = "announcements"
     }
 }
