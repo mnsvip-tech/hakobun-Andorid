@@ -27,6 +27,55 @@ private const val CURRENT_LONGITUDE = 139.767125
 
 fun currentRouteOrigin(): Pair<Double, Double> = CURRENT_LATITUDE to CURRENT_LONGITUDE
 
+/**
+ * 実機テスト用: 東京駅を中心に半径約15km圏内へランダムに散らしたダミー荷物をcount件生成する。
+ * 座標・時間指定・配達ステータスをランダム化し、ピン表示・ルート計算・ステータス更新の実機検証に使う。
+ */
+fun generateDebugTestPackages(count: Int, seed: Long = System.currentTimeMillis()): List<DeliveryPackage> {
+    val random = kotlin.random.Random(seed)
+    val wards = listOf(
+        "千代田区丸の内", "中央区銀座", "港区六本木", "新宿区西新宿", "渋谷区渋谷",
+        "品川区大崎", "目黒区中目黒", "大田区蒲田", "世田谷区三軒茶屋", "杉並区荻窪",
+        "豊島区池袋", "北区赤羽", "板橋区大山", "練馬区石神井", "台東区浅草",
+        "墨田区錦糸町", "江東区豊洲", "荒川区南千住", "足立区北千住", "葛飾区亀有",
+        "江戸川区船堀", "文京区本郷", "中野区中野", "武蔵野市吉祥寺"
+    )
+    val surnames = listOf("山田", "佐藤", "鈴木", "田中", "高橋", "伊藤", "渡辺", "中村", "小林", "加藤")
+    val givenNames = listOf("太郎", "花子", "一郎", "美咲", "健太", "由美", "翔太", "さくら", "大輔", "愛子")
+
+    return (1..count).map { index ->
+        val ward = wards.random(random)
+        val recipient = "${surnames.random(random)} ${givenNames.random(random)}"
+        // 東京駅中心の半径約15km圏内に均等分布させる(緯度1度≒111km, 経度1度≒91km@東京緯度)
+        val radiusKm = sqrt(random.nextDouble()) * 15.0
+        val angle = random.nextDouble() * 2 * Math.PI
+        val lat = CURRENT_LATITUDE + (radiusKm * kotlin.math.cos(angle)) / 111.0
+        val lng = CURRENT_LONGITUDE + (radiusKm * kotlin.math.sin(angle)) / 91.0
+        val timeWindow = RegistrationTimeWindow.entries.random(random)
+        val status = DeliveryStatus.entries.random(random)
+        DeliveryPackage(
+            trackingCode = "TEST-${1000 + index}",
+            recipient = recipient,
+            address = "東京都$ward${random.nextInt(1, 9)}-${random.nextInt(1, 30)}-${random.nextInt(1, 20)}",
+            timeWindow = timeWindow.toTimeWindow(),
+            deliveryTimeWindow = timeWindow,
+            size = "80",
+            colorLabel = "テスト",
+            packageType = "テストデータ",
+            cod = random.nextBoolean(),
+            hasLocker = random.nextBoolean(),
+            memo = "実機テスト用ダミーデータ #$index",
+            latitude = lat,
+            longitude = lng,
+            status = status,
+            nameplate = recipient,
+            packageMemo = "",
+            phoneNumber = "090-0000-${(1000 + index).toString().padStart(4, '0')}",
+            shape = com.delivery.navigator.model.PackageShape.entries.random(random)
+        )
+    }
+}
+
 fun samplePackages(): List<DeliveryPackage> = listOf(
     DeliveryPackage(
         trackingCode = "DA-1028",

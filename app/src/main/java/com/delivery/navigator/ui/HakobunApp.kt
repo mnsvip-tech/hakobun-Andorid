@@ -69,6 +69,7 @@ import com.delivery.navigator.data.defaultRegularCourses
 import com.delivery.navigator.data.geocodeAddressPublic
 import com.delivery.navigator.data.exportPackages
 import com.delivery.navigator.data.fetchDrivingRoutePoints
+import com.delivery.navigator.data.generateDebugTestPackages
 import com.delivery.navigator.data.hidesMapPin
 import com.delivery.navigator.data.importPackages
 import com.delivery.navigator.data.LocalDeliveryStore
@@ -481,6 +482,12 @@ fun HakobunApp() {
                     onSaveProfile = { updated ->
                         userProfile = updated
                         deliveryStore.saveUserProfile(updated)
+                    },
+                    onSeedTestData = {
+                        packages.clear()
+                        packages.addAll(generateDebugTestPackages(200))
+                        persistPackages()
+                        activeMenuItem = null
                     }
                 )
             } else {
@@ -1525,7 +1532,8 @@ private fun UserAccountScreen(
     billingClient: BillingClient,
     onBack: () -> Unit,
     onLoginToggle: () -> Unit,
-    onSaveProfile: (UserProfile) -> Unit
+    onSaveProfile: (UserProfile) -> Unit,
+    onSeedTestData: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as? android.app.Activity
@@ -1729,6 +1737,10 @@ private fun UserAccountScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(stringResource(R.string.debug_reset_trial_button)) }
                     }
+                    OutlinedButton(
+                        onClick = onSeedTestData,
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("実機テスト用ダミーデータ200件を投入") }
                 }
             }
         }

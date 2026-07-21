@@ -70,6 +70,16 @@ kotlin {
     }
 }
 
+tasks.register<JavaExec>("runRouteDiagnostics") {
+    dependsOn("compileStandardDebugUnitTestKotlin")
+    group = "verification"
+    mainClass.set("com.delivery.navigator.data.RouteCalculationTestKt")
+    classpath = files(
+        "build/tmp/kotlin-classes/standardDebugUnitTest",
+        "build/tmp/kotlin-classes/standardDebug"
+    ) + configurations.getByName("standardDebugUnitTestRuntimeClasspath")
+}
+
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.06.01"))
     implementation("androidx.activity:activity-compose:1.10.1")
@@ -87,4 +97,5 @@ dependencies {
     implementation("com.google.maps.android:maps-compose:6.12.0")
     implementation("com.android.billingclient:billing-ktx:7.1.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    testImplementation("junit:junit:4.13.2")
 }
