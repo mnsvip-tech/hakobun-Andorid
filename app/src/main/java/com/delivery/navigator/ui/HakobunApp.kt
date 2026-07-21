@@ -68,7 +68,7 @@ import com.delivery.navigator.data.currentRouteOrigin
 import com.delivery.navigator.data.defaultRegularCourses
 import com.delivery.navigator.data.geocodeAddressPublic
 import com.delivery.navigator.data.exportPackages
-import com.delivery.navigator.data.fetchDrivingRoutePoints
+import com.delivery.navigator.data.fetchDrivingRoutePointsCached
 import com.delivery.navigator.data.generateDebugTestPackages
 import com.delivery.navigator.data.hidesMapPin
 import com.delivery.navigator.data.importPackages
@@ -1157,7 +1157,7 @@ private fun FullScreenDeliveryMap(
     LaunchedEffect(activeRouteDestination?.trackingCode) {
         drivingRoutePoints = activeRouteDestination
             ?.let {
-                fetchDrivingRoutePoints(
+                fetchDrivingRoutePointsCached(
                     origin = origin.latitude to origin.longitude,
                     destination = it.latitude to it.longitude
                 ).map { point -> LatLng(point.first, point.second) }

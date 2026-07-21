@@ -517,6 +517,32 @@ suspend fun fetchDrivingRoutePoints(
     }
 }
 
+private val drivingRouteCache = java.util.concurrent.ConcurrentHashMap<String, List<Pair<Double, Double>>>()
+
+private fun drivingRouteCacheKey(origin: Pair<Double, Double>, destination: Pair<Double, Double>): String {
+    fun round5(value: Double): Double = Math.round(value * 100_000.0) / 100_000.0
+    return "${round5(origin.first)},${round5(origin.second)}->${round5(destination.first)},${round5(destination.second)}"
+}
+
+/**
+ * fetchDrivingRoutePoints の結果をアプリ起動中のみメモリにキャッシュする。
+ * 同じ出発地→目的地(座標を小数5桁で丸めて判定)の描画では Directions API を再呼び出しせず、
+ * キャッシュ済みのポリラインを返すことで課金対象の呼び出し回数を抑える。
+ * 空(取得失敗)の結果はキャッシュしないため、次回に再試行できる。
+ */
+suspend fun fetchDrivingRoutePointsCached(
+    origin: Pair<Double, Double>,
+    destination: Pair<Double, Double>
+): List<Pair<Double, Double>> {
+    val key = drivingRouteCacheKey(origin, destination)
+    drivingRouteCache[key]?.let { return it }
+    val points = fetchDrivingRoutePoints(origin, destination)
+    if (points.isNotEmpty()) {
+        drivingRouteCache[key] = points
+    }
+    return points
+}
+
 private fun decodePolyline(encoded: String): List<Pair<Double, Double>> {
     val points = mutableListOf<Pair<Double, Double>>()
     var index = 0
