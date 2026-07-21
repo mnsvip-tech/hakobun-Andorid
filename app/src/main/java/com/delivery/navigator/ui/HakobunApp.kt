@@ -488,6 +488,13 @@ fun HakobunApp() {
                         packages.addAll(generateDebugTestPackages(200))
                         persistPackages()
                         activeMenuItem = null
+                    },
+                    onClearTestData = {
+                        packages.clear()
+                        fixedRouteNumbers.clear()
+                        selectedPackageCode = ""
+                        persistPackages()
+                        activeMenuItem = null
                     }
                 )
             } else {
@@ -1533,7 +1540,8 @@ private fun UserAccountScreen(
     onBack: () -> Unit,
     onLoginToggle: () -> Unit,
     onSaveProfile: (UserProfile) -> Unit,
-    onSeedTestData: () -> Unit = {}
+    onSeedTestData: () -> Unit = {},
+    onClearTestData: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as? android.app.Activity
@@ -1741,6 +1749,11 @@ private fun UserAccountScreen(
                         onClick = onSeedTestData,
                         modifier = Modifier.fillMaxWidth()
                     ) { Text("実機テスト用ダミーデータ200件を投入") }
+                    OutlinedButton(
+                        onClick = onClearTestData,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFE53935))
+                    ) { Text("テストデータを全件クリア") }
                 }
             }
         }
