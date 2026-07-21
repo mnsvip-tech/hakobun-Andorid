@@ -122,6 +122,7 @@ import com.android.billingclient.api.queryPurchasesAsync
 import com.delivery.navigator.model.MembershipPlan
 import com.delivery.navigator.model.UserProfile
 import com.delivery.navigator.model.isFreeTrialExpired
+import com.delivery.navigator.model.FREE_TRIAL_DAYS
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.TextRecognition
@@ -179,7 +180,9 @@ fun HakobunApp() {
         BillingClient.newBuilder(context)
             .setListener { result, purchases ->
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    val hasActivePurchase = purchases?.any { it.purchaseState == Purchase.PurchaseState.PURCHASED } == true
+                    val hasActivePurchase = purchases?.any {
+                        it.purchaseState == Purchase.PurchaseState.PURCHASED && it.products.contains(SUBSCRIPTION_PRODUCT_ID)
+                    } == true
                     if (hasActivePurchase) {
                         val updated = userProfile.copy(plan = MembershipPlan.Premium)
                         userProfile = updated
@@ -1536,7 +1539,11 @@ private fun UserAccountScreen(
     var subscribeMessage by remember { mutableStateOf("") }
 
     val isPremium = userProfile.plan == MembershipPlan.Premium
-    val isFreeExpired = !isPremium && userProfile.isRegistered
+    val isFreeExpired = !isPremium && userProfile.isFreeTrialExpired()
+    val trialRemainingDays = if (!isPremium && !isFreeExpired && userProfile.registeredAt > 0L) {
+        val trialEndMillis = userProfile.registeredAt + FREE_TRIAL_DAYS * 24L * 60L * 60L * 1000L
+        kotlin.math.ceil((trialEndMillis - System.currentTimeMillis()) / (24.0 * 60 * 60 * 1000)).toInt().coerceAtLeast(0)
+    } else 0
 
     fun launchSubscription() {
         if (activity == null) { subscribeMessage = "Google Play Billingを起動できません"; return }
@@ -1651,8 +1658,12 @@ private fun UserAccountScreen(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                stringResource(R.string.free_trial_expired),
-                                color = if (isFreeExpired) Color(0xFFE53935) else MutedText,
+                                if (isFreeExpired) {
+                                    stringResource(R.string.free_trial_expired)
+                                } else {
+                                    stringResource(R.string.free_trial_active_title, trialRemainingDays)
+                                },
+                                color = if (isFreeExpired) Color(0xFFE53935) else BrandBlue,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)

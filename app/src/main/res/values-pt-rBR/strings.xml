@@ -211,6 +211,7 @@
     <string name="premium_plan">✓ Plano Premium</string>
     <string name="premium_features">Todos os recursos estão disponíveis.</string>
     <string name="free_trial_expired">Não Assinado ao Premium</string>
+    <string name="free_trial_active_title">Teste gratuito (restam %1$d dias)</string>
     <string name="trial_after_register">Todos os recursos do plano Premium são gratuitos por 14 dias a partir da data de cadastro da conta. Nenhuma cobrança ocorre automaticamente durante esse período gratuito. Se quiser continuar com o Premium depois que esse período terminar, você precisará assinar por conta própria pelo Google Play.</string>
     <string name="free_plan_name">Gratuito</string>
     <string name="free_trial_period">Teste de 2 semanas</string>

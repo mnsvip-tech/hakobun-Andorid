@@ -211,6 +211,7 @@
     <string name="premium_plan">✓ 高级套餐</string>
     <string name="premium_features">所有功能均可使用。</string>
     <string name="free_trial_expired">未订阅高级版</string>
+    <string name="free_trial_active_title">免费试用中（剩余%1$d天）</string>
     <string name="trial_after_register">自账户注册之日起14天内，可免费使用高级套餐的全部功能。免费期间不会自动产生任何费用。免费期结束后如需继续使用高级套餐，需通过 Google Play 自行订阅。</string>
     <string name="free_plan_name">免费</string>
     <string name="free_trial_period">2周试用</string>

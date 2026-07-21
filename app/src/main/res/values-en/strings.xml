@@ -211,6 +211,7 @@
     <string name="premium_plan">✓ Premium Plan</string>
     <string name="premium_features">All features are available.</string>
     <string name="free_trial_expired">Not Subscribed to Premium</string>
+    <string name="free_trial_active_title">Free trial (%1$d days left)</string>
     <string name="trial_after_register">All Premium features are free for 14 days from your account registration date. No charge occurs automatically during this free period. If you\'d like to continue with Premium after it ends, you\'ll need to subscribe yourself through Google Play.</string>
     <string name="free_plan_name">Free</string>
     <string name="free_trial_period">2-Week Trial</string>

@@ -214,6 +214,7 @@
     <string name="premium_plan">✓ プレミアムプラン</string>
     <string name="premium_features">すべての機能が利用できます。</string>
     <string name="free_trial_expired">プレミアム未登録</string>
+    <string name="free_trial_active_title">無料トライアル中（残り%1$d日）</string>
     <string name="trial_after_register">アカウント登録日から14日間、プレミアムプランの全機能を無料でお試しいただけます。無料期間中に自動的な課金は発生しません。無料期間終了後もプレミアムをご希望の場合は、Google Playを通じてお客様ご自身でお申し込みください。</string>
     <string name="free_plan_name">無料</string>
     <string name="free_trial_period">2週間トライアル</string>

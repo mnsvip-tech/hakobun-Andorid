@@ -392,9 +392,11 @@ fun calculateNearestRoute(
     // 出発時刻からの絶対経過分で扱うため、時刻情報は「出発日0時からの分」に正規化する(日またぎでも%24による丸めのずれが起きない)。
     val startMinuteOfDay = startTime.get(Calendar.HOUR_OF_DAY) * 60.0 + startTime.get(Calendar.MINUTE)
 
-    // 到着予定の絶対分(startMinuteOfDay起点、1440を超えたら翌日)から、その到着が属する日の時間指定枠を絶対分で返す。
-    fun windowAbsoluteMinutes(arrivalAbsoluteMinute: Double, startWindowHour: Int, endWindowHour: Int): Pair<Double, Double> {
-        val dayIndex = kotlin.math.floor(arrivalAbsoluteMinute / 1440.0)
+    // 時間指定枠が出発時点で既に終了している場合は「翌日の枠」を指すものとして扱う(23時出発+翌朝指定などの日またぎに対応)。
+    // ルート出発時刻(startMinuteOfDay)基準で一度だけ決まる値なので、経過時間や到着予定に応じて枠の日付がずれることはない。
+    fun windowAbsoluteMinutes(startWindowHour: Int, endWindowHour: Int): Pair<Double, Double> {
+        val windowEndToday = endWindowHour * 60.0
+        val dayIndex = if (startMinuteOfDay > windowEndToday) 1.0 else 0.0
         return (dayIndex * 1440.0 + startWindowHour * 60.0) to (dayIndex * 1440.0 + endWindowHour * 60.0)
     }
 
@@ -405,7 +407,7 @@ fun calculateNearestRoute(
             val travelMinutes = estimatedTravelMinutes(distanceMeters, currentHour)
             val arrivalAbsoluteMinute = startMinuteOfDay + elapsedMinutes + travelMinutes
             val latenessPenalty = item.deliveryTimeWindow.hourRange()?.let { (startWindowHour, endWindowHour) ->
-                val (_, windowEndAbs) = windowAbsoluteMinutes(arrivalAbsoluteMinute, startWindowHour, endWindowHour)
+                val (_, windowEndAbs) = windowAbsoluteMinutes(startWindowHour, endWindowHour)
                 val overMinutes = arrivalAbsoluteMinute - windowEndAbs
                 if (overMinutes > 0) overMinutes * LATENESS_PENALTY_PER_MINUTE else 0.0
             } ?: 0.0
@@ -418,7 +420,7 @@ fun calculateNearestRoute(
         elapsedMinutes += travelMinutes
         next.deliveryTimeWindow.hourRange()?.let { (startWindowHour, endWindowHour) ->
             val arrivalAbsoluteMinute = startMinuteOfDay + elapsedMinutes
-            val (windowStartAbs, _) = windowAbsoluteMinutes(arrivalAbsoluteMinute, startWindowHour, endWindowHour)
+            val (windowStartAbs, _) = windowAbsoluteMinutes(startWindowHour, endWindowHour)
             if (arrivalAbsoluteMinute < windowStartAbs) {
                 elapsedMinutes = windowStartAbs - startMinuteOfDay
             }
@@ -523,8 +525,7 @@ fun createEndOfDayCalendarIntent(summary: EndOfDaySummary): Intent {
     """.trimIndent()
 
     return Intent(Intent.ACTION_INSERT).apply {
-        data = CalendarContract.Events.CONTENT_URI
-        type = "vnd.android.cursor.item/event"
+        setDataAndType(CalendarContract.Events.CONTENT_URI, "vnd.android.cursor.item/event")
         putExtra(CalendarContract.Events.TITLE, "HAKOBUN 本日の配送実績")
         putExtra(CalendarContract.Events.DESCRIPTION, description)
         putExtra(Intent.EXTRA_TEXT, description)
