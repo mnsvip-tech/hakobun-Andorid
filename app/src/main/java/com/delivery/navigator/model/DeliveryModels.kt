@@ -89,8 +89,19 @@ data class UserProfile(
     val contact: String = "",
     val email: String = "",
     val plan: MembershipPlan = MembershipPlan.Free,
-    val isRegistered: Boolean = false
+    val isRegistered: Boolean = false,
+    /** 初回登録日時(epoch millis)。無料トライアル(登録から14日間)の起算点。未登録時は0。 */
+    val registeredAt: Long = 0L
 )
+
+const val FREE_TRIAL_DAYS = 14
+
+fun UserProfile.isFreeTrialExpired(nowMillis: Long = System.currentTimeMillis()): Boolean {
+    if (!isRegistered) return false
+    if (registeredAt <= 0L) return true
+    val trialEndMillis = registeredAt + FREE_TRIAL_DAYS * 24L * 60L * 60L * 1000L
+    return nowMillis >= trialEndMillis
+}
 
 enum class AccountMenuItem(val title: String, val description: String) {
     Feedback("ユーザーからのフィードバック", "改善要望や不具合報告を運営へ送信"),

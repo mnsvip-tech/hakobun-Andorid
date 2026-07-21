@@ -211,7 +211,7 @@
     <string name="premium_plan">✓ Gói Premium</string>
     <string name="premium_features">Tất cả tính năng đều có thể sử dụng.</string>
     <string name="free_trial_expired">Chưa đăng ký Premium</string>
-    <string name="trial_after_register">Gói Premium có 2 tuần dùng thử miễn phí, được Google Play tự động quản lý. Sau khi hết hạn dùng thử, việc tính phí sẽ tự động bắt đầu.</string>
+    <string name="trial_after_register">Toàn bộ tính năng của gói Premium được miễn phí trong 14 ngày kể từ ngày đăng ký tài khoản. Không có khoản phí nào được tính tự động trong thời gian miễn phí này. Nếu muốn tiếp tục dùng Premium sau khi hết thời gian này, bạn cần tự đăng ký qua Google Play.</string>
     <string name="free_plan_name">Miễn phí</string>
     <string name="free_trial_period">Dùng thử 2 tuần</string>
     <string name="free_features">・Tất cả tính năng đều miễn phí trong 14 ngày\n・Sau khi hết hạn, chỉ khóa đăng ký hàng mới\n・Sao lưu</string>
@@ -329,7 +329,7 @@
     <string name="faq_q_09">Làm thế nào để tắt thông báo?</string>
     <string name="faq_a_09">Trong ứng dụng: menu bên → Thông báo → Cài đặt → tắt nút gạt Thông báo.\n\nBạn cũng có thể tắt qua Android Cài đặt → Ứng dụng → HAKOBUN → Thông báo.</string>
     <string name="faq_q_10">Bao giờ thì hết thời gian dùng thử miễn phí?</string>
-    <string name="faq_a_10">Thời gian dùng thử miễn phí là 14 ngày kể từ ngày đăng ký.\n\nBạn có thể kiểm tra số ngày còn lại trên màn hình Tài khoản người dùng (menu bên → Thông tin tài khoản người dùng).\n\nHủy trước 24 giờ khi hết thời gian dùng thử để không bị tính phí.</string>
+    <string name="faq_a_10">Thời gian miễn phí là 14 ngày kể từ ngày đăng ký.\n\nBạn có thể kiểm tra số ngày còn lại trên màn hình Tài khoản người dùng (menu bên → Thông tin tài khoản người dùng).\n\nKhông có khoản phí nào được tính trong thời gian miễn phí này. Nếu hết thời gian mà bạn chưa đăng ký Premium, chỉ tính năng đăng ký hàng hóa mới bị khóa (bạn vẫn có thể xem và chỉnh sửa dữ liệu hiện có miễn phí). Việc đăng ký Premium cần bạn tự thực hiện qua Google Play — sẽ không có khoản phí nào được tính tự động.</string>
     <string name="faq_q_11">Làm thế nào để hủy đăng ký?</string>
     <string name="faq_a_11">Vào Google Play Store → Biểu tượng tài khoản → 「Đăng ký」→ HAKOBUN → 「Hủy đăng ký」.\n\nSau khi hủy, bạn vẫn có thể sử dụng đến cuối tháng hiện tại. Tính năng hủy trong ứng dụng đang được phát triển.</string>
     <string name="faq_q_12">Thanh toán thất bại</string>
@@ -354,7 +354,7 @@
     <string name="terms_s02_title">Điều 2　Điều kiện sử dụng</string>
     <string name="terms_s02_body">Ứng dụng dành cho người từ 18 tuổi trở lên đang làm việc trong lĩnh vực giao hàng hoặc quản lý nghiệp vụ.\n\nCó thể cần tài khoản Google để sử dụng ứng dụng. Cấm đăng ký bằng thông tin giả mạo.</string>
     <string name="terms_s03_title">Điều 3　Đăng ký gói &amp; Thanh toán</string>
-    <string name="terms_s03_body">[Dùng thử miễn phí]\nCung cấp 2 tuần dùng thử miễn phí khi đăng ký lần đầu. Có thể sử dụng toàn bộ tính năng trong thời gian dùng thử. Nếu không hủy trước 24 giờ khi hết thời gian dùng thử, sẽ tự động chuyển sang gói có phí.\n\n[Gói có phí (Premium)]\nGiá: ¥980 / tháng (đã bao gồm thuế)\nThanh toán: Tự động gia hạn hàng tháng qua Google Play\nHủy: Có thể hủy bất kỳ lúc nào từ màn hình「Đăng ký」trên Google Play Store. Sau khi hủy vẫn sử dụng được đến cuối tháng.\n\n[Chính sách hoàn tiền]\nTheo chính sách hoàn tiền của Google Play. Hủy trong vòng 48 giờ sau khi mua vui lòng đăng ký qua Google Play.\n\n[Thay đổi giá]\nSẽ thông báo trước 30 ngày qua thông báo trong ứng dụng hoặc email khi có thay đổi giá.</string>
+    <string name="terms_s03_body">[Thời gian miễn phí]\nToàn bộ tính năng của gói Premium được miễn phí trong 14 ngày kể từ ngày đăng ký tài khoản lần đầu. Không có khoản phí nào được tính tự động trong thời gian miễn phí này. Nếu muốn tiếp tục dùng Premium sau khi hết thời gian này, bạn cần tự đăng ký qua Google Play (không có việc tự động chuyển từ thời gian miễn phí sang gói có phí).\n\n[Gói có phí (Premium)]\nGiá: ¥980 / tháng (đã bao gồm thuế)\nThanh toán: Tự động gia hạn hàng tháng qua Google Play\nHủy: Có thể hủy bất kỳ lúc nào từ màn hình「Đăng ký」trên Google Play Store. Sau khi hủy vẫn sử dụng được đến cuối tháng.\n\n[Chính sách hoàn tiền]\nTheo chính sách hoàn tiền của Google Play. Hủy trong vòng 48 giờ sau khi mua vui lòng đăng ký qua Google Play.\n\n[Thay đổi giá]\nSẽ thông báo trước 30 ngày qua thông báo trong ứng dụng hoặc email khi có thay đổi giá.</string>
     <string name="terms_s04_title">Điều 4　Thông tin thu thập và mục đích sử dụng</string>
     <string name="terms_s04_body">■ Vị trí (GPS)\nMục đích: Dẫn đường đến địa điểm giao hàng, hiển thị vị trí hiện tại, tối ưu hóa tuyến đường\nThời điểm thu thập: Chỉ khi đang sử dụng ứng dụng (không thu thập nền)\n\n■ Camera/Hình ảnh\nMục đích: Nhập địa chỉ tự động bằng OCR vận đơn\nLưu trữ: Chỉ trên thiết bị (không tải lên đám mây)\n\n■ Giọng nói (Microphone)\nMục đích: Chuyển đổi địa chỉ và ghi chú qua nhập liệu bằng giọng nói\nLưu trữ: Chỉ trên thiết bị\n\n■ Thông tin nhập (Họ tên, địa chỉ, điện thoại, email)\nMục đích: Quản lý nghiệp vụ giao hàng và thiết lập hồ sơ tài xế\nLưu trữ: Bộ nhớ mã hóa trên thiết bị (AES-256-GCM)\nGửi ra ngoài: Không</string>
     <string name="terms_s05_title">Điều 5　Sử dụng dịch vụ bên thứ ba</string>

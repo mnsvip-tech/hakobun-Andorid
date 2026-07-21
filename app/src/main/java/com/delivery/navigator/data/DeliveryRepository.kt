@@ -269,7 +269,10 @@ suspend fun searchPostalCode(postalCode: String): AddressCandidate {
     return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         runCatching {
             val url = java.net.URL("https://zipcloud.ibsnet.co.jp/api/search?zipcode=$postalCode")
-            val json = url.readText(Charsets.UTF_8)
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 8000
+            connection.readTimeout = 8000
+            val json = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
             val root = org.json.JSONObject(json)
             val results = root.optJSONArray("results")
             if (results != null && results.length() > 0) {
@@ -386,17 +389,25 @@ fun calculateNearestRoute(
     var currentLatitude = originLat
     var currentLongitude = originLng
     var elapsedMinutes = 0.0
-    val startHour = startTime.get(Calendar.HOUR_OF_DAY)
+    // 出発時刻からの絶対経過分で扱うため、時刻情報は「出発日0時からの分」に正規化する(日またぎでも%24による丸めのずれが起きない)。
+    val startMinuteOfDay = startTime.get(Calendar.HOUR_OF_DAY) * 60.0 + startTime.get(Calendar.MINUTE)
+
+    // 到着予定の絶対分(startMinuteOfDay起点、1440を超えたら翌日)から、その到着が属する日の時間指定枠を絶対分で返す。
+    fun windowAbsoluteMinutes(arrivalAbsoluteMinute: Double, startWindowHour: Int, endWindowHour: Int): Pair<Double, Double> {
+        val dayIndex = kotlin.math.floor(arrivalAbsoluteMinute / 1440.0)
+        return (dayIndex * 1440.0 + startWindowHour * 60.0) to (dayIndex * 1440.0 + endWindowHour * 60.0)
+    }
 
     while (remaining.isNotEmpty()) {
-        val currentHour = (startHour + (elapsedMinutes / 60.0).toInt()) % 24
+        val currentHour = (((startMinuteOfDay + elapsedMinutes) / 60.0).toInt()) % 24
         val next = remaining.minBy { item ->
             val distanceMeters = haversineMeters(currentLatitude, currentLongitude, item.latitude, item.longitude)
             val travelMinutes = estimatedTravelMinutes(distanceMeters, currentHour)
-            val arrivalHour = (startHour + ((elapsedMinutes + travelMinutes) / 60.0).toInt()) % 24
-            val latenessPenalty = item.deliveryTimeWindow.hourRange()?.let { (_, endHour) ->
-                val overHours = arrivalHour - endHour
-                if (overHours > 0) overHours * 60.0 * LATENESS_PENALTY_PER_MINUTE else 0.0
+            val arrivalAbsoluteMinute = startMinuteOfDay + elapsedMinutes + travelMinutes
+            val latenessPenalty = item.deliveryTimeWindow.hourRange()?.let { (startWindowHour, endWindowHour) ->
+                val (_, windowEndAbs) = windowAbsoluteMinutes(arrivalAbsoluteMinute, startWindowHour, endWindowHour)
+                val overMinutes = arrivalAbsoluteMinute - windowEndAbs
+                if (overMinutes > 0) overMinutes * LATENESS_PENALTY_PER_MINUTE else 0.0
             } ?: 0.0
             travelMinutes + latenessPenalty
         }
@@ -405,10 +416,11 @@ fun calculateNearestRoute(
         val distanceMeters = haversineMeters(currentLatitude, currentLongitude, next.latitude, next.longitude)
         val travelMinutes = estimatedTravelMinutes(distanceMeters, currentHour)
         elapsedMinutes += travelMinutes
-        next.deliveryTimeWindow.hourRange()?.let { (startWindowHour, _) ->
-            val arrivalHour = startHour + (elapsedMinutes / 60.0)
-            if (arrivalHour < startWindowHour) {
-                elapsedMinutes = (startWindowHour - startHour) * 60.0
+        next.deliveryTimeWindow.hourRange()?.let { (startWindowHour, endWindowHour) ->
+            val arrivalAbsoluteMinute = startMinuteOfDay + elapsedMinutes
+            val (windowStartAbs, _) = windowAbsoluteMinutes(arrivalAbsoluteMinute, startWindowHour, endWindowHour)
+            if (arrivalAbsoluteMinute < windowStartAbs) {
+                elapsedMinutes = windowStartAbs - startMinuteOfDay
             }
         }
 

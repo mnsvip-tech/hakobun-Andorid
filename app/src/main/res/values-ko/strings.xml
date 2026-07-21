@@ -211,7 +211,7 @@
     <string name="premium_plan">✓ 프리미엄 플랜</string>
     <string name="premium_features">모든 기능을 이용할 수 있습니다.</string>
     <string name="free_trial_expired">프리미엄 미등록</string>
-    <string name="trial_after_register">프리미엄 플랜은 첫 2주 무료 체험이 가능하며 Google Play가 자동으로 관리합니다. 무료 기간 종료 후 자동으로 결제가 시작됩니다.</string>
+    <string name="trial_after_register">계정 등록일로부터 14일간 프리미엄 플랜의 모든 기능을 무료로 체험할 수 있습니다. 무료 기간 중에는 자동으로 결제되지 않습니다. 무료 기간 종료 후에도 프리미엄을 계속 이용하려면 Google Play를 통해 직접 구독 신청을 해야 합니다.</string>
     <string name="free_plan_name">무료</string>
     <string name="free_trial_period">2주 체험</string>
     <string name="free_features">・전체 기능이 14일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
@@ -329,7 +329,7 @@
     <string name="faq_q_09">알림을 끄고 싶어요</string>
     <string name="faq_a_09">앱 내: 사이드 메뉴 → 알림 → 설정 항목 → 알림 토글을 OFF로 설정하세요.\n\nAndroid 설정 → 앱 → HAKOBUN → 알림에서도 비활성화할 수 있습니다.</string>
     <string name="faq_q_10">무료 체험은 언제 종료되나요?</string>
-    <string name="faq_a_10">사용자 등록일로부터 14일간이 무료 체험 기간입니다.\n\n앱 내 사용자 계정 화면(사이드 메뉴 → 사용자 계정 정보)에서 남은 일수를 확인할 수 있습니다.\n\n체험 종료 24시간 전까지 취소하면 요금이 발생하지 않습니다.</string>
+    <string name="faq_a_10">사용자 등록일로부터 14일간이 무료 기간입니다.\n\n앱 내 사용자 계정 화면(사이드 메뉴 → 사용자 계정 정보)에서 남은 일수를 확인할 수 있습니다.\n\n이 무료 기간 중에는 요금이 발생하지 않습니다. 기간 종료 후 프리미엄에 가입하지 않으면 신규 화물 등록만 잠깁니다(기존 데이터의 조회·수정은 계속 무료로 이용 가능). 프리미엄 가입은 Google Play를 통해 직접 신청해야 하며, 자동으로 결제가 시작되지 않습니다.</string>
     <string name="faq_q_11">구독을 취소하려면?</string>
     <string name="faq_a_11">Google Play 스토어 → 계정 아이콘 → 「구독」→ HAKOBUN → 「구독 취소」에서 진행하세요.\n\n취소 후에도 당월 말까지 이용할 수 있습니다. 앱 내 취소 기능은 현재 준비 중입니다.</string>
     <string name="faq_q_12">결제에 실패했어요</string>
@@ -354,7 +354,7 @@
     <string name="terms_s02_title">제2조　이용 자격</string>
     <string name="terms_s02_body">본 앱은 18세 이상 배송 업무 종사자 또는 업무 관리자를 대상으로 합니다.\n\n본 앱 이용을 위해 Google 계정이 필요할 수 있습니다. 허위 정보를 이용한 등록은 금지합니다.</string>
     <string name="terms_s03_title">제3조　구독 및 결제</string>
-    <string name="terms_s03_body">[무료 체험]\n최초 등록 시 2주 무료 체험을 제공합니다. 체험 기간 중 모든 기능을 이용할 수 있습니다. 체험 종료 24시간 전까지 취소하지 않으면 자동으로 유료 플랜으로 전환됩니다.\n\n[유료 플랜(프리미엄)]\n요금: ¥980 / 월 (세금 포함)\n청구: Google Play를 통해 매월 자동 갱신\n취소: Google Play 스토어 「구독」 화면에서 언제든지 취소 가능. 취소 후 당월 말까지 이용 가능.\n\n[환불 정책]\nGoogle Play 환불 정책을 따릅니다. 구매 후 48시간 이내 취소는 Google Play를 통해 신청하세요.\n\n[가격 변경]\n가격 변경 시 30일 전까지 앱 내 또는 이메일로 안내합니다.</string>
+    <string name="terms_s03_body">[무료 기간]\n최초 계정 등록일로부터 14일간 프리미엄 플랜의 모든 기능을 무료로 이용할 수 있습니다. 이 무료 기간 중에는 자동으로 요금이 청구되지 않습니다. 무료 기간 종료 후에도 프리미엄 이용을 원하시면 Google Play를 통해 직접 구독 신청을 해야 합니다(무료 기간에서 유료 플랜으로의 자동 전환은 없습니다).\n\n[유료 플랜(프리미엄)]\n요금: ¥980 / 월 (세금 포함)\n청구: Google Play를 통해 매월 자동 갱신\n취소: Google Play 스토어 「구독」 화면에서 언제든지 취소 가능. 취소 후 당월 말까지 이용 가능.\n\n[환불 정책]\nGoogle Play 환불 정책을 따릅니다. 구매 후 48시간 이내 취소는 Google Play를 통해 신청하세요.\n\n[가격 변경]\n가격 변경 시 30일 전까지 앱 내 또는 이메일로 안내합니다.</string>
     <string name="terms_s04_title">제4조　수집 정보 및 이용 목적</string>
     <string name="terms_s04_body">■ 위치 정보(GPS)\n목적: 배송지 내비게이션, 현재 위치 표시, 배송 경로 최적화\n수집 시점: 앱 사용 중에만 (백그라운드 수집 없음)\n\n■ 카메라/이미지\n목적: 송장 OCR을 통한 주소·성명 자동 입력\n저장처: 기기 내부만 (클라우드 전송 없음)\n\n■ 음성(마이크)\n목적: 음성 입력을 통한 주소·메모 전사\n저장처: 기기 내부만\n\n■ 입력 정보(성명, 주소, 전화, 이메일)\n목적: 배송 업무 관리 및 기사 프로필 설정\n저장처: 기기 내 암호화 저장소(AES-256-GCM)\n외부 전송: 없음</string>
     <string name="terms_s05_title">제5조　제3자 서비스 이용</string>

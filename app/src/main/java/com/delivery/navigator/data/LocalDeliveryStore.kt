@@ -37,6 +37,7 @@ class LocalDeliveryStore(context: Context) {
             buildList {
                 for (index in 0 until array.length()) {
                     val item = array.getJSONObject(index)
+                    if (!item.has("latitude") || !item.has("longitude")) continue
                     add(item.toDeliveryPackage())
                 }
             }
@@ -81,7 +82,8 @@ class LocalDeliveryStore(context: Context) {
                 contact = obj.optString("contact"),
                 email = obj.optString("email"),
                 plan = enumValueOrDefault(obj.optString("plan"), MembershipPlan.Free),
-                isRegistered = obj.optBoolean("isRegistered", false)
+                isRegistered = obj.optBoolean("isRegistered", false),
+                registeredAt = obj.optLong("registeredAt", 0L)
             )
         }.getOrDefault(UserProfile())
     }
@@ -94,11 +96,16 @@ class LocalDeliveryStore(context: Context) {
             .put("email", profile.email)
             .put("plan", profile.plan.name)
             .put("isRegistered", profile.isRegistered)
+            .put("registeredAt", profile.registeredAt)
         preferences.edit().putString(KEY_USER_PROFILE, obj.toString()).apply()
     }
 
     fun clear() {
-        preferences.edit().remove(KEY_PACKAGES).apply()
+        preferences.edit()
+            .remove(KEY_PACKAGES)
+            .remove(KEY_REGULAR_COURSES)
+            .remove(KEY_USER_PROFILE)
+            .apply()
     }
 
     private fun JSONObject.toDeliveryPackage(): DeliveryPackage {
@@ -159,7 +166,9 @@ class LocalDeliveryStore(context: Context) {
             displayName = optString("displayName"),
             addresses = buildList {
                 for (index in 0 until addressesArray.length()) {
-                    add(addressesArray.getJSONObject(index).toCourseAddress())
+                    val item = addressesArray.getJSONObject(index)
+                    if (!item.has("latitude") || !item.has("longitude")) continue
+                    add(item.toCourseAddress())
                 }
             }
         )

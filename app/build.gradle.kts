@@ -29,11 +29,33 @@ android {
             ?: ""
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "FORCE_PLAN", "\"NONE\"")
     }
 
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    flavorDimensions += "testMode"
+    productFlavors {
+        // 通常ビルド。Google Play課金を実際に照会する(本番と同じ挙動)。
+        create("standard") {
+            dimension = "testMode"
+        }
+        // 実機テスト用: 課金照会をスキップしプレミアム状態を強制する。applicationIdは変更しないため、
+        // standard/premiumOffと同時にはインストールできない(上書きされる)が、ビルド成果物(APK)は別名で残る。
+        create("premiumOn") {
+            dimension = "testMode"
+            versionNameSuffix = "-premium-on"
+            buildConfigField("String", "FORCE_PLAN", "\"PREMIUM\"")
+        }
+        // 実機テスト用: 課金照会をスキップし無料(トライアル切れ)状態を強制する。
+        create("premiumOff") {
+            dimension = "testMode"
+            versionNameSuffix = "-premium-off"
+            buildConfigField("String", "FORCE_PLAN", "\"FREE\"")
+        }
     }
 
     compileOptions {

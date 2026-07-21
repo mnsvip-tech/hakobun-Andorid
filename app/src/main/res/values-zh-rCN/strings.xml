@@ -211,7 +211,7 @@
     <string name="premium_plan">✓ 高级套餐</string>
     <string name="premium_features">所有功能均可使用。</string>
     <string name="free_trial_expired">未订阅高级版</string>
-    <string name="trial_after_register">高级套餐首2周免费试用，由 Google Play 自动管理。试用期结束后将自动开始计费。</string>
+    <string name="trial_after_register">自账户注册之日起14天内，可免费使用高级套餐的全部功能。免费期间不会自动产生任何费用。免费期结束后如需继续使用高级套餐，需通过 Google Play 自行订阅。</string>
     <string name="free_plan_name">免费</string>
     <string name="free_trial_period">2周试用</string>
     <string name="free_features">・全部功能14天内免费\n・试用期结束后仅新登记功能被锁定\n・备份</string>
@@ -329,7 +329,7 @@
     <string name="faq_q_09">如何关闭通知？</string>
     <string name="faq_a_09">在应用内：侧边菜单 → 通知 → 设置项目 → 将通知开关关闭。\n\n也可通过Android设置 → 应用 → HAKOBUN → 通知进行关闭。</string>
     <string name="faq_q_10">免费试用何时结束？</string>
-    <string name="faq_a_10">免费试用期为注册之日起14天。\n\n可在应用内用户账户页面（侧边菜单 → 用户账户信息）查看剩余天数。\n\n在试用期结束前24小时取消，则不会产生费用。</string>
+    <string name="faq_a_10">免费期为注册之日起14天。\n\n可在应用内用户账户页面（侧边菜单 → 用户账户信息）查看剩余天数。\n\n此免费期间不会产生任何费用。期限结束后如未订阅高级版，仅新货物登录功能会被锁定（已有数据的查看、编辑仍可继续免费使用）。订阅高级版需通过 Google Play 自行办理，不会自动开始计费。</string>
     <string name="faq_q_11">如何取消订阅？</string>
     <string name="faq_a_11">前往 Google Play 商店 → 账户图标 → 「订阅」→ HAKOBUN → 「取消订阅」进行操作。\n\n取消后仍可使用至当月月末。应用内取消功能目前正在开发中。</string>
     <string name="faq_q_12">付款失败</string>
@@ -354,7 +354,7 @@
     <string name="terms_s02_title">第2条　使用资格</string>
     <string name="terms_s02_body">本应用面向18岁及以上从事配送业务或业务管理的人员。\n\n使用本应用可能需要Google账户。禁止使用虚假信息进行注册。</string>
     <string name="terms_s03_title">第3条　订阅与计费</string>
-    <string name="terms_s03_body">【免费试用】\n首次注册时提供2周免费试用，试用期间可使用全部功能。如未在试用期结束前24小时内取消，将自动升级为付费套餐。\n\n【付费套餐（高级版）】\n价格：¥980 / 月（含税）\n计费：通过Google Play每月自动续费\n取消：可随时通过Google Play商店「订阅」页面取消。取消后可使用至当月月末。\n\n【退款政策】\n遵循Google Play的退款政策。购买后48小时内的取消请通过Google Play申请。\n\n【价格变更】\n价格调整将提前30天通过应用内通知或邮件告知。</string>
+    <string name="terms_s03_body">【免费期】\n自首次账户注册之日起14天内，可免费使用高级套餐的全部功能。此免费期间不会自动产生任何费用。免费期结束后如需继续使用高级版，需通过 Google Play 自行订阅（不会自动从免费期转为付费套餐）。\n\n【付费套餐（高级版）】\n价格：¥980 / 月（含税）\n计费：通过Google Play每月自动续费\n取消：可随时通过Google Play商店「订阅」页面取消。取消后可使用至当月月末。\n\n【退款政策】\n遵循Google Play的退款政策。购买后48小时内的取消请通过Google Play申请。\n\n【价格变更】\n价格调整将提前30天通过应用内通知或邮件告知。</string>
     <string name="terms_s04_title">第4条　收集的信息及使用目的</string>
     <string name="terms_s04_body">■ 位置信息（GPS）\n用途：导航至配送目的地、显示当前位置、优化配送路线\n获取时机：仅在使用应用期间（不在后台获取）\n\n■ 相机/图像\n用途：通过OCR识别快递单自动填写地址和姓名\n存储：仅在设备内（不上传至云端）\n\n■ 语音（麦克风）\n用途：通过语音输入转录地址和备注\n存储：仅在设备内\n\n■ 输入信息（姓名、地址、电话、邮箱）\n用途：配送业务管理及司机资料设置\n存储：设备内加密存储（AES-256-GCM）\n对外传输：无</string>
     <string name="terms_s05_title">第5条　第三方服务的使用</string>

@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -120,6 +121,7 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryPurchasesAsync
 import com.delivery.navigator.model.MembershipPlan
 import com.delivery.navigator.model.UserProfile
+import com.delivery.navigator.model.isFreeTrialExpired
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.TextRecognition
@@ -192,6 +194,16 @@ fun HakobunApp() {
             .build()
     }
     suspend fun reconcileSubscriptionStatus() {
+        if (com.delivery.navigator.BuildConfig.FORCE_PLAN != "NONE") {
+            // 実機テスト用ビルド(premiumOn/premiumOff)では課金照会を行わず、強制したプラン状態を維持する。
+            val forcedPlan = if (com.delivery.navigator.BuildConfig.FORCE_PLAN == "PREMIUM") MembershipPlan.Premium else MembershipPlan.Free
+            if (userProfile.plan != forcedPlan) {
+                val updated = userProfile.copy(plan = forcedPlan)
+                userProfile = updated
+                deliveryStore.saveUserProfile(updated)
+            }
+            return
+        }
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -235,7 +247,7 @@ fun HakobunApp() {
         onDispose { billingClient.endConnection() }
     }
     var showPaywallDialog by remember { mutableStateOf(false) }
-    val isFreeExpired = userProfile.isRegistered && userProfile.plan != MembershipPlan.Premium
+    val isFreeExpired = userProfile.plan != MembershipPlan.Premium && userProfile.isFreeTrialExpired()
     val onRegisterPackageAttempt = {
         when {
             !isLoggedIn -> activeMenuItem = AccountMenuItem.Account
@@ -253,6 +265,7 @@ fun HakobunApp() {
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var locationCallback by remember { mutableStateOf<com.google.android.gms.location.LocationCallback?>(null) }
 
     fun startLocationUpdates() {
         val priority = if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -270,6 +283,7 @@ fun HakobunApp() {
                 result.lastLocation?.let { currentLocation = LatLng(it.latitude, it.longitude) }
             }
         }
+        locationCallback = callback
         fusedLocationClient.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
     }
 
@@ -294,7 +308,9 @@ fun HakobunApp() {
                 )
             )
         }
-        onDispose {}
+        onDispose {
+            locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
+        }
     }
     val persistPackages = { deliveryStore.savePackages(packages) }
     val persistRegularCourses = { deliveryStore.saveRegularCourses(regularCourseList) }
@@ -359,8 +375,10 @@ fun HakobunApp() {
         selectedSummaryFilter?.matches(it) ?: true
     }
     val gpsOrigin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second)
-    val gpsRouteStops = remember(packages, gpsOrigin) {
-        calculateNearestRoute(packages.filterNot { it.status.hidesMapPin() }, gpsOrigin.latitude, gpsOrigin.longitude)
+    val gpsRouteStops by remember(gpsOrigin) {
+        derivedStateOf {
+            calculateNearestRoute(packages.filterNot { it.status.hidesMapPin() }, gpsOrigin.latitude, gpsOrigin.longitude)
+        }
     }
     val gpsRouteNumberMap = remember(gpsRouteStops) {
         gpsRouteStops.associate { it.deliveryPackage.trackingCode to it.routeNumber }
@@ -624,10 +642,13 @@ fun HakobunApp() {
                 onOpenNavigation = { addr -> context.startActivity(openNavigationIntent(addr)) },
                 onRegister = { results ->
                     coroutineScope.launch {
+                        var lastAddedCode: String? = null
                         results.forEach { result ->
-                            packages.add(createDeliveryPackageFromRegistration(result, packages.size))
+                            val newPackage = createDeliveryPackageFromRegistration(result, packages.size)
+                            packages.add(newPackage)
+                            lastAddedCode = newPackage.trackingCode
                         }
-                        selectedPackageCode = packages.last().trackingCode
+                        lastAddedCode?.let { selectedPackageCode = it }
                         persistPackages()
                     }
                 }
@@ -1202,9 +1223,11 @@ private fun FullScreenDeliveryMap(
                             }
                         }
                     }
-                } else if (currentLocation != null) {
-                    coroutineScope.launch {
-                        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 15f))
+                } else {
+                    currentLocation?.let { location ->
+                        coroutineScope.launch {
+                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                        }
                     }
                 }
             }
@@ -1587,7 +1610,8 @@ private fun UserAccountScreen(
                                 base = base,
                                 contact = contact,
                                 email = email,
-                                isRegistered = true
+                                isRegistered = true,
+                                registeredAt = if (userProfile.registeredAt > 0L) userProfile.registeredAt else System.currentTimeMillis()
                             ))
                             isEditing = false
                         },
