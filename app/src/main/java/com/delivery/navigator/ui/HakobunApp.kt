@@ -515,7 +515,10 @@ fun HakobunApp() {
                 onBack = { isSupportHubOpen = false },
                 onSelect = { activeMenuItem = it },
                 onLoginToggle = onLoginToggle,
-                onGoToBackup = { isSupportHubOpen = false },
+                onGoToBackup = {
+                    isSupportHubOpen = false
+                    homePanel = HomePanel.Backup
+                },
                 onFinishDay = { summary ->
                     runCatching {
                         context.startActivity(createEndOfDayCalendarIntent(summary))
