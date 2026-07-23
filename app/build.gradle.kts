@@ -17,6 +17,22 @@ android {
     namespace = "com.delivery.navigator"
     compileSdk = 36
 
+    signingConfigs {
+        create("release") {
+            val storeFilePath = localProperties.getProperty("RELEASE_STORE_FILE")
+                ?: providers.environmentVariable("RELEASE_STORE_FILE").orNull
+            if (storeFilePath != null) {
+                storeFile = rootProject.file(storeFilePath)
+                storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+                    ?: providers.environmentVariable("RELEASE_STORE_PASSWORD").orNull
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                    ?: providers.environmentVariable("RELEASE_KEY_ALIAS").orNull
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+                    ?: providers.environmentVariable("RELEASE_KEY_PASSWORD").orNull
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.delivery.navigator"
         minSdk = 26
@@ -55,6 +71,23 @@ android {
             dimension = "testMode"
             versionNameSuffix = "-premium-off"
             buildConfigField("String", "FORCE_PLAN", "\"FREE\"")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    // premiumOn / premiumOff は課金照会を強制的にバイパスする実機テスト専用ビルド。
+    // 誤ってPlay Consoleへ提出されないよう、これらのフレーバーのreleaseバリアントは生成しない。
+    androidComponents {
+        beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+            if (variantBuilder.productFlavors.any { (_, flavorName) -> flavorName != "standard" }) {
+                variantBuilder.enable = false
+            }
         }
     }
 

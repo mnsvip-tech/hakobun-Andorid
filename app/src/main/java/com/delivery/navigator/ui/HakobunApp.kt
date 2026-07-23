@@ -32,6 +32,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -53,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +79,7 @@ import com.delivery.navigator.data.LocalDeliveryStore
 import com.delivery.navigator.data.regularCourses
 import com.delivery.navigator.data.samplePackages
 import com.delivery.navigator.data.searchPostalCode
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.delivery.navigator.model.AccountMenuItem
 import com.delivery.navigator.model.AddressCandidate
@@ -97,6 +100,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -116,6 +120,7 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.queryProductDetails
@@ -158,7 +163,9 @@ fun HakobunApp() {
     }
     var selectedWindow by remember { mutableStateOf(TimeWindow.All) }
     var selectedMapTimeWindow by remember { mutableStateOf(TimeWindow.All) }
-    var selectedPackageCode by remember { mutableStateOf(packages.firstOrNull()?.trackingCode.orEmpty()) }
+    // 初期状態では未選択(空文字)にする。荷物登録順の先頭を選択済み扱いにすると、
+    // 地図上の最寄り①番ではなく登録順の荷物へルート線が引かれてしまうため。
+    var selectedPackageCode by remember { mutableStateOf("") }
     var postalCode by remember { mutableStateOf("") }
     var addressCandidate by remember { mutableStateOf<AddressCandidate?>(null) }
     var isRegisteringPackage by remember { mutableStateOf(false) }
@@ -268,6 +275,7 @@ fun HakobunApp() {
     var isHomeMenuOpen by remember { mutableStateOf(false) }
     var homePanel by remember { mutableStateOf<HomePanel?>(null) }
     var showMapControls by remember { mutableStateOf(true) }
+    var showNormalPinsWithCourse by remember { mutableStateOf(false) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -293,6 +301,7 @@ fun HakobunApp() {
         fusedLocationClient.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
     }
 
+    var showLocationRationale by remember { mutableStateOf(false) }
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
@@ -301,22 +310,40 @@ fun HakobunApp() {
         if (hasAny) startLocationUpdates()
     }
 
+    // 位置情報は地図・現在地表示に使う機能のため、システムの許可ダイアログを出す前に
+    // アプリ内で用途を説明してから要求する（起動直後にいきなり求めない）。
     DisposableEffect(Unit) {
         val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (hasFine || hasCoarse) {
             startLocationUpdates()
         } else {
-            locationPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
+            showLocationRationale = true
         }
         onDispose {
             locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
         }
+    }
+    if (showLocationRationale) {
+        AlertDialog(
+            onDismissRequest = { showLocationRationale = false },
+            title = { Text(stringResource(R.string.location_rationale_title)) },
+            text = { Text(stringResource(R.string.location_rationale_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLocationRationale = false
+                    locationPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
+                }) { Text(stringResource(R.string.location_rationale_allow)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationRationale = false }) { Text(stringResource(R.string.location_rationale_later)) }
+            }
+        )
     }
     val persistPackages = { deliveryStore.savePackages(packages) }
     val persistRegularCourses = { deliveryStore.saveRegularCourses(regularCourseList) }
@@ -375,11 +402,14 @@ fun HakobunApp() {
         assignFixedRouteNumbers(fixedRouteNumbers, packages, origin.latitude, origin.longitude)
     }
 
-    val visiblePackages = packages.filter {
-        selectedWindow == TimeWindow.All || it.timeWindow == selectedWindow
-    }.filter {
-        selectedSummaryFilter?.matches(it) ?: true
-    }
+    val hasActiveCourse = packages.any { it.trackingCode.startsWith("COURSE-") }
+    val visiblePackages = packages
+        .filter { !hasActiveCourse || showNormalPinsWithCourse || it.trackingCode.startsWith("COURSE-") }
+        .filter {
+            selectedWindow == TimeWindow.All || it.timeWindow == selectedWindow
+        }.filter {
+            selectedSummaryFilter?.matches(it) ?: true
+        }
     val gpsOrigin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second)
     val gpsRouteStops by remember(gpsOrigin) {
         derivedStateOf {
@@ -417,8 +447,10 @@ fun HakobunApp() {
     val visibleMapPackages = visiblePackages
         .filterNot { it.status.hidesMapPin() }
         .filter { selectedMapTimeWindow == TimeWindow.All || it.timeWindow == selectedMapTimeWindow }
+    // 未選択(空文字)のときは登録順の先頭にフォールバックしない。
+    // それをすると、地図上の最寄り①番ではなく登録順の荷物へルート線が引かれてしまうため、
+    // 未選択のままにして FullScreenDeliveryMap 側の「最寄り優先」フォールバックに委ねる。
     val selectedPackage = packages.firstOrNull { it.trackingCode == selectedPackageCode }
-        ?: visiblePackages.firstOrNull()
     val redeliveryCandidate = packages.firstOrNull { it.trackingCode == redeliveryCandidateCode }
     val summaryPackages = selectedSummaryFilter
         ?.let { filter -> packages.filter { filter.matches(it) } }
@@ -487,7 +519,7 @@ fun HakobunApp() {
                     },
                     onSeedTestData = {
                         packages.clear()
-                        packages.addAll(generateDebugTestPackages(200))
+                        packages.addAll(generateDebugTestPackages(100))
                         persistPackages()
                         activeMenuItem = null
                     },
@@ -496,6 +528,19 @@ fun HakobunApp() {
                         fixedRouteNumbers.clear()
                         selectedPackageCode = ""
                         persistPackages()
+                        activeMenuItem = null
+                    },
+                    onDeleteAllData = {
+                        packages.clear()
+                        fixedRouteNumbers.clear()
+                        selectedPackageCode = ""
+                        regularCourseList.clear()
+                        backupText = ""
+                        importText = ""
+                        deliveryStore.clear()
+                        userProfile = UserProfile()
+                        com.delivery.navigator.notification.cancelAllAlarms(context)
+                        context.getSystemService(android.app.NotificationManager::class.java)?.cancelAll()
                         activeMenuItem = null
                     }
                 )
@@ -562,6 +607,11 @@ fun HakobunApp() {
         if (homePanel == HomePanel.Courses) {
             RegularCourseScreen(
                 courses = regularCourseList,
+                loadedCourseCode = packages
+                    .firstOrNull { it.trackingCode.startsWith("COURSE-") }
+                    ?.trackingCode
+                    ?.removePrefix("COURSE-")
+                    ?.substringBefore("-"),
                 isLoggedIn = isLoggedIn,
                 isFreeExpired = isFreeExpired,
                 onRequireLogin = {
@@ -594,10 +644,16 @@ fun HakobunApp() {
                         selectedPackageCode = packages.lastOrNull()?.trackingCode ?: ""
                     }
                     persistPackages()
+                    val message = if (removedCodes.isNotEmpty()) {
+                        context.getString(R.string.course_cleared_from_map, course.code, removedCodes.size)
+                    } else {
+                        context.getString(R.string.course_not_on_map, course.code)
+                    }
+                    android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
                 },
                 onAddCourseAddress = { courseCode, recipient, address, timeWindow, memo ->
                     coroutineScope.launch {
-                        val newAddress = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                        val newAddress = createCourseAddressFromInput(context, recipient, address, timeWindow, memo)
                         val index = regularCourseList.indexOfFirst { it.code == courseCode }
                         if (index >= 0) {
                             val course = regularCourseList[index]
@@ -608,7 +664,7 @@ fun HakobunApp() {
                 },
                 onUpdateCourseAddress = { courseCode, addressIndex, recipient, address, timeWindow, memo ->
                     coroutineScope.launch {
-                        val updated = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                        val updated = createCourseAddressFromInput(context, recipient, address, timeWindow, memo)
                         val index = regularCourseList.indexOfFirst { it.code == courseCode }
                         if (index >= 0) {
                             val course = regularCourseList[index]
@@ -666,7 +722,7 @@ fun HakobunApp() {
                     coroutineScope.launch {
                         var lastAddedCode: String? = null
                         results.forEach { result ->
-                            val newPackage = createDeliveryPackageFromRegistration(result, packages.size)
+                            val newPackage = createDeliveryPackageFromRegistration(context, result, packages.size)
                             packages.add(newPackage)
                             lastAddedCode = newPackage.trackingCode
                         }
@@ -706,10 +762,13 @@ fun HakobunApp() {
                     selectedMapTimeWindow = selectedMapTimeWindow,
                     showMapControls = showMapControls,
                     isLoggedIn = isLoggedIn,
+                    hasActiveCourse = hasActiveCourse,
+                    showNormalPinsWithCourse = showNormalPinsWithCourse,
                     onOpenMenu = { isHomeMenuOpen = true },
                     onOpenSupport = { isSupportHubOpen = true },
                     onRegisterPackage = { onRegisterPackageAttempt() },
                     onToggleMapControls = { showMapControls = !showMapControls },
+                    onToggleNormalPinsWithCourse = { showNormalPinsWithCourse = !showNormalPinsWithCourse },
                     onVoiceNextStop = {
                         nextStopVoiceHint = null
                         nextStopVoiceLauncher.launch(createVoiceNextStopIntent())
@@ -752,7 +811,7 @@ fun HakobunApp() {
                             coroutineScope.launch {
                                 importedPackages.forEach { pkg ->
                                     if (pkg.latitude == 0.0 && pkg.longitude == 0.0 && pkg.address.isNotBlank()) {
-                                        val (lat, lng) = com.delivery.navigator.data.geocodeAddressPublic(pkg.address)
+                                        val (lat, lng) = com.delivery.navigator.data.geocodeAddressPublic(context, pkg.address)
                                         val idx = packages.indexOfFirst { it.trackingCode == pkg.trackingCode }
                                         if (idx >= 0) packages[idx] = packages[idx].copy(latitude = lat, longitude = lng)
                                     }
@@ -762,7 +821,7 @@ fun HakobunApp() {
                         },
                         onAddCourseAddress = { courseCode, recipient, address, timeWindow, memo ->
                             coroutineScope.launch {
-                                val newAddress = createCourseAddressFromInput(recipient, address, timeWindow, memo)
+                                val newAddress = createCourseAddressFromInput(context, recipient, address, timeWindow, memo)
                                 val index = regularCourseList.indexOfFirst { it.code == courseCode }
                                 if (index >= 0) {
                                     val course = regularCourseList[index]
@@ -795,6 +854,12 @@ fun HakobunApp() {
                                 selectedPackageCode = packages.lastOrNull()?.trackingCode ?: ""
                             }
                             persistPackages()
+                            val message = if (removedCodes.isNotEmpty()) {
+                                context.getString(R.string.course_cleared_from_map, course.code, removedCodes.size)
+                            } else {
+                                context.getString(R.string.course_not_on_map, course.code)
+                            }
+                            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
@@ -886,10 +951,13 @@ private fun MapHomeChrome(
     selectedMapTimeWindow: TimeWindow,
     showMapControls: Boolean,
     isLoggedIn: Boolean,
+    hasActiveCourse: Boolean,
+    showNormalPinsWithCourse: Boolean,
     onOpenMenu: () -> Unit,
     onOpenSupport: () -> Unit,
     onRegisterPackage: () -> Unit,
     onToggleMapControls: () -> Unit,
+    onToggleNormalPinsWithCourse: () -> Unit,
     onFilterSelected: (PackageSummaryFilter) -> Unit,
     onMapTimeWindowSelected: (TimeWindow) -> Unit,
     onVoiceNextStop: () -> Unit,
@@ -929,6 +997,19 @@ private fun MapHomeChrome(
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = onToggleMapControls, modifier = Modifier.height(36.dp)) {
                 Text(if (showMapControls) stringResource(R.string.hide_summary) else stringResource(R.string.show_summary))
+            }
+        }
+        if (hasActiveCourse) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilterChip(
+                    selected = showNormalPinsWithCourse,
+                    onClick = onToggleNormalPinsWithCourse,
+                    label = { Text(stringResource(R.string.show_normal_pins_with_course)) }
+                )
             }
         }
         voiceNextStopHint?.let {
@@ -1131,19 +1212,74 @@ private fun FullScreenDeliveryMap(
     val context = LocalContext.current
     var mapLoaded by remember { mutableStateOf(false) }
     var mapBearing by remember { mutableStateOf(0f) }
+    var liveBearing by remember { mutableStateOf(0f) }
     var drivingRoutePoints by remember { mutableStateOf<List<LatLng>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val activeRouteDestination = selectedPackage ?: routeStops.firstOrNull()?.deliveryPackage
     var initialCameraMoved by remember { mutableStateOf(false) }
+    var isFollowingLocation by remember { mutableStateOf(true) }
+    var arrivalZoomedCode by remember { mutableStateOf<String?>(null) }
+    var showConvenienceStores by remember { mutableStateOf(false) }
+    var showGasStations by remember { mutableStateOf(false) }
+    var nearbyConvenienceStores by remember { mutableStateOf<List<com.delivery.navigator.data.NearbyPlace>>(emptyList()) }
+    var nearbyGasStations by remember { mutableStateOf<List<com.delivery.navigator.data.NearbyPlace>>(emptyList()) }
+    // 約100m単位に丸めて、GPS更新のたびにAPIへ再検索が飛ばないようにする。
+    val searchLocationBucket = "%.3f,%.3f".format(effectiveOrigin.latitude, effectiveOrigin.longitude)
+    LaunchedEffect(showConvenienceStores, searchLocationBucket) {
+        nearbyConvenienceStores = if (showConvenienceStores) {
+            com.delivery.navigator.data.fetchNearbyPlaces(
+                context, effectiveOrigin.latitude, effectiveOrigin.longitude, "convenience_store"
+            )
+        } else {
+            emptyList()
+        }
+    }
+    LaunchedEffect(showGasStations, searchLocationBucket) {
+        nearbyGasStations = if (showGasStations) {
+            com.delivery.navigator.data.fetchNearbyPlaces(
+                context, effectiveOrigin.latitude, effectiveOrigin.longitude, "gas_station"
+            )
+        } else {
+            emptyList()
+        }
+    }
     LaunchedEffect(mapLoaded, currentLocation) {
         if (!mapLoaded || initialCameraMoved) return@LaunchedEffect
         val target = currentLocation ?: return@LaunchedEffect
         initialCameraMoved = true
         cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 14f))
     }
+    // 移動中は現在地ポインターをMap中央に固定（フォローモード）。
+    // ユーザーが手動でドラッグした場合はフォローを解除し、現在地ボタンで再度フォローに戻る。
+    // 目的地の半径100m圏内に入った時点で一度だけ最大ズームに切り替える。
+    LaunchedEffect(currentLocation, isFollowingLocation, activeRouteDestination?.trackingCode) {
+        if (!mapLoaded || !isFollowingLocation || !initialCameraMoved) return@LaunchedEffect
+        val target = currentLocation ?: return@LaunchedEffect
+        val destinationCode = activeRouteDestination?.trackingCode
+        if (destinationCode != arrivalZoomedCode) {
+            arrivalZoomedCode = null
+        }
+        val isNearDestination = activeRouteDestination?.let { dest ->
+            val result = FloatArray(1)
+            android.location.Location.distanceBetween(
+                target.latitude, target.longitude,
+                dest.latitude, dest.longitude,
+                result
+            )
+            result[0] <= 100f
+        } ?: false
+        if (isNearDestination && arrivalZoomedCode != destinationCode) {
+            arrivalZoomedCode = destinationCode
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 20f))
+        } else {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLng(target))
+        }
+    }
     LaunchedEffect(selectedPackage?.trackingCode) {
         if (mapLoaded) {
             selectedPackage?.let {
+                // 選択直後にGPS追従effect(1236行目)へ即座に上書きされないよう、先に追従を解除する。
+                isFollowingLocation = false
                 cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f))
             }
         }
@@ -1155,11 +1291,14 @@ private fun FullScreenDeliveryMap(
             }
         }
     }
-    LaunchedEffect(activeRouteDestination?.trackingCode) {
+    // origin(現在地確定前はTokyo仮値、確定後はGPS座標)もキーに含めることで、
+    // 起動直後にTokyo仮値でルート取得した後、実際のGPS位置が確定した際に再取得する。
+    LaunchedEffect(activeRouteDestination?.trackingCode, effectiveOrigin) {
         drivingRoutePoints = activeRouteDestination
             ?.let {
                 fetchDrivingRoutePointsCached(
-                    origin = origin.latitude to origin.longitude,
+                    context = context,
+                    origin = effectiveOrigin.latitude to effectiveOrigin.longitude,
                     destination = it.latitude to it.longitude
                 ).map { point -> LatLng(point.first, point.second) }
             }
@@ -1170,14 +1309,7 @@ private fun FullScreenDeliveryMap(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ),
+            properties = MapProperties(isMyLocationEnabled = false),
             uiSettings = MapUiSettings(
                 compassEnabled = true,
                 myLocationButtonEnabled = false,
@@ -1189,11 +1321,21 @@ private fun FullScreenDeliveryMap(
             ),
             onMapLoaded = { mapLoaded = true }
         ) {
+            MapEffect(Unit) { map ->
+                map.setOnCameraMoveListener {
+                    liveBearing = map.cameraPosition.bearing
+                }
+                map.setOnCameraMoveStartedListener { reason ->
+                    if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                        isFollowingLocation = false
+                    }
+                }
+            }
             if (drivingRoutePoints.isNotEmpty()) {
                 Polyline(
                     points = drivingRoutePoints,
                     color = BrandBlue,
-                    width = 9f
+                    width = 16f
                 )
             } else if (activeRouteDestination != null) {
                 Polyline(
@@ -1218,6 +1360,47 @@ private fun FullScreenDeliveryMap(
                     }
                 )
             }
+            if (nearbyConvenienceStores.isNotEmpty() || nearbyGasStations.isNotEmpty()) {
+                val convenienceStoreIcon = remember { poiMarkerIcon("🏪", 0xFF2E9E4F.toInt()) }
+                val gasStationIcon = remember { poiMarkerIcon("⛽", 0xFFE0722C.toInt()) }
+                nearbyConvenienceStores.forEach { place ->
+                    Marker(
+                        state = rememberUpdatedMarkerState(position = LatLng(place.latitude, place.longitude)),
+                        title = place.name,
+                        icon = convenienceStoreIcon,
+                        anchor = Offset(0.5f, 0.5f),
+                        onClick = {
+                            context.startActivity(
+                                openNavigationIntent(latitude = place.latitude, longitude = place.longitude, label = place.name)
+                            )
+                            true
+                        }
+                    )
+                }
+                nearbyGasStations.forEach { place ->
+                    Marker(
+                        state = rememberUpdatedMarkerState(position = LatLng(place.latitude, place.longitude)),
+                        title = place.name,
+                        icon = gasStationIcon,
+                        anchor = Offset(0.5f, 0.5f),
+                        onClick = {
+                            context.startActivity(
+                                openNavigationIntent(latitude = place.latitude, longitude = place.longitude, label = place.name)
+                            )
+                            true
+                        }
+                    )
+                }
+            }
+            currentLocation?.let { location ->
+                Marker(
+                    state = rememberUpdatedMarkerState(position = location),
+                    icon = currentLocationMarkerIcon(),
+                    anchor = Offset(0.5f, 0.5f),
+                    flat = true,
+                    zIndex = 10f
+                )
+            }
         }
         Column(
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 14.dp),
@@ -1225,6 +1408,7 @@ private fun FullScreenDeliveryMap(
         ) {
             FloatingMapButton(stringResource(R.string.current_location)) {
                 if (!mapLoaded) return@FloatingMapButton
+                isFollowingLocation = true
                 val hasFine = androidx.core.content.ContextCompat.checkSelfPermission(
                     context, android.Manifest.permission.ACCESS_FINE_LOCATION
                 ) == android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -1278,18 +1462,65 @@ private fun FullScreenDeliveryMap(
                 }
             }
             MiniCompass(
+                bearing = liveBearing,
                 onClick = {
                     if (mapLoaded) {
                         mapBearing = 0f
-                        cameraPositionState.move(
-                            CameraUpdateFactory.newCameraPosition(
-                                CameraPosition.Builder(cameraPositionState.position)
-                                    .bearing(mapBearing)
-                                    .build()
+                        coroutineScope.launch {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newCameraPosition(
+                                    CameraPosition.Builder(cameraPositionState.position)
+                                        .bearing(mapBearing)
+                                        .build()
+                                )
                             )
-                        )
+                        }
                     }
                 }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .navigationBarsPadding()
+                .padding(start = 14.dp, bottom = 18.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            PoiToggleButton(
+                emoji = "🏪",
+                label = stringResource(R.string.poi_convenience_store),
+                isActive = showConvenienceStores,
+                onClick = { showConvenienceStores = !showConvenienceStores }
+            )
+            PoiToggleButton(
+                emoji = "⛽",
+                label = stringResource(R.string.poi_gas_station),
+                isActive = showGasStations,
+                onClick = { showGasStations = !showGasStations }
+            )
+        }
+    }
+}
+
+@Composable
+private fun PoiToggleButton(emoji: String, label: String, isActive: Boolean, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = if (isActive) BrandBlue else Color.White),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(emoji, style = MaterialTheme.typography.titleMedium)
+            Text(
+                label,
+                color = if (isActive) Color.White else Color(0xFF20242C),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -1323,7 +1554,7 @@ private fun FloatingMapButton(label: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun MiniCompass(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MiniCompass(bearing: Float = 0f, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .size(46.dp)
@@ -1332,7 +1563,9 @@ private fun MiniCompass(onClick: () -> Unit, modifier: Modifier = Modifier) {
         shape = CircleShape
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { rotationZ = -bearing },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -1537,6 +1770,18 @@ private fun AccountMenuPanel(
 
 private const val SUBSCRIPTION_PRODUCT_ID = "hakobun_monthly_premium"
 
+// ISO 8601 duration("P14D"等)をおおよその日数に変換する。無料期間表示をProductDetailsの
+// 実際のオファーと一致させるために使用する。
+private fun billingPeriodToDays(isoPeriod: String): Int? {
+    val match = Regex("^P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)W)?(?:(\\d+)D)?$").find(isoPeriod) ?: return null
+    val (years, months, weeks, days) = match.destructured
+    val total = (years.toIntOrNull() ?: 0) * 365 +
+        (months.toIntOrNull() ?: 0) * 30 +
+        (weeks.toIntOrNull() ?: 0) * 7 +
+        (days.toIntOrNull() ?: 0)
+    return total.takeIf { it > 0 }
+}
+
 @Composable
 private fun UserAccountScreen(
     userProfile: UserProfile,
@@ -1546,7 +1791,8 @@ private fun UserAccountScreen(
     onLoginToggle: () -> Unit,
     onSaveProfile: (UserProfile) -> Unit,
     onSeedTestData: () -> Unit = {},
-    onClearTestData: () -> Unit = {}
+    onClearTestData: () -> Unit = {},
+    onDeleteAllData: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as? android.app.Activity
@@ -1558,6 +1804,8 @@ private fun UserAccountScreen(
     var contact by remember { mutableStateOf(userProfile.contact) }
     var email by remember { mutableStateOf(userProfile.email) }
     var subscribeMessage by remember { mutableStateOf("") }
+    var subscriptionProductDetails by remember { mutableStateOf<ProductDetails?>(null) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val isPremium = userProfile.plan == MembershipPlan.Premium
     val isFreeExpired = !isPremium && userProfile.isFreeTrialExpired()
@@ -1566,23 +1814,51 @@ private fun UserAccountScreen(
         kotlin.math.ceil((trialEndMillis - System.currentTimeMillis()) / (24.0 * 60 * 60 * 1000)).toInt().coerceAtLeast(0)
     } else 0
 
+    // 購入画面に表示する価格・請求周期・無料期間は、実際に選択するオファーと一致させるため
+    // 画面表示前にProductDetailsを取得しておき、購入フロー(launchSubscription)でも同じインスタンスを使う。
+    LaunchedEffect(Unit) {
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(listOf(
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(SUBSCRIPTION_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build()
+            )).build()
+        val result = billingClient.queryProductDetails(params)
+        subscriptionProductDetails = result.productDetailsList?.firstOrNull()
+    }
+
+    // 表示中の価格・無料期間と、実際に購入するオファーを必ず一致させるため、
+    // 「無料体験フェーズを含むオファー」を優先的に選び、なければ先頭オファーにフォールバックする。
+    // launchSubscription() でも同じロジックで同一オファーを選ぶ。
+    val offerDetails = subscriptionProductDetails?.subscriptionOfferDetails?.let { offers ->
+        offers.firstOrNull { offer -> offer.pricingPhases.pricingPhaseList.any { it.priceAmountMicros == 0L } }
+            ?: offers.firstOrNull()
+    }
+    val freeTrialPhase = offerDetails?.pricingPhases?.pricingPhaseList?.firstOrNull { it.priceAmountMicros == 0L }
+    val paidPhase = offerDetails?.pricingPhases?.pricingPhaseList?.firstOrNull { it.priceAmountMicros > 0L }
+    val freeTrialLabel = freeTrialPhase?.let { phase ->
+        val days = billingPeriodToDays(phase.billingPeriod)
+        if (days != null) stringResource(R.string.free_trial_period_dynamic, days) else null
+    }
+    val priceLabel = paidPhase?.let { phase ->
+        stringResource(R.string.premium_price_dynamic, phase.formattedPrice)
+    }
+
     fun launchSubscription() {
         if (activity == null) { subscribeMessage = "Google Play Billingを起動できません"; return }
         scope.launch {
-            val params = QueryProductDetailsParams.newBuilder()
-                .setProductList(listOf(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(SUBSCRIPTION_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build()
-                )).build()
-            val result = billingClient.queryProductDetails(params)
-            val productDetails = result.productDetailsList?.firstOrNull()
+            val productDetails = subscriptionProductDetails
             if (productDetails == null) {
                 subscribeMessage = "プランが見つかりません（Play Console設定をご確認ください）"
                 return@launch
             }
-            val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return@launch
+            val offers = productDetails.subscriptionOfferDetails
+            val offerToken = offers
+                ?.firstOrNull { offer -> offer.pricingPhases.pricingPhaseList.any { it.priceAmountMicros == 0L } }
+                ?.offerToken
+                ?: offers?.firstOrNull()?.offerToken
+                ?: return@launch
             val flowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(listOf(
                     BillingFlowParams.ProductDetailsParams.newBuilder()
@@ -1592,6 +1868,13 @@ private fun UserAccountScreen(
                 )).build()
             billingClient.launchBillingFlow(activity, flowParams)
         }
+    }
+
+    fun openManageSubscription() {
+        val uri = android.net.Uri.parse(
+            "https://play.google.com/store/account/subscriptions?sku=$SUBSCRIPTION_PRODUCT_ID&package=${context.packageName}"
+        )
+        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F7F9)) {
@@ -1700,7 +1983,7 @@ private fun UserAccountScreen(
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(stringResource(R.string.free_plan_name), fontWeight = FontWeight.Bold)
-                                Text(stringResource(R.string.free_trial_period), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text(freeTrialLabel ?: stringResource(R.string.price_loading), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                                 Text(stringResource(R.string.free_features), style = MaterialTheme.typography.labelSmall, color = MutedText)
                             }
                         }
@@ -1713,24 +1996,33 @@ private fun UserAccountScreen(
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(stringResource(R.string.premium_plan_name), fontWeight = FontWeight.Bold)
-                                Text(stringResource(R.string.premium_price), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                                Text(priceLabel ?: stringResource(R.string.price_loading), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                                 Text(stringResource(R.string.premium_features_list), style = MaterialTheme.typography.labelSmall, color = MutedText)
                             }
                         }
                     }
                     Button(
                         onClick = { launchSubscription() },
+                        enabled = subscriptionProductDetails != null,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8))
                     ) {
                         Text(stringResource(R.string.subscribe_google_pay), color = Color.White, fontWeight = FontWeight.Bold)
                     }
                     Text(
-                        stringResource(R.string.subscription_terms),
+                        if (freeTrialLabel != null && priceLabel != null) {
+                            stringResource(R.string.subscription_terms_dynamic, freeTrialLabel, priceLabel)
+                        } else {
+                            stringResource(R.string.price_loading)
+                        },
                         color = MutedText,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
+                TextButton(
+                    onClick = { openManageSubscription() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(stringResource(R.string.manage_subscription_link)) }
                 if (subscribeMessage.isNotBlank()) {
                     Text(
                         subscribeMessage,
@@ -1761,7 +2053,42 @@ private fun UserAccountScreen(
                     ) { Text("テストデータを全件クリア") }
                 }
             }
+
+            if (userProfile.isRegistered) {
+                WhiteCard {
+                    Text(stringResource(R.string.delete_account_title), fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(R.string.delete_account_description),
+                        color = MutedText,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    OutlinedButton(
+                        onClick = { showDeleteConfirm = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFE53935))
+                    ) { Text(stringResource(R.string.delete_account_button)) }
+                }
+            }
         }
+    }
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text(stringResource(R.string.delete_account_confirm_title)) },
+            text = { Text(stringResource(R.string.delete_account_confirm_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirm = false
+                        onDeleteAllData()
+                    }
+                ) { Text(stringResource(R.string.delete_account_confirm_action), color = Color(0xFFE53935)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
     }
 }
 
@@ -1909,6 +2236,45 @@ private fun FaqContent() {
     }
 }
 
+private fun currentLocationMarkerIcon(): com.google.android.gms.maps.model.BitmapDescriptor {
+    val density = android.content.res.Resources.getSystem().displayMetrics.density
+    val size = (34f * density).toInt()
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val canvas = AndroidCanvas(bitmap)
+    val cx = size / 2f
+    val cy = size / 2f
+    // 外側の淡いハロー
+    val haloPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x332457D6 }
+    canvas.drawCircle(cx, cy, size / 2f, haloPaint)
+    // 白い縁取り
+    val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE }
+    canvas.drawCircle(cx, cy, size * 0.34f, borderPaint)
+    // 現在地本体（ブランドブルー）
+    val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2457D6.toInt() }
+    canvas.drawCircle(cx, cy, size * 0.27f, dotPaint)
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
+
+private fun poiMarkerIcon(emoji: String, color: Int): com.google.android.gms.maps.model.BitmapDescriptor {
+    val density = android.content.res.Resources.getSystem().displayMetrics.density
+    val size = (30f * density).toInt()
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val canvas = AndroidCanvas(bitmap)
+    val cx = size / 2f
+    val cy = size / 2f
+    val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color }
+    canvas.drawCircle(cx, cy, size / 2f, bodyPaint)
+    val innerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = android.graphics.Color.WHITE }
+    canvas.drawCircle(cx, cy, size * 0.42f, innerPaint)
+    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textSize = size * 0.5f
+        textAlign = Paint.Align.CENTER
+    }
+    val textY = cy - (textPaint.descent() + textPaint.ascent()) / 2f
+    canvas.drawText(emoji, cx, textY, textPaint)
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
+
 private fun standardPinMarkerIcon(label: String, color: Int): com.google.android.gms.maps.model.BitmapDescriptor {
     val density = android.content.res.Resources.getSystem().displayMetrics.density
     val width = (30f * density).toInt()
@@ -1962,6 +2328,7 @@ private fun TermsSection(title: String, body: String) {
 
 @Composable
 private fun TermsContent() {
+    val context = LocalContext.current
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
         // ヘッダー
@@ -1981,6 +2348,15 @@ private fun TermsContent() {
                     stringResource(R.string.terms_header_intro),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF333333)
+                )
+                Text(
+                    stringResource(R.string.terms_web_link_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = BrandBlue,
+                    modifier = Modifier.clickable {
+                        val uri = android.net.Uri.parse(context.getString(R.string.terms_web_link_url))
+                        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+                    }
                 )
             }
         }
@@ -2355,6 +2731,7 @@ private fun EndOfDayPanel(
 @Composable
 private fun RegularCourseScreen(
     courses: List<RegularCourse>,
+    loadedCourseCode: String?,
     isLoggedIn: Boolean,
     isFreeExpired: Boolean,
     onRequireLogin: () -> Unit,
@@ -2367,8 +2744,8 @@ private fun RegularCourseScreen(
     onDeleteCourseAddress: (String, Int) -> Unit
 ) {
     val context = LocalContext.current
-    var selectedCourseCode by remember { mutableStateOf(courses.firstOrNull()?.code ?: "A") }
-    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode } ?: courses.firstOrNull()
+    var selectedCourseCode by remember { mutableStateOf<String?>(null) }
+    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode }
     var newRecipient by remember { mutableStateOf("") }
     var newAddress by remember { mutableStateOf("") }
     var newTimeWindow by remember { mutableStateOf(TimeWindow.Unspecified) }
@@ -2377,27 +2754,38 @@ private fun RegularCourseScreen(
     var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var flashingClearCode by remember { mutableStateOf<String?>(null) }
 
     var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var ocrImageFile by remember { mutableStateOf<java.io.File?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             ocrImageUri?.let { uri ->
-                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
-                } else {
-                    @Suppress("DEPRECATION")
-                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                }
-                recognizeAddressFromBitmap(
-                    bitmap = bitmap,
-                    onSuccess = { candidate = it },
-                    onFailure = {
-                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                try {
+                    val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                        android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                     }
-                )
+                    recognizeAddressFromBitmap(
+                        bitmap = bitmap,
+                        onSuccess = { candidate = it },
+                        onFailure = {
+                            candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                        }
+                    )
+                } finally {
+                    // 送り状画像には氏名・住所等が含まれ得るため、認識結果の成否に関わらず速やかに削除する。
+                    ocrImageFile?.delete()
+                    ocrImageFile = null
+                }
             }
+        } else {
+            ocrImageFile?.delete()
+            ocrImageFile = null
         }
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -2410,6 +2798,7 @@ private fun RegularCourseScreen(
                 context, "${context.packageName}.fileprovider", file
             )
             ocrImageUri = uri
+            ocrImageFile = file
             cameraOcrLauncher.launch(uri)
         } else {
             candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
@@ -2463,12 +2852,33 @@ private fun RegularCourseScreen(
     WhiteCard {
         Text(stringResource(R.string.regular_courses_title), fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.course_address_hint), color = MutedText)
+        Text(
+            text = loadedCourseCode?.let { stringResource(R.string.course_loaded_status, it) }
+                ?: stringResource(R.string.course_loaded_status_none),
+            color = if (loadedCourseCode != null) BrandBlue else MutedText,
+            fontWeight = FontWeight.Bold
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             courses.forEach { course ->
                 FilterChip(
                     selected = selectedCourseCode == course.code,
-                    onClick = { selectedCourseCode = course.code },
-                    label = { Text(stringResource(R.string.course_chip_label, course.code)) },
+                    onClick = {
+                        selectedCourseCode = if (selectedCourseCode == course.code) null else course.code
+                    },
+                    label = {
+                        Text(
+                            if (loadedCourseCode == course.code) {
+                                stringResource(R.string.course_chip_label_loaded, course.code)
+                            } else {
+                                stringResource(R.string.course_chip_label, course.code)
+                            }
+                        )
+                    },
+                    colors = if (loadedCourseCode == course.code) {
+                        FilterChipDefaults.filterChipColors(containerColor = Color(0xFFDDEBFF))
+                    } else {
+                        FilterChipDefaults.filterChipColors()
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -2490,7 +2900,22 @@ private fun RegularCourseScreen(
                     Text(stringResource(R.string.load_course_button, course.code))
                 }
                 OutlinedButton(
-                    onClick = { onClearCourseFromMap(course) },
+                    onClick = {
+                        flashingClearCode = course.code
+                        onClearCourseFromMap(course)
+                        scope.launch {
+                            delay(300)
+                            if (flashingClearCode == course.code) flashingClearCode = null
+                        }
+                    },
+                    colors = if (flashingClearCode == course.code) {
+                        ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color(0xFFD32F2F),
+                            contentColor = Color.White
+                        )
+                    } else {
+                        ButtonDefaults.outlinedButtonColors()
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(R.string.clear_course_from_map_button))
@@ -2508,6 +2933,7 @@ private fun RegularCourseScreen(
         }
     }
 
+    selectedCourseCode?.let { code ->
     WhiteCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -2527,6 +2953,7 @@ private fun RegularCourseScreen(
                                 context, "${context.packageName}.fileprovider", file
                             )
                             ocrImageUri = uri
+                            ocrImageFile = file
                             cameraOcrLauncher.launch(uri)
                         } else {
                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -2584,7 +3011,7 @@ private fun RegularCourseScreen(
                     !isLoggedIn -> onRequireLogin()
                     isFreeExpired -> onShowPaywall()
                     else -> {
-                        onAddCourseAddress(selectedCourseCode, newRecipient, newAddress, newTimeWindow, newMemo)
+                        onAddCourseAddress(code, newRecipient, newAddress, newTimeWindow, newMemo)
                         newRecipient = ""
                         newAddress = ""
                         newTimeWindow = TimeWindow.Unspecified
@@ -2597,8 +3024,9 @@ private fun RegularCourseScreen(
             enabled = newAddress.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.add_to_course_button, selectedCourseCode))
+            Text(stringResource(R.string.add_to_course_button, code))
         }
+    }
     }
             }
         }
@@ -2676,8 +3104,8 @@ private fun RegularCoursePanel(
     onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit
 ) {
     val context = LocalContext.current
-    var selectedCourseCode by remember { mutableStateOf(courses.firstOrNull()?.code ?: "A") }
-    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode } ?: courses.firstOrNull()
+    var selectedCourseCode by remember { mutableStateOf<String?>(null) }
+    val selectedCourse = courses.firstOrNull { it.code == selectedCourseCode }
     var newRecipient by remember { mutableStateOf("") }
     var newAddress by remember { mutableStateOf("") }
     var newTimeWindow by remember { mutableStateOf(TimeWindow.Unspecified) }
@@ -2686,27 +3114,38 @@ private fun RegularCoursePanel(
     var candidate by remember { mutableStateOf<AddressCandidate?>(null) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var postalSearchJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var flashingClearCode by remember { mutableStateOf<String?>(null) }
 
     var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var ocrImageFile by remember { mutableStateOf<java.io.File?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             ocrImageUri?.let { uri ->
-                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
-                } else {
-                    @Suppress("DEPRECATION")
-                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                }
-                recognizeAddressFromBitmap(
-                    bitmap = bitmap,
-                    onSuccess = { candidate = it },
-                    onFailure = {
-                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                try {
+                    val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                        android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                     }
-                )
+                    recognizeAddressFromBitmap(
+                        bitmap = bitmap,
+                        onSuccess = { candidate = it },
+                        onFailure = {
+                            candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                        }
+                    )
+                } finally {
+                    // 送り状画像には氏名・住所等が含まれ得るため、認識結果の成否に関わらず速やかに削除する。
+                    ocrImageFile?.delete()
+                    ocrImageFile = null
+                }
             }
+        } else {
+            ocrImageFile?.delete()
+            ocrImageFile = null
         }
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -2719,6 +3158,7 @@ private fun RegularCoursePanel(
                 context, "${context.packageName}.fileprovider", file
             )
             ocrImageUri = uri
+            ocrImageFile = file
             cameraOcrLauncher.launch(uri)
         } else {
             candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
@@ -2752,7 +3192,9 @@ private fun RegularCoursePanel(
             courses.forEach { course ->
                 FilterChip(
                     selected = selectedCourseCode == course.code,
-                    onClick = { selectedCourseCode = course.code },
+                    onClick = {
+                        selectedCourseCode = if (selectedCourseCode == course.code) null else course.code
+                    },
                     label = { Text(stringResource(R.string.course_chip_label, course.code)) },
                     modifier = Modifier.weight(1f)
                 )
@@ -2769,7 +3211,22 @@ private fun RegularCoursePanel(
                     Text(stringResource(R.string.load_course_button, course.code))
                 }
                 OutlinedButton(
-                    onClick = { onClearCourseFromMap(course) },
+                    onClick = {
+                        flashingClearCode = course.code
+                        onClearCourseFromMap(course)
+                        scope.launch {
+                            delay(300)
+                            if (flashingClearCode == course.code) flashingClearCode = null
+                        }
+                    },
+                    colors = if (flashingClearCode == course.code) {
+                        ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color(0xFFD32F2F),
+                            contentColor = Color.White
+                        )
+                    } else {
+                        ButtonDefaults.outlinedButtonColors()
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(R.string.clear_course_from_map_button))
@@ -2781,6 +3238,7 @@ private fun RegularCoursePanel(
         }
     }
 
+    selectedCourseCode?.let { code ->
     WhiteCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -2800,6 +3258,7 @@ private fun RegularCoursePanel(
                                 context, "${context.packageName}.fileprovider", file
                             )
                             ocrImageUri = uri
+                            ocrImageFile = file
                             cameraOcrLauncher.launch(uri)
                         } else {
                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -2853,7 +3312,7 @@ private fun RegularCoursePanel(
         LabeledField(stringResource(R.string.memo_field_label), stringResource(R.string.memo_placeholder), newMemo) { newMemo = it }
         Button(
             onClick = {
-                onAddCourseAddress(selectedCourseCode, newRecipient, newAddress, newTimeWindow, newMemo)
+                onAddCourseAddress(code, newRecipient, newAddress, newTimeWindow, newMemo)
                 newRecipient = ""
                 newAddress = ""
                 newTimeWindow = TimeWindow.Unspecified
@@ -2864,8 +3323,9 @@ private fun RegularCoursePanel(
             enabled = newAddress.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.add_to_course_button, selectedCourseCode))
+            Text(stringResource(R.string.add_to_course_button, code))
         }
+    }
     }
 }
 
@@ -3539,25 +3999,35 @@ private fun PackageRegistrationScreen(
     val addressDetails = remember { mutableStateMapOf<String, PackageRegistrationDetail>() }
 
     var ocrImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var ocrImageFile by remember { mutableStateOf<java.io.File?>(null) }
     val cameraOcrLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             ocrImageUri?.let { uri ->
-                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                    android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
-                } else {
-                    @Suppress("DEPRECATION")
-                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                }
-                recognizeAddressFromBitmap(
-                    bitmap = bitmap,
-                    onSuccess = { candidate = it },
-                    onFailure = {
-                        candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                try {
+                    val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                        android.graphics.ImageDecoder.decodeBitmap(android.graphics.ImageDecoder.createSource(context.contentResolver, uri))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                     }
-                )
+                    recognizeAddressFromBitmap(
+                        bitmap = bitmap,
+                        onSuccess = { candidate = it },
+                        onFailure = {
+                            candidate = AddressCandidate("OCR", "", "住所を読み取れませんでした", "要確認")
+                        }
+                    )
+                } finally {
+                    // 送り状画像には氏名・住所等が含まれ得るため、認識結果の成否に関わらず速やかに削除する。
+                    ocrImageFile?.delete()
+                    ocrImageFile = null
+                }
             }
+        } else {
+            ocrImageFile?.delete()
+            ocrImageFile = null
         }
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -3570,6 +4040,7 @@ private fun PackageRegistrationScreen(
                 context, "${context.packageName}.fileprovider", file
             )
             ocrImageUri = uri
+            ocrImageFile = file
             cameraOcrLauncher.launch(uri)
         } else {
             candidate = AddressCandidate("カメラ", "", "カメラ権限が許可されていません", "権限確認")
@@ -3605,7 +4076,7 @@ private fun PackageRegistrationScreen(
         addresses.forEach { addr ->
             if (!geocodedLocations.containsKey(addr) && addr.isNotBlank()) {
                 scope.launch {
-                    val (lat, lng) = geocodeAddressPublic(addr)
+                    val (lat, lng) = geocodeAddressPublic(context, addr)
                     if ((lat != 0.0 || lng != 0.0) && addr in addresses) {
                         geocodedLocations[addr] = LatLng(lat, lng)
                     }
@@ -3658,6 +4129,7 @@ private fun PackageRegistrationScreen(
                                                 context, "${context.packageName}.fileprovider", file
                                             )
                                             ocrImageUri = uri
+                                            ocrImageFile = file
                                             cameraOcrLauncher.launch(uri)
                                         } else {
                                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)

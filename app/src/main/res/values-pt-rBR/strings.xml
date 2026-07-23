@@ -29,6 +29,7 @@
     <string name="notice">Avisos</string>
     <string name="hide_summary">Ocultar resumo</string>
     <string name="show_summary">Mostrar resumo</string>
+    <string name="show_normal_pins_with_course">Mostrar também os pinos normais</string>
     <string name="all_time_windows">Todos</string>
     <string name="all_time_windows_filter">Todos os horários</string>
     <string name="tagline">Torne as entregas de hoje mais ágeis e precisas</string>
@@ -59,6 +60,8 @@
     <string name="rotate">Girar</string>
     <string name="marker_current_location">Minha localização</string>
     <string name="marker_route_base_point">Ponto de origem do cálculo de rota</string>
+    <string name="poi_convenience_store">Loja de conveniência</string>
+    <string name="poi_gas_station">Posto de gasolina</string>
 
     <!-- Títulos do painel -->
     <string name="panel_delivery_list">Lista de entregas</string>
@@ -96,6 +99,11 @@
     <string name="load_course_button">Carregar rota %1$s nas entregas de hoje</string>
     <string name="add_course_address_title">Adicionar endereço à rota</string>
     <string name="clear_course_from_map_button">Remover do mapa</string>
+    <string name="course_cleared_from_map">Rota %1$s removida do mapa (%2$d itens)</string>
+    <string name="course_not_on_map">A rota %1$s não está carregada no mapa</string>
+    <string name="course_chip_label_loaded">Rota %1$s ✓Carregada</string>
+    <string name="course_loaded_status">Carregada atualmente: Rota %1$s</string>
+    <string name="course_loaded_status_none">Nenhuma rota está carregada no mapa no momento</string>
 
     <!-- Backup -->
     <string name="backup_data_title">Gerenciamento de dados de endereço</string>
@@ -221,6 +229,21 @@
     <string name="premium_features_list">· Todos os recursos\n· Registros ilimitados\n· Suporte prioritário</string>
     <string name="subscribe_google_pay">Assinar Premium via Google Pay</string>
     <string name="subscription_terms">Primeiras 2 semanas grátis, depois ¥980/mês（imposto incluído）. Cancele quando quiser.</string>
+    <string name="free_trial_period_dynamic">Teste de %1$d dias</string>
+    <string name="premium_price_dynamic">%1$s / mês</string>
+    <string name="subscription_terms_dynamic">Os primeiros %1$s são gratuitos. Ao fim do período gratuito, você será cobrado automaticamente em %2$s (impostos inclusos) e a assinatura será renovada automaticamente todo mês pelo Google Play até ser cancelada. Cancele quando quiser.</string>
+    <string name="manage_subscription_link">Gerenciar ou cancelar assinatura no Google Play</string>
+    <string name="price_loading">Verificando o preço…</string>
+    <string name="location_rationale_title">Sobre o uso da localização</string>
+    <string name="location_rationale_body">Sua localização atual é exibida no mapa e usada para navegar até os destinos de entrega e otimizar rotas. A localização só é acessada enquanto o aplicativo está em uso, nunca em segundo plano. Você será solicitado a conceder a permissão na próxima tela.</string>
+    <string name="location_rationale_allow">Permitir localização</string>
+    <string name="location_rationale_later">Agora não</string>
+    <string name="delete_account_title">Excluir perfil e dados</string>
+    <string name="delete_account_description">Exclui todos os dados armazenados neste dispositivo, incluindo nome, contato, pacotes, rotas e avisos, e retorna o app ao estado não cadastrado. Esta ação não pode ser desfeita. Para cancelar a assinatura em si, use o gerenciamento de assinaturas do Google Play.</string>
+    <string name="delete_account_button">Excluir todos os dados</string>
+    <string name="delete_account_confirm_title">Tem certeza de que deseja excluir tudo?</string>
+    <string name="delete_account_confirm_body">Todos os dados armazenados neste dispositivo — perfil, pacotes, rotas, avisos e outros — serão excluídos. Esta ação não pode ser desfeita.</string>
+    <string name="delete_account_confirm_action">Excluir</string>
     <string name="subscribe_complete">Transferência para o plano Premium concluída</string>
     <string name="billing_not_available">Não foi possível iniciar o Google Play Billing</string>
     <string name="plan_not_found">Plano não encontrado（verifique as configurações do Play Console）</string>
@@ -332,11 +355,11 @@
     <string name="faq_q_10">Quando termina o período de teste gratuito?</string>
     <string name="faq_a_10">O período gratuito dura 14 dias a partir da data de cadastro.\n\nVocê pode verificar os dias restantes na tela de Conta do usuário (menu lateral → Informações da conta do usuário).\n\nNenhuma cobrança ocorre durante esse período gratuito. Se você não assinar o Premium quando ele terminar, apenas o registro de novos pacotes ficará bloqueado (a visualização e edição dos dados existentes continuam gratuitas). A assinatura do Premium exige que você mesmo se inscreva pelo Google Play — não há cobrança automática.</string>
     <string name="faq_q_11">Como cancelar a assinatura?</string>
-    <string name="faq_a_11">Acesse a Google Play Store → ícone de conta →「Assinaturas」→ HAKOBUN →「Cancelar assinatura」.\n\nApós o cancelamento, você pode continuar usando até o final do período de cobrança atual. A função de cancelamento no aplicativo está em desenvolvimento.</string>
+    <string name="faq_a_11">Acesse a Google Play Store → ícone de conta →「Assinaturas」→ HAKOBUN →「Cancelar assinatura」, ou use o link "Gerenciar ou cancelar assinatura no Google Play" na tela de conta do aplicativo.\n\nApós o cancelamento, você pode continuar usando até o final do período de cobrança atual.</string>
     <string name="faq_q_12">O pagamento falhou</string>
     <string name="faq_a_12">Verifique sua forma de pagamento no Google Play.\n\nGoogle Play Store → Conta → Pagamentos e assinaturas → Formas de pagamento\n\nCartões vencidos ou saldo insuficiente são causas comuns. Consulte também o suporte do Google Play.</string>
     <string name="faq_q_13">Onde os dados são armazenados?</string>
-    <string name="faq_a_13">Todos os dados são armazenados no armazenamento criptografado do seu smartphone.\n\nNenhum dado é enviado a servidores externos ou sincronizado na nuvem. Desinstalar o aplicativo apagará todos os dados.\n\nRecomendamos exportar dados importantes usando o recurso de backup (menu lateral → Backup).</string>
+    <string name="faq_a_13">Seu perfil, pacotes e rotas são armazenados no armazenamento criptografado do seu smartphone e não são sincronizados na nuvem. Desinstalar o aplicativo apagará todos os dados.\n\nNo entanto, endereços, CEPs, localização atual e coordenadas de destino são enviados ao Google e ao zipcloud (serviço de busca de CEP) para exibição de mapas, busca de rotas e busca de endereços. A entrada por voz usa o serviço de reconhecimento de voz do dispositivo. Consulte os Termos e a Política de Privacidade para mais detalhes.\n\nRecomendamos exportar dados importantes usando o recurso de backup (menu lateral → Backup).</string>
     <string name="faq_q_14">Posso transferir os dados ao trocar de celular?</string>
     <string name="faq_a_14">A transferência automática de dados não é suportada atualmente.\n\nAntes de trocar de dispositivo, exporte os dados com o recurso de backup (copiar/compartilhar) e importe no novo dispositivo.\n\nImportação: menu lateral → Backup → 「Restaurar」</string>
     <string name="faq_q_15">O aplicativo está lento ou travando</string>
@@ -350,18 +373,20 @@
     <string name="terms_header_title">Termos de Serviço e Política de Privacidade do HAKOBUN</string>
     <string name="terms_header_date">Última atualização: 19 de julho de 2026</string>
     <string name="terms_header_intro">Leia os termos a seguir antes de usar o aplicativo. Ao começar a usar, você concorda com estes termos.</string>
+    <string name="terms_web_link_label">Abrir versão web no navegador (para imprimir/compartilhar)</string>
+    <string name="terms_web_link_url" translatable="false">https://mnsvip-tech.github.io/hakobun-legal/</string>
     <string name="terms_s01_title">Artigo 1　Visão geral do serviço</string>
     <string name="terms_s01_body">O HAKOBUN (doravante "o Aplicativo") é um aplicativo de suporte ao gerenciamento de entregas, projetado para aumentar a eficiência dos entregadores. Oferece recursos como cadastro de pacotes, gerenciamento de rotas, registro de status de entrega e leitura de endereços por OCR.\n\nO Aplicativo é uma ferramenta de suporte operacional. O cumprimento das leis aplicáveis, a direção segura e a observância dos regulamentos da empresa de entrega são responsabilidade exclusiva do usuário.</string>
     <string name="terms_s02_title">Artigo 2　Elegibilidade</string>
-    <string name="terms_s02_body">O Aplicativo é destinado a pessoas com 18 anos ou mais que atuam em operações de entrega ou como gestores operacionais.\n\nUma conta Google pode ser necessária para usar o Aplicativo. É proibido se cadastrar com informações falsas.</string>
+    <string name="terms_s02_body">O Aplicativo é destinado a pessoas com 18 anos ou mais que atuam em operações de entrega ou como gestores operacionais.\n\nPara usar o Aplicativo é necessário cadastrar um perfil dentro do app (nome, base, contato, e-mail). Esse perfil é armazenado somente no dispositivo; vincular uma conta Google ou autenticação externa não é obrigatório. É proibido se cadastrar com informações falsas.</string>
     <string name="terms_s03_title">Artigo 3　Assinatura e cobrança</string>
-    <string name="terms_s03_body">[Período gratuito]\nTodos os recursos do plano Premium são gratuitos por 14 dias a partir da data do primeiro cadastro da conta. Nenhuma cobrança ocorre automaticamente durante esse período gratuito. Se quiser continuar usando o Premium depois que esse período terminar, você precisará assinar por conta própria pelo Google Play (não há migração automática do período gratuito para um plano pago).\n\n[Plano pago (Premium)]\nPreço: ¥980 / mês (impostos incluídos)\nCobrança: Renovação automática mensal via Google Play\nCancelamento: Pode ser feito a qualquer momento em「Assinaturas」na Google Play Store. O acesso continua até o fim do período de cobrança atual.\n\n[Política de reembolso]\nSeguimos a política de reembolso do Google Play. Para cancelamentos dentro de 48 horas após a compra, solicite pelo Google Play.\n\n[Alteração de preço]\nVocê será notificado com pelo menos 30 dias de antecedência sobre mudanças de preço, por meio de avisos no aplicativo ou e-mail.</string>
+    <string name="terms_s03_body">[Período gratuito]\nTodos os recursos do plano Premium ficam disponíveis gratuitamente por 14 dias a partir da data do primeiro cadastro do perfil. Nenhuma cobrança ocorre automaticamente durante esse período gratuito. Se quiser continuar usando o Premium depois que esse período terminar, você precisará assinar por conta própria pelo Google Play (não há migração automática do período gratuito para um plano pago).\n\n[Plano pago (Premium)]\nPreço: o valor exibido na tela de compra do Google Play (impostos incluídos); varia por região/moeda.\nCobrança: Renovação automática mensal via Google Play\nCancelamento: Pode ser feito a qualquer momento em「Assinaturas」na Google Play Store, ou pelo link "Gerenciar ou cancelar assinatura no Google Play" na tela de conta do aplicativo. O acesso continua até o fim do período de cobrança atual.\n\n[Política de reembolso]\nSeguimos a política de reembolso do Google Play. Para cancelamentos dentro de 48 horas após a compra, solicite pelo Google Play.\n\n[Alteração de preço]\nVocê será notificado com pelo menos 30 dias de antecedência sobre mudanças de preço, por meio de avisos no aplicativo.</string>
     <string name="terms_s04_title">Artigo 4　Dados coletados e como são usados</string>
-    <string name="terms_s04_body">■ Localização (GPS)\nFinalidade: Navegação até os destinos de entrega, exibição de localização atual, otimização de rotas\nColeta: Somente enquanto o aplicativo está em uso (sem coleta em segundo plano)\n\n■ Câmera/Imagens\nFinalidade: Preenchimento automático de endereços via OCR de etiquetas\nArmazenamento: Somente no dispositivo (sem envio para a nuvem)\n\n■ Voz (Microfone)\nFinalidade: Transcrição de endereços e notas por entrada de voz\nArmazenamento: Somente no dispositivo\n\n■ Dados inseridos (nome, endereço, telefone, e-mail)\nFinalidade: Gerenciamento de entregas e configuração do perfil do entregador\nArmazenamento: Armazenamento criptografado no dispositivo (AES-256-GCM)\nTransmissão externa: Nenhuma</string>
+    <string name="terms_s04_body">■ Localização (GPS)\nFinalidade: Navegação até os destinos de entrega, exibição de localização atual, otimização de rotas\nColeta: Somente enquanto o aplicativo está em uso (sem coleta em segundo plano)\nEnvio: Sua localização atual e as coordenadas do destino de entrega são enviadas à API Google Directions para busca de rota.\n\n■ Câmera/Imagens\nFinalidade: Preenchimento automático de endereços via OCR de etiquetas\nProcessamento: As fotos são processadas no dispositivo com o Google ML Kit e não são enviadas a servidores externos.\nArmazenamento: As imagens temporárias são excluídas imediatamente após a conclusão do reconhecimento, com sucesso ou falha.\n\n■ Voz (Microfone)\nFinalidade: Transcrição de endereços, notas e comandos de status de entrega por voz\nProcessamento: O Aplicativo não armazena dados de voz. Usa o serviço de reconhecimento de voz configurado no dispositivo (padrão do sistema), que pode processar a voz remotamente dependendo do provedor.\n\n■ Endereço/CEP\nFinalidade: Conversão de coordenadas (geocodificação) e busca de endereço a partir do CEP\nEnvio: Os endereços inseridos são enviados à API Google Geocoding; os CEPs são enviados ao zipcloud (serviço de terceiros de busca de CEP).\n\n■ Dados inseridos (nome, telefone, e-mail)\nFinalidade: Gerenciamento de entregas e configuração do perfil do entregador\nArmazenamento: Armazenamento criptografado no dispositivo (AES-256-GCM)\nTransmissão externa: Nenhuma (exceto endereço/localização/voz descritos acima)</string>
     <string name="terms_s05_title">Artigo 5　Serviços de terceiros</string>
-    <string name="terms_s05_body">■ Google Maps Platform\nUsado para exibição de mapas, navegação e geocodificação de endereços. A Política de Privacidade do Google (https://policies.google.com/privacy) se aplica.\n\n■ Google Play Billing\nUsado para pagamentos de assinatura. As informações de pagamento são gerenciadas pelo Google; o Aplicativo não as armazena.\n\n■ Google ML Kit (Reconhecimento de texto)\nO OCR é realizado somente no dispositivo; nenhum dado é enviado a servidores externos.\n\n■ Google Location Services\nUsado para acesso ao GPS.</string>
+    <string name="terms_s05_body">■ Google Maps Platform (incluindo Geocoding API, Directions API e Maps SDK for Android)\nUsado para exibição de mapas, navegação, geocodificação de endereços e busca de rotas. A exibição/interação com o mapa pode enviar automaticamente seu endereço IP, informações do dispositivo e identificadores como cookies ao Google. A Política de Privacidade do Google (https://policies.google.com/privacy) se aplica.\n\n■ Google Play Billing\nUsado para pagamentos de assinatura. As informações de pagamento são gerenciadas pelo Google; o Aplicativo não as armazena.\n\n■ Google ML Kit (Reconhecimento de texto)\nO OCR em si é executado no dispositivo e os dados de imagem nunca são enviados. No entanto, diagnósticos da biblioteca, como status de operação, informações do dispositivo e estatísticas de uso, podem ser enviados ao Google.\n\n■ Google Location Services\nUsado para acesso ao GPS.\n\n■ Serviço de reconhecimento de voz do dispositivo\nUsado para o recurso de entrada por voz. O provedor e o método de processamento dependem das configurações do dispositivo.\n\n■ zipcloud (API de busca de CEP)\nUsado para buscar um endereço a partir de um CEP. Apenas o CEP inserido é transmitido. Aplica-se a própria política de privacidade do operador.\n\n■ GitHub (avisos)\nO Aplicativo busca um arquivo público no GitHub para exibir avisos no app. Nenhum dado pessoal é transmitido nessa solicitação.</string>
     <string name="terms_s06_title">Artigo 6　Armazenamento de dados e segurança</string>
-    <string name="terms_s06_body">Os dados pessoais e operacionais inseridos são armazenados no armazenamento criptografado do dispositivo (Android EncryptedSharedPreferences / AES-256-GCM).\n\nNenhum dado é transmitido a servidores externos ou sincronizado na nuvem. A desinstalação do Aplicativo removerá todos os dados do dispositivo.\n\nAo usar o recurso de backup, o usuário é responsável pelo gerenciamento dos dados exportados.</string>
+    <string name="terms_s06_body">Os dados pessoais e operacionais inseridos são armazenados no armazenamento criptografado do dispositivo (Android EncryptedSharedPreferences / AES-256-GCM).\n\nExceto pelo endereço, CEP, localização e voz descritos nos Artigos 4 e 5, nenhum dado é transmitido a servidores externos ou sincronizado na nuvem. A desinstalação do Aplicativo removerá todos os dados do dispositivo.\n\nVocê pode excluir todos os dados salvos (perfil, pacotes, rotas, avisos etc.) a qualquer momento na tela de conta do aplicativo. A exclusão retorna ao estado não cadastrado e não pode ser desfeita.\n\nAo usar o recurso de backup, o usuário é responsável pelo gerenciamento dos dados exportados.</string>
     <string name="terms_s07_title">Artigo 7　Atividades proibidas</string>
     <string name="terms_s07_body">As seguintes atividades são proibidas:\n\n· Engenharia reversa, adulteração ou redistribuição do Aplicativo\n· Inserir ou usar informações pessoais de terceiros sem consentimento\n· Usar o Aplicativo para qualquer finalidade que viole a lei aplicável\n· Sobrecarregar os servidores ou a infraestrutura do Aplicativo\n· Cadastro fraudulento ou uso indevido para contornar cobranças</string>
     <string name="terms_s08_title">Artigo 8　Isenção de responsabilidade</string>

@@ -29,6 +29,7 @@
     <string name="notice">通知</string>
     <string name="hide_summary">隐藏统计</string>
     <string name="show_summary">显示统计</string>
+    <string name="show_normal_pins_with_course">同时显示常规图钉</string>
     <string name="all_time_windows">全部</string>
     <string name="all_time_windows_filter">全部时段</string>
     <string name="tagline">让今天的配送更轻松、更准确</string>
@@ -59,6 +60,8 @@
     <string name="rotate">旋转</string>
     <string name="marker_current_location">当前位置</string>
     <string name="marker_route_base_point">路线计算起点</string>
+    <string name="poi_convenience_store">便利店</string>
+    <string name="poi_gas_station">加油站</string>
 
     <!-- 面板标题 -->
     <string name="panel_delivery_list">配送列表</string>
@@ -96,6 +99,11 @@
     <string name="load_course_button">将%1$s路线加载到今日配送</string>
     <string name="add_course_address_title">添加地址到路线</string>
     <string name="clear_course_from_map_button">从地图中删除</string>
+    <string name="course_cleared_from_map">已从地图中删除%1$s路线（%2$d件）</string>
+    <string name="course_not_on_map">%1$s路线尚未加载到地图中</string>
+    <string name="course_chip_label_loaded">%1$s路线 ✓已加载</string>
+    <string name="course_loaded_status">当前已加载：%1$s路线</string>
+    <string name="course_loaded_status_none">当前地图中没有已加载的路线</string>
 
     <!-- 备份 -->
     <string name="backup_data_title">地址数据管理</string>
@@ -221,6 +229,21 @@
     <string name="premium_features_list">· 全部功能\n· 无限注册\n· 优先支持</string>
     <string name="subscribe_google_pay">通过Google Pay订阅高级版</string>
     <string name="subscription_terms">首2周免费，之后每月¥980（含税）。随时可取消。</string>
+    <string name="free_trial_period_dynamic">%1$d天试用</string>
+    <string name="premium_price_dynamic">%1$s / 月</string>
+    <string name="subscription_terms_dynamic">前%1$s免费。免费期结束后将自动转为付费方案并收取%2$s（含税）。此后除非取消，将通过Google Play每月自动续费。可随时取消。</string>
+    <string name="manage_subscription_link">在Google Play管理或取消订阅</string>
+    <string name="price_loading">正在获取价格信息…</string>
+    <string name="location_rationale_title">关于位置信息的使用</string>
+    <string name="location_rationale_body">用于在地图上显示当前位置，并用于配送导航和路线优化。仅在使用应用期间获取位置信息，不会在后台获取。请在下一个画面中授予权限。</string>
+    <string name="location_rationale_allow">允许获取位置信息</string>
+    <string name="location_rationale_later">以后再说</string>
+    <string name="delete_account_title">删除资料和数据</string>
+    <string name="delete_account_description">删除保存在设备中的所有数据（姓名、联系方式、包裹、路线、公告等），并恢复为未注册状态。此操作无法撤销。如需取消订阅，请通过Google Play订阅管理另行操作。</string>
+    <string name="delete_account_button">删除所有数据</string>
+    <string name="delete_account_confirm_title">确定要删除吗?</string>
+    <string name="delete_account_confirm_body">资料、包裹、路线、公告等保存在设备中的所有数据都将被删除。此操作无法撤销。</string>
+    <string name="delete_account_confirm_action">删除</string>
     <string name="subscribe_complete">已成功升级到高级套餐</string>
     <string name="billing_not_available">无法启动Google Play Billing</string>
     <string name="plan_not_found">未找到套餐（请检查Play Console设置）</string>
@@ -332,11 +355,11 @@
     <string name="faq_q_10">免费试用何时结束？</string>
     <string name="faq_a_10">免费期为注册之日起14天。\n\n可在应用内用户账户页面（侧边菜单 → 用户账户信息）查看剩余天数。\n\n此免费期间不会产生任何费用。期限结束后如未订阅高级版，仅新货物登录功能会被锁定（已有数据的查看、编辑仍可继续免费使用）。订阅高级版需通过 Google Play 自行办理，不会自动开始计费。</string>
     <string name="faq_q_11">如何取消订阅？</string>
-    <string name="faq_a_11">前往 Google Play 商店 → 账户图标 → 「订阅」→ HAKOBUN → 「取消订阅」进行操作。\n\n取消后仍可使用至当月月末。应用内取消功能目前正在开发中。</string>
+    <string name="faq_a_11">前往 Google Play 商店 → 账户图标 → 「订阅」→ HAKOBUN → 「取消订阅」，或使用应用内账户页面的「在Google Play管理或取消订阅」链接进行操作。\n\n取消后仍可使用至当前计费周期结束。</string>
     <string name="faq_q_12">付款失败</string>
     <string name="faq_a_12">请检查您的Google Play支付方式。\n\nGoogle Play商店 → 账户 → 付款和订阅 → 付款方式\n\n可能原因包括信用卡过期或余额不足等。也请参考Google Play的支持页面。</string>
     <string name="faq_q_13">数据保存在哪里？</string>
-    <string name="faq_a_13">所有数据均保存在您手机的加密存储中。\n\n不会向外部服务器发送数据，也不会进行云同步。卸载应用后，数据将被删除。\n\n建议通过备份功能（侧边菜单 → 备份）导出重要数据。</string>
+    <string name="faq_a_13">资料、包裹、路线等业务数据保存在您手机的加密存储中，不会进行云同步。卸载应用后，数据将被删除。\n\n但地址、邮政编码、当前位置、配送目的地坐标会为地图显示、路线搜索、地址检索发送至Google和zipcloud（邮政编码检索服务）。语音输入使用设备的语音识别服务。详情请参阅使用条款・隐私政策。\n\n建议通过备份功能（侧边菜单 → 备份）导出重要数据。</string>
     <string name="faq_q_14">换机后数据可以迁移吗？</string>
     <string name="faq_a_14">目前不支持自动数据迁移。\n\n换机前请使用备份功能导出（复制/分享）数据，然后在新设备上导入。\n\n导入功能：侧边菜单 → 备份 → 「恢复」</string>
     <string name="faq_q_15">应用卡顿或崩溃</string>
@@ -350,18 +373,20 @@
     <string name="terms_header_title">HAKOBUN 服务条款与隐私政策</string>
     <string name="terms_header_date">最后更新日期：2026年7月19日</string>
     <string name="terms_header_intro">使用本应用前，请阅读以下条款。开始使用即表示您同意本条款。</string>
+    <string name="terms_web_link_label">在浏览器中打开网页版（用于打印/分享）</string>
+    <string name="terms_web_link_url" translatable="false">https://mnsvip-tech.github.io/hakobun-legal/</string>
     <string name="terms_s01_title">第1条　服务概述</string>
     <string name="terms_s01_body">HAKOBUN（以下简称「本应用」）是一款旨在提升配送司机工作效率的配送管理辅助应用，提供包裹登记、路线管理、配送状态记录、快递单OCR识别等功能。\n\n本应用为业务辅助工具，用户在实际配送业务中须自行遵守相关法律法规、安全驾驶规定及所在配送公司的规章制度。</string>
     <string name="terms_s02_title">第2条　使用资格</string>
-    <string name="terms_s02_body">本应用面向18岁及以上从事配送业务或业务管理的人员。\n\n使用本应用可能需要Google账户。禁止使用虚假信息进行注册。</string>
+    <string name="terms_s02_body">本应用面向18岁及以上从事配送业务或业务管理的人员。\n\n使用本应用需要在应用内注册资料（姓名、所属点、联系方式、邮箱）。该资料仅保存在设备本地，无需绑定Google账户或进行外部身份验证。禁止使用虚假信息进行注册。</string>
     <string name="terms_s03_title">第3条　订阅与计费</string>
-    <string name="terms_s03_body">【免费期】\n自首次账户注册之日起14天内，可免费使用高级套餐的全部功能。此免费期间不会自动产生任何费用。免费期结束后如需继续使用高级版，需通过 Google Play 自行订阅（不会自动从免费期转为付费套餐）。\n\n【付费套餐（高级版）】\n价格：¥980 / 月（含税）\n计费：通过Google Play每月自动续费\n取消：可随时通过Google Play商店「订阅」页面取消。取消后可使用至当月月末。\n\n【退款政策】\n遵循Google Play的退款政策。购买后48小时内的取消请通过Google Play申请。\n\n【价格变更】\n价格调整将提前30天通过应用内通知或邮件告知。</string>
+    <string name="terms_s03_body">【免费期】\n自首次注册资料之日起14天内，可免费试用高级套餐的全部功能。此免费期间不会自动产生任何费用。免费期结束后如需继续使用高级版，需通过 Google Play 自行订阅（不会自动从免费期转为付费套餐）。\n\n【付费套餐（高级版）】\n价格：Google Play购买页面显示的金额（含税），因地区和货币而异。\n计费：通过Google Play每月自动续费\n取消：可随时通过Google Play商店「订阅」页面，或应用内账户页面的「在Google Play管理或取消订阅」链接取消。取消后可使用至当前计费周期结束。\n\n【退款政策】\n遵循Google Play的退款政策。购买后48小时内的取消请通过Google Play申请。\n\n【价格变更】\n价格调整将提前30天通过应用内通知告知。</string>
     <string name="terms_s04_title">第4条　收集的信息及使用目的</string>
-    <string name="terms_s04_body">■ 位置信息（GPS）\n用途：导航至配送目的地、显示当前位置、优化配送路线\n获取时机：仅在使用应用期间（不在后台获取）\n\n■ 相机/图像\n用途：通过OCR识别快递单自动填写地址和姓名\n存储：仅在设备内（不上传至云端）\n\n■ 语音（麦克风）\n用途：通过语音输入转录地址和备注\n存储：仅在设备内\n\n■ 输入信息（姓名、地址、电话、邮箱）\n用途：配送业务管理及司机资料设置\n存储：设备内加密存储（AES-256-GCM）\n对外传输：无</string>
+    <string name="terms_s04_body">■ 位置信息（GPS）\n用途：导航至配送目的地、显示当前位置、优化配送路线\n获取时机：仅在使用应用期间（不在后台获取）\n传输对象：当前位置和配送目的地坐标会为路线搜索发送至Google Directions API。\n\n■ 相机/图像\n用途：通过OCR识别快递单自动填写地址和姓名\n处理：拍摄的图像在设备端由Google ML Kit处理，不会上传至外部服务器。\n存储：识别处理完成后（无论成功或失败），临时图像会立即删除。\n\n■ 语音（麦克风）\n用途：通过语音输入转录地址、备注和配送状态操作\n处理：本应用不保存语音数据。使用设备设置的语音识别服务（系统默认），具体提供方可能会对语音进行远程处理。\n\n■ 地址・邮政编码\n用途：坐标转换（地理编码）及通过邮政编码检索地址\n传输对象：输入的地址会发送至Google Geocoding API，邮政编码会发送至zipcloud（第三方邮政编码检索服务）。\n\n■ 输入信息（姓名、电话、邮箱）\n用途：配送业务管理及司机资料设置\n存储：设备内加密存储（AES-256-GCM）\n对外传输：无（上述地址・位置・语音信息除外）</string>
     <string name="terms_s05_title">第5条　第三方服务的使用</string>
-    <string name="terms_s05_body">■ Google Maps Platform\n用于地图显示、导航及地址地理编码。适用Google隐私政策（https://policies.google.com/privacy）。\n\n■ Google Play Billing\n用于订阅付款。支付信息由Google管理，本应用不保存。\n\n■ Google ML Kit（文字识别）\nOCR处理仅在设备上运行，不向外部服务器发送数据。\n\n■ Google位置服务\n用于GPS获取。</string>
+    <string name="terms_s05_body">■ Google Maps Platform（含Geocoding API、Directions API、Maps SDK for Android）\n用于地图显示、导航、地址地理编码及路线搜索。显示和操作地图时，IP地址、设备信息、Cookie等标识符可能会自动发送至Google。适用Google隐私政策（https://policies.google.com/privacy）。\n\n■ Google Play Billing\n用于订阅付款。支付信息由Google管理，本应用不保存。\n\n■ Google ML Kit（文字识别）\nOCR处理本身仅在设备上运行，图像数据不会上传。但库的运行状态、设备信息、使用统计等可能会因诊断目的发送至Google。\n\n■ Google位置服务\n用于GPS获取。\n\n■ 设备的语音识别服务\n用于语音输入功能。提供方及处理方式取决于设备设置。\n\n■ zipcloud（邮政编码检索API）\n用于通过邮政编码检索地址。仅传输您输入的邮政编码。适用运营方自身的隐私政策。\n\n■ GitHub（公告）\n为显示应用内公告，会从GitHub获取公开文件。此通信不会传输任何个人信息。</string>
     <string name="terms_s06_title">第6条　数据存储与安全</string>
-    <string name="terms_s06_body">您输入的个人信息和业务数据存储在设备内的加密存储中（Android EncryptedSharedPreferences / AES-256-GCM）。\n\n数据不会传输至外部服务器，也不会进行云同步。卸载应用后，所有数据将从设备中删除。\n\n使用备份功能时，导出数据的管理由用户自行负责。</string>
+    <string name="terms_s06_body">您输入的个人信息和业务数据存储在设备内的加密存储中（Android EncryptedSharedPreferences / AES-256-GCM）。\n\n除第4条・第5条所述的地址、邮政编码、位置信息、语音外，数据不会传输至外部服务器，也不会进行云同步。卸载应用后，所有数据将从设备中删除。\n\n您可以随时在应用内账户页面删除所有已保存的数据（资料、包裹、路线、公告等）。删除后将恢复为未注册状态，且此操作不可撤销。\n\n使用备份功能时，导出数据的管理由用户自行负责。</string>
     <string name="terms_s07_title">第7条　禁止行为</string>
     <string name="terms_s07_body">禁止以下行为：\n\n· 对本应用进行逆向工程、篡改或再发布\n· 未经授权输入或使用他人个人信息\n· 将本应用用于违反法律法规的目的\n· 对本应用的服务器或基础设施施加过度负载\n· 使用虚假信息注册或以逃避计费为目的的不当使用</string>
     <string name="terms_s08_title">第8条　免责声明</string>

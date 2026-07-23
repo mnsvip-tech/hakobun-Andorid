@@ -29,35 +29,56 @@ private const val CURRENT_LONGITUDE = 139.767125
 fun currentRouteOrigin(): Pair<Double, Double> = CURRENT_LATITUDE to CURRENT_LONGITUDE
 
 /**
- * 実機テスト用: 東京駅を中心に半径約15km圏内へランダムに散らしたダミー荷物をcount件生成する。
- * 座標・時間指定・配達ステータスをランダム化し、ピン表示・ルート計算・ステータス更新の実機検証に使う。
+ * 実機テスト用: 奈良県内の各市町村中心地の周辺約1.5km圏内にダミー荷物をcount件散らして生成する。
+ * 住所の市町村名と生成座標を対応させることで、住所とピン位置の乖離を防ぐ。
+ * 時間指定・配達ステータスはランダム化し、ピン表示・ルート計算・ステータス更新の実機検証に使う。
  */
 fun generateDebugTestPackages(count: Int, seed: Long = System.currentTimeMillis()): List<DeliveryPackage> {
     val random = kotlin.random.Random(seed)
+    // 地名と実際のおおよその中心座標(緯度, 経度)を対応させる
     val wards = listOf(
-        "千代田区丸の内", "中央区銀座", "港区六本木", "新宿区西新宿", "渋谷区渋谷",
-        "品川区大崎", "目黒区中目黒", "大田区蒲田", "世田谷区三軒茶屋", "杉並区荻窪",
-        "豊島区池袋", "北区赤羽", "板橋区大山", "練馬区石神井", "台東区浅草",
-        "墨田区錦糸町", "江東区豊洲", "荒川区南千住", "足立区北千住", "葛飾区亀有",
-        "江戸川区船堀", "文京区本郷", "中野区中野", "武蔵野市吉祥寺"
+        Triple("奈良市登大路町", 34.6853, 135.8329),
+        Triple("奈良市二条大路南", 34.6851, 135.8050),
+        Triple("奈良市学園南", 34.6706, 135.7644),
+        Triple("大和郡山市北郡山町", 34.6494, 135.7827),
+        Triple("生駒市俵口町", 34.6912, 135.7011),
+        Triple("生駒市谷田町", 34.6805, 135.6970),
+        Triple("橿原市八木町", 34.5033, 135.7906),
+        Triple("橿原市畝傍町", 34.4833, 135.7900),
+        Triple("天理市川原城町", 34.5966, 135.8374),
+        Triple("桜井市粟殿", 34.5150, 135.8467),
+        Triple("香芝市関屋", 34.5350, 135.6983),
+        Triple("大和高田市大中", 34.5150, 135.7365),
+        Triple("御所市中央町", 34.4633, 135.7417),
+        Triple("五條市新町", 34.3609, 135.6989),
+        Triple("宇陀市榛原区", 34.5717, 135.9250),
+        Triple("葛城市新庄", 34.5033, 135.7167),
+        Triple("北葛城郡王寺町", 34.6014, 135.7017),
+        Triple("北葛城郡広陵町", 34.5450, 135.7217),
+        Triple("磯城郡田原本町", 34.5567, 135.7967),
+        Triple("山辺郡山添村", 34.6417, 135.9750),
+        Triple("生駒郡斑鳩町", 34.6136, 135.7317),
+        Triple("生駒郡三郷町", 34.6167, 135.6853),
+        Triple("高市郡明日香村", 34.4667, 135.8183),
+        Triple("吉野郡吉野町", 34.4372, 135.8611)
     )
     val surnames = listOf("山田", "佐藤", "鈴木", "田中", "高橋", "伊藤", "渡辺", "中村", "小林", "加藤")
     val givenNames = listOf("太郎", "花子", "一郎", "美咲", "健太", "由美", "翔太", "さくら", "大輔", "愛子")
 
     return (1..count).map { index ->
-        val ward = wards.random(random)
+        val (ward, baseLat, baseLng) = wards.random(random)
         val recipient = "${surnames.random(random)} ${givenNames.random(random)}"
-        // 東京駅中心の半径約15km圏内に均等分布させる(緯度1度≒111km, 経度1度≒91km@東京緯度)
-        val radiusKm = sqrt(random.nextDouble()) * 15.0
+        // 各地区の中心座標から半径約1km圏内に散らす(緯度1度≒111km, 経度1度≒91km@奈良緯度)
+        val radiusKm = sqrt(random.nextDouble()) * 1.0
         val angle = random.nextDouble() * 2 * Math.PI
-        val lat = CURRENT_LATITUDE + (radiusKm * kotlin.math.cos(angle)) / 111.0
-        val lng = CURRENT_LONGITUDE + (radiusKm * kotlin.math.sin(angle)) / 91.0
+        val lat = baseLat + (radiusKm * kotlin.math.cos(angle)) / 111.0
+        val lng = baseLng + (radiusKm * kotlin.math.sin(angle)) / 91.0
         val timeWindow = RegistrationTimeWindow.entries.random(random)
         val status = DeliveryStatus.entries.random(random)
         DeliveryPackage(
             trackingCode = "TEST-${1000 + index}",
             recipient = recipient,
-            address = "東京都$ward${random.nextInt(1, 9)}-${random.nextInt(1, 30)}-${random.nextInt(1, 20)}",
+            address = "奈良県$ward${random.nextInt(1, 9)}-${random.nextInt(1, 30)}-${random.nextInt(1, 20)}",
             timeWindow = timeWindow.toTimeWindow(),
             deliveryTimeWindow = timeWindow,
             size = "80",
@@ -208,12 +229,13 @@ fun createPackagesFromCourse(course: RegularCourse, existingCount: Int): List<De
 }
 
 suspend fun createCourseAddressFromInput(
+    context: android.content.Context,
     recipient: String,
     address: String,
     timeWindow: TimeWindow,
     memo: String
 ): CourseAddress {
-    val (lat, lng) = geocodeAddress(address)
+    val (lat, lng) = geocodeAddress(context, address)
     return CourseAddress(
         recipient = recipient.ifBlank { "届け先未入力" },
         address = address,
@@ -225,6 +247,7 @@ suspend fun createCourseAddressFromInput(
 }
 
 suspend fun createDeliveryPackageFromRegistration(
+    context: android.content.Context,
     result: PackageRegistrationResult,
     existingCount: Int
 ): DeliveryPackage {
@@ -233,7 +256,7 @@ suspend fun createDeliveryPackageFromRegistration(
     val (lat, lng) = if (result.latitude != 0.0 || result.longitude != 0.0) {
         result.latitude to result.longitude
     } else {
-        geocodeAddress(result.address)
+        geocodeAddress(context, result.address)
     }
 
     return DeliveryPackage(
@@ -287,9 +310,45 @@ suspend fun fetchAnnouncements(): List<Announcement> {
     }
 }
 
-suspend fun geocodeAddressPublic(address: String): Pair<Double, Double> = geocodeAddress(address)
+// Google MapsのREST API(Geocoding/Directions)はAPIキー制限を「Androidアプリ」で設定した場合、
+// X-Android-Package / X-Android-Cert ヘッダーの付与が必須になる。ヘッダーを付けずに平文キーだけで
+// 呼び出すと、キーが漏洩した際に第三者が別アプリ・別サーバーから流用できてしまうため必ず付与する。
+private fun java.net.HttpURLConnection.applyAndroidRestrictionHeaders(context: android.content.Context) {
+    setRequestProperty("X-Android-Package", context.packageName)
+    val certSha1 = signingCertificateSha1(context)
+    if (certSha1.isNotBlank()) {
+        setRequestProperty("X-Android-Cert", certSha1)
+    }
+}
 
-private suspend fun geocodeAddress(address: String): Pair<Double, Double> {
+private fun signingCertificateSha1(context: android.content.Context): String {
+    return runCatching {
+        val signature = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            val info = context.packageManager.getPackageInfo(
+                context.packageName,
+                android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+            )
+            info.signingInfo?.apkContentsSigners?.firstOrNull()
+        } else {
+            @Suppress("DEPRECATION")
+            val info = context.packageManager.getPackageInfo(
+                context.packageName,
+                android.content.pm.PackageManager.GET_SIGNATURES
+            )
+            @Suppress("DEPRECATION")
+            info.signatures?.firstOrNull()
+        } ?: return ""
+        val digest = java.security.MessageDigest.getInstance("SHA-1").digest(signature.toByteArray())
+        // X-Android-Cert ヘッダーはコロンなしの連続した16進文字列である必要がある
+        // （Google Cloud Console の登録画面はコロン区切り表示だが、HTTPヘッダーの値は区切り文字なし）。
+        digest.joinToString("") { "%02X".format(it) }
+    }.getOrDefault("")
+}
+
+suspend fun geocodeAddressPublic(context: android.content.Context, address: String): Pair<Double, Double> =
+    geocodeAddress(context, address)
+
+private suspend fun geocodeAddress(context: android.content.Context, address: String): Pair<Double, Double> {
     return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         runCatching {
             val encoded = java.net.URLEncoder.encode(address, "UTF-8")
@@ -298,6 +357,7 @@ private suspend fun geocodeAddress(address: String): Pair<Double, Double> {
                 "https://maps.googleapis.com/maps/api/geocode/json?address=$encoded&language=ja&region=JP&key=$apiKey"
             )
             val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.applyAndroidRestrictionHeaders(context)
             connection.connectTimeout = 8000
             connection.readTimeout = 8000
             val json = try {
@@ -451,7 +511,10 @@ private fun estimatedTravelMinutes(distanceMeters: Double, atHour: Int): Double 
     return (distanceKm / speedKmh) * 60.0
 }
 
-private const val LATENESS_PENALTY_PER_MINUTE = 3.0
+// 地理的な近さを最優先とし、時間指定の遅れは同程度の距離の候補間でのみ選択を左右する
+// 弱い参考情報として扱う(以前は3.0で、時間指定違反が数十分でも移動時間の差を圧倒し、
+// 近くの荷物を後回しにしてしまっていた)。
+private const val LATENESS_PENALTY_PER_MINUTE = 0.3
 
 /**
  * 渋滞(時間帯別の平均速度補正)と各荷物の時間指定(timeWindow)を考慮して配送順を決定する。
@@ -514,6 +577,7 @@ fun calculateNearestRoute(
 }
 
 suspend fun fetchDrivingRoutePoints(
+    context: android.content.Context,
     origin: Pair<Double, Double>,
     destination: Pair<Double, Double>
 ): List<Pair<Double, Double>> {
@@ -528,6 +592,7 @@ suspend fun fetchDrivingRoutePoints(
                     "&mode=driving&language=ja&region=JP&key=$apiKey"
             )
             val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.applyAndroidRestrictionHeaders(context)
             connection.connectTimeout = 8000
             connection.readTimeout = 8000
             val json = try {
@@ -561,16 +626,67 @@ private fun drivingRouteCacheKey(origin: Pair<Double, Double>, destination: Pair
  * 空(取得失敗)の結果はキャッシュしないため、次回に再試行できる。
  */
 suspend fun fetchDrivingRoutePointsCached(
+    context: android.content.Context,
     origin: Pair<Double, Double>,
     destination: Pair<Double, Double>
 ): List<Pair<Double, Double>> {
     val key = drivingRouteCacheKey(origin, destination)
     drivingRouteCache[key]?.let { return it }
-    val points = fetchDrivingRoutePoints(origin, destination)
+    val points = fetchDrivingRoutePoints(context, origin, destination)
     if (points.isNotEmpty()) {
         drivingRouteCache[key] = points
     }
     return points
+}
+
+data class NearbyPlace(
+    val placeId: String,
+    val name: String,
+    val latitude: Double,
+    val longitude: Double
+)
+
+/**
+ * Google Places API (Nearby Search) で周辺のコンビニ/ガソリンスタンド等を検索する。
+ * type には "convenience_store" や "gas_station" を渡す。
+ */
+suspend fun fetchNearbyPlaces(
+    context: android.content.Context,
+    latitude: Double,
+    longitude: Double,
+    type: String,
+    radiusMeters: Int = 1500
+): List<NearbyPlace> {
+    return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        runCatching {
+            val apiKey = com.delivery.navigator.BuildConfig.MAPS_API_KEY
+            val url = java.net.URL(
+                "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
+                    "?location=$latitude,$longitude&radius=$radiusMeters&type=$type&language=ja&key=$apiKey"
+            )
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.applyAndroidRestrictionHeaders(context)
+            connection.connectTimeout = 8000
+            connection.readTimeout = 8000
+            val json = try {
+                connection.inputStream.bufferedReader().readText()
+            } finally {
+                connection.disconnect()
+            }
+            val root = org.json.JSONObject(json)
+            val results = root.optJSONArray("results") ?: return@runCatching emptyList()
+            (0 until results.length()).mapNotNull { i ->
+                val item = results.optJSONObject(i) ?: return@mapNotNull null
+                val loc = item.optJSONObject("geometry")?.optJSONObject("location") ?: return@mapNotNull null
+                NearbyPlace(
+                    placeId = item.optString("place_id"),
+                    name = item.optString("name"),
+                    latitude = loc.getDouble("lat"),
+                    longitude = loc.getDouble("lng")
+                )
+            }
+        }.getOrDefault(emptyList())
+    }
 }
 
 private fun decodePolyline(encoded: String): List<Pair<Double, Double>> {

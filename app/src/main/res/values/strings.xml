@@ -29,6 +29,7 @@
     <string name="notice">お知らせ</string>
     <string name="hide_summary">集計を非表示</string>
     <string name="show_summary">集計を表示</string>
+    <string name="show_normal_pins_with_course">通常のピンも表示</string>
     <string name="all_time_windows">全て</string>
     <string name="all_time_windows_filter">全時間帯</string>
     <string name="tagline">今日の配達を軽く、正確に</string>
@@ -59,6 +60,8 @@
     <string name="rotate">回転</string>
     <string name="marker_current_location">現在地</string>
     <string name="marker_route_base_point">ルート計算の基準点</string>
+    <string name="poi_convenience_store">コンビニ</string>
+    <string name="poi_gas_station">ガソリン</string>
 
     <!-- パネルタイトル -->
     <string name="panel_delivery_list">配達リスト</string>
@@ -91,6 +94,9 @@
     <string name="regular_courses_title">定期配送コース</string>
     <string name="course_address_hint">住所追加は荷物登録画面でコースを選んで行います。</string>
     <string name="course_chip_label">%1$sコース</string>
+    <string name="course_chip_label_loaded">%1$sコース ✓読込中</string>
+    <string name="course_loaded_status">現在読み込み中: %1$sコース</string>
+    <string name="course_loaded_status_none">現在地図に読み込まれているコースはありません</string>
     <string name="course_summary">%1$s / 登録住所 %2$d件</string>
     <string name="load_course_button">%1$sコースを今日の配達へ読み込み</string>
 
@@ -178,6 +184,8 @@
     <string name="package_shape_title">荷姿</string>
     <string name="add_course_address_title">コースへ住所を追加</string>
     <string name="clear_course_from_map_button">地図から削除</string>
+    <string name="course_cleared_from_map">%1$sコースを地図から削除しました（%2$d件）</string>
+    <string name="course_not_on_map">%1$sコースは地図に読み込まれていません</string>
     <string name="complete_all_button">全て配達完了にする</string>
     <string name="debug_section_title">デバッグ用（開発ビルドのみ表示）</string>
     <string name="debug_expire_trial_button">プレミアムを解除して無料プランに戻す（テスト用）</string>
@@ -224,6 +232,21 @@
     <string name="premium_features_list">・全機能\n・無制限登録\n・優先サポート</string>
     <string name="subscribe_google_pay">Google Payでプレミアムに登録</string>
     <string name="subscription_terms">最初の2週間は無料。その後月額¥980（税込）。いつでもキャンセル可能。</string>
+    <string name="free_trial_period_dynamic">%1$d日間トライアル</string>
+    <string name="premium_price_dynamic">%1$s / 月</string>
+    <string name="subscription_terms_dynamic">最初の%1$sは無料です。無料期間終了後、自動的に有料プランへ移行し%2$s（税込）が請求されます。以降、解約しない限りGoogle Playを通じて毎月自動更新されます。いつでもキャンセル可能です。</string>
+    <string name="manage_subscription_link">Google Playで定期購入を管理・解約する</string>
+    <string name="price_loading">価格情報を確認中です…</string>
+    <string name="location_rationale_title">位置情報の利用について</string>
+    <string name="location_rationale_body">現在地を地図上に表示し、配達先へのナビゲーションやルートの最適化に使用します。位置情報はアプリ使用中のみ取得し、バックグラウンドでは取得しません。次の画面で権限の許可をお願いします。</string>
+    <string name="location_rationale_allow">位置情報を許可する</string>
+    <string name="location_rationale_later">後で</string>
+    <string name="delete_account_title">プロフィールとデータの削除</string>
+    <string name="delete_account_description">氏名・連絡先・荷物・コース・お知らせなど、端末に保存されているすべてのデータを削除し、未登録状態に戻します。この操作は取り消せません。定期購入自体はGoogle Playの管理画面から別途解約してください。</string>
+    <string name="delete_account_button">すべてのデータを削除</string>
+    <string name="delete_account_confirm_title">本当に削除しますか?</string>
+    <string name="delete_account_confirm_body">プロフィール・荷物・コース・お知らせなど、端末に保存されたすべてのデータが削除されます。この操作は取り消せません。</string>
+    <string name="delete_account_confirm_action">削除する</string>
     <string name="subscribe_complete">プレミアムプランへの移行が完了しました</string>
     <string name="billing_not_available">Google Play Billingを起動できません</string>
     <string name="plan_not_found">プランが見つかりません（Play Console設定をご確認ください）</string>
@@ -332,11 +355,11 @@
     <string name="faq_q_10">無料トライアルはいつ終わりますか？</string>
     <string name="faq_a_10">ユーザー登録した日から14日間が無料期間です。\n\nアプリ内のユーザーアカウント画面（サイドメニュー → ユーザーアカウント情報）で残り日数を確認できます。\n\nこの無料期間中に料金が発生することはありません。期間終了後もプレミアムに加入しない場合、新規の荷物登録のみロックされます（既存データの閲覧・編集は引き続き無料でご利用いただけます）。プレミアムへの加入はGoogle Playを通じてお客様ご自身でお申し込みいただく必要があり、自動的に課金が始まることはありません。</string>
     <string name="faq_q_11">サブスクリプションをキャンセルするには？</string>
-    <string name="faq_a_11">Google Play ストア → アカウントアイコン → 「定期購入」→ HAKOBUN → 「定期購入を解約」から手続きしてください。\n\n解約後も当月末までご利用いただけます。アプリ内からの解約機能は現在準備中です。</string>
+    <string name="faq_a_11">Google Play ストア → アカウントアイコン → 「定期購入」→ HAKOBUN → 「定期購入を解約」、またはアプリ内アカウント画面の「Google Playで定期購入を管理・解約する」リンクから手続きできます。\n\n解約後も、現在の請求期間が終了するまではご利用いただけます。</string>
     <string name="faq_q_12">決済に失敗しました</string>
     <string name="faq_a_12">Google Play のお支払い方法をご確認ください。\n\nGoogle Play ストア → アカウント → お支払いと定期購入 → お支払い方法\n\nカードの有効期限切れ・残高不足などが原因の場合があります。Google Play のサポートもご参照ください。</string>
     <string name="faq_q_13">データはどこに保存されますか？</string>
-    <string name="faq_a_13">すべてのデータはお使いのスマートフォン内の暗号化ストレージに保存されます。\n\n外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールするとデータは削除されます。\n\n大切なデータはバックアップ機能（サイドメニュー → バックアップ）でエクスポートしておくことをお勧めします。</string>
+    <string name="faq_a_13">プロフィール・荷物・コースなどの業務データは、お使いのスマートフォン内の暗号化ストレージに保存され、外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールするとデータは削除されます。\n\nただし、住所・郵便番号・現在地・配達先座標は、地図表示や経路検索・住所検索のためGoogleおよびzipcloud（郵便番号検索サービス）へ送信されます。音声入力は端末の音声認識サービスを利用します。詳しくは利用規約・プライバシーポリシーをご確認ください。\n\n大切なデータはバックアップ機能（サイドメニュー → バックアップ）でエクスポートしておくことをお勧めします。</string>
     <string name="faq_q_14">機種変更したらデータは引き継げますか？</string>
     <string name="faq_a_14">現在、自動的なデータ引き継ぎ機能はありません。\n\n機種変更前にバックアップ機能でデータをエクスポート（コピー・共有）し、新しい端末でインポートしてください。\n\nインポート機能：サイドメニュー → バックアップ → 「復元」</string>
     <string name="faq_q_15">アプリが重い・クラッシュします</string>
@@ -350,18 +373,20 @@
     <string name="terms_header_title">HAKOBUN ご利用規約・プライバシーポリシー</string>
     <string name="terms_header_date">最終更新日：2026年7月19日</string>
     <string name="terms_header_intro">本アプリをご利用になる前に、以下の規約をお読みください。利用を開始した時点で、本規約に同意したものとみなします。</string>
+    <string name="terms_web_link_label">Web版をブラウザで開く（印刷・共有用）</string>
+    <string name="terms_web_link_url" translatable="false">https://mnsvip-tech.github.io/hakobun-legal/</string>
     <string name="terms_s01_title">第1条　サービス概要</string>
     <string name="terms_s01_body">HAKOBUN（以下「本アプリ」）は、配送ドライバーの業務効率化を目的とした配達管理支援アプリです。荷物の登録・ルート管理・配達状況の記録・住所のOCR読み取りなどの機能を提供します。\n\n本アプリは業務補助ツールであり、実際の配送業務における法令遵守・安全運転・配送会社の規定遵守はご利用者ご自身の責任となります。</string>
     <string name="terms_s02_title">第2条　利用資格</string>
-    <string name="terms_s02_body">本アプリは18歳以上の方を対象としています。配送業務に従事する方、または業務管理者としてご利用ください。\n\n本アプリをご利用いただくには、Google アカウントが必要な場合があります。虚偽の情報による登録は禁止します。</string>
+    <string name="terms_s02_body">本アプリは18歳以上の方を対象としています。配送業務に従事する方、または業務管理者としてご利用ください。\n\n本アプリのご利用にはアプリ内でのプロフィール登録（氏名・拠点・連絡先・メールアドレス）が必要です。この登録はデバイス内のみに保存されるローカルなプロフィールであり、Googleアカウントとの連携や外部認証は必須ではありません。虚偽の情報による登録は禁止します。</string>
     <string name="terms_s03_title">第3条　サブスクリプション・課金</string>
-    <string name="terms_s03_body">【無料期間】\n初回アカウント登録日から14日間、プレミアムプランの全機能を無料でご利用いただけます。この無料期間中に自動的な課金が発生することはありません。無料期間終了後もプレミアムのご利用を継続されたい場合は、Google Playを通じてお客様ご自身でお申し込みください（無料期間から有料プランへの自動移行はありません）。\n\n【有料プラン（プレミアム）】\n料金：¥980 / 月（税込）\n請求：Google Play を通じて毎月自動更新\nキャンセル：Google Play ストア「定期購入」画面からいつでも解約可能。解約後も当月末まで利用できます。\n\n【返金ポリシー】\nGoogle Play の返金ポリシーに従います。購入後48時間以内のキャンセルについては、Google Play を通じてご申請ください。\n\n【価格変更】\n価格改定の際は30日前までにアプリ内またはメールにてお知らせします。</string>
+    <string name="terms_s03_body">【無料期間】\n初回プロフィール登録日から14日間、プレミアムプランの全機能を無料でお試しいただけます。無料期間中に自動的な課金が発生することはありません。無料期間終了後もプレミアムのご利用を継続されたい場合は、Google Playを通じてお客様ご自身でお申し込みください（無料期間から有料プランへの自動移行はありません）。\n\n【有料プラン（プレミアム）】\n料金：Google Playストアの購入画面に表示される金額（税込）。金額はお住まいの地域・通貨により異なります。\n請求：Google Play を通じて毎月自動更新\nキャンセル：Google Play ストア「定期購入」画面、またはアプリ内アカウント画面の「Google Playで定期購入を管理・解約する」リンクからいつでも解約可能です。解約後も、現在の請求期間が終了するまではご利用いただけます。\n\n【返金ポリシー】\nGoogle Play の返金ポリシーに従います。購入後48時間以内のキャンセルについては、Google Play を通じてご申請ください。\n\n【価格変更】\n価格改定の際は30日前までにアプリ内でお知らせします。</string>
     <string name="terms_s04_title">第4条　収集する情報とその利用目的</string>
-    <string name="terms_s04_body">■ 位置情報（GPS）\n目的：配達先へのナビゲーション・現在地表示・配達ルートの最適化\n取得タイミング：アプリ使用中のみ（バックグラウンド取得なし）\n\n■ カメラ・画像\n目的：荷物の送り状OCR読み取りによる住所・氏名の自動入力\n保存先：デバイス内のみ（クラウドへの送信なし）\n\n■ 音声（マイク）\n目的：音声入力による住所・メモの文字起こし\n保存先：デバイス内のみ\n\n■ 入力情報（氏名・住所・電話番号・メールアドレス）\n目的：配達業務の管理・ドライバープロフィールの設定\n保存先：デバイス内の暗号化ストレージ（AES-256-GCM）\n外部送信：なし</string>
+    <string name="terms_s04_body">■ 位置情報（GPS）\n目的：配達先へのナビゲーション・現在地表示・配達ルートの最適化\n取得タイミング：アプリ使用中のみ（バックグラウンド取得なし）\n送信先：現在地・配達先座標はルート検索のためGoogle Directions APIへ送信されます\n\n■ カメラ・画像\n目的：荷物の送り状OCR読み取りによる住所・氏名の自動入力\n処理：デバイス上のGoogle ML Kitで処理し、外部サーバーへは送信しません\n保存：認識処理の完了後、一時画像は速やかに削除されます\n\n■ 音声（マイク）\n目的：音声入力による住所・メモ・ステータス操作の文字起こし\n処理：端末に設定された音声認識サービス（システム標準）を利用します。実装によっては音声データがそのサービス提供元でリモート処理される場合があります\n\n■ 住所・郵便番号\n目的：座標変換（ジオコーディング）および郵便番号からの住所検索\n送信先：Google Geocoding API（住所→座標）、zipcloud（郵便番号→住所、第三者の郵便番号検索サービス）\n\n■ 入力情報（氏名・電話番号・メールアドレス）\n目的：配達業務の管理・ドライバープロフィールの設定\n保存先：デバイス内の暗号化ストレージ（AES-256-GCM）\n外部送信：なし（上記の住所・位置情報を除く）</string>
     <string name="terms_s05_title">第5条　第三者サービスの利用</string>
-    <string name="terms_s05_body">■ Google Maps Platform\nマップ表示・ナビゲーション・住所のジオコーディングに使用します。Google のプライバシーポリシー（https://policies.google.com/privacy）が適用されます。\n\n■ Google Play Billing\nサブスクリプション決済に使用します。決済情報は Google が管理し、本アプリは保持しません。\n\n■ Google ML Kit（テキスト認識）\nOCR処理はデバイス上でのみ実行され、外部サーバーへのデータ送信は行いません。\n\n■ Google 位置情報サービス\nGPS取得に使用します。</string>
+    <string name="terms_s05_body">■ Google Maps Platform（Geocoding API／Directions API・Maps SDK for Android を含む）\nマップ表示・ナビゲーション・住所のジオコーディング・経路検索に使用します。地図の表示・操作に伴い、IPアドレス、端末情報、Cookie等の識別子がGoogleへ自動的に送信される場合があります。Google のプライバシーポリシー（https://policies.google.com/privacy）が適用されます。\n\n■ Google Play Billing\nサブスクリプション決済に使用します。決済情報は Google が管理し、本アプリは保持しません。\n\n■ Google ML Kit（テキスト認識）\n荷物画像のOCR処理自体はデバイス上でのみ実行され、画像データが外部サーバーへ送信されることはありません。ただし、ライブラリの動作状況・端末情報・利用統計等が診断目的でGoogleへ送信される場合があります。\n\n■ Google 位置情報サービス\nGPS取得に使用します。\n\n■ 端末の音声認識サービス\n音声入力機能で使用します。提供元・処理方法は端末設定に依存します。\n\n■ zipcloud（郵便番号検索API）\n郵便番号から住所を検索するために使用します。入力された郵便番号のみが送信されます。運営元のプライバシーポリシーが適用されます。\n\n■ GitHub（お知らせ配信）\nアプリ内のお知らせ表示のため、GitHub上の公開ファイルを取得します。この通信で個人情報が送信されることはありません。</string>
     <string name="terms_s06_title">第6条　データの保管・セキュリティ</string>
-    <string name="terms_s06_body">ご入力いただいた個人情報・業務データは、デバイス内の暗号化ストレージ（Android EncryptedSharedPreferences / AES-256-GCM）に保存されます。\n\nデータの外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールした場合、すべてのデータはデバイスから削除されます。\n\nバックアップ機能をご利用の場合、エクスポートデータの管理はご利用者ご自身の責任となります。</string>
+    <string name="terms_s06_body">ご入力いただいた個人情報・業務データは、デバイス内の暗号化ストレージ（Android EncryptedSharedPreferences / AES-256-GCM）に保存されます。\n\n第4条・第5条に記載の住所・郵便番号・位置情報・音声を除き、データの外部サーバーへの送信・クラウド同期は行いません。アプリをアンインストールした場合、すべてのデータはデバイスから削除されます。\n\n設定画面から、保存されているすべてのデータをいつでも削除できます。\n\nバックアップ機能をご利用の場合、エクスポートデータの管理はご利用者ご自身の責任となります。</string>
     <string name="terms_s07_title">第7条　禁止事項</string>
     <string name="terms_s07_body">以下の行為を禁止します。\n\n・本アプリのリバースエンジニアリング・改ざん・再配布\n・他者の個人情報を無断で入力・利用する行為\n・法令に違反する目的での利用\n・本アプリのサーバー・インフラへの過負荷をかける行為\n・虚偽の情報による登録・課金回避を目的とした不正利用</string>
     <string name="terms_s08_title">第8条　免責事項</string>

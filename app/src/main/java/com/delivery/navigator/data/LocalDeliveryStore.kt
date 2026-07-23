@@ -142,6 +142,7 @@ class LocalDeliveryStore(context: Context) {
             .remove(KEY_PACKAGES)
             .remove(KEY_REGULAR_COURSES)
             .remove(KEY_USER_PROFILE)
+            .remove(KEY_ANNOUNCEMENTS)
             .apply()
     }
 

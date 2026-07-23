@@ -29,6 +29,7 @@
     <string name="notice">Thông báo</string>
     <string name="hide_summary">Ẩn thống kê</string>
     <string name="show_summary">Hiện thống kê</string>
+    <string name="show_normal_pins_with_course">Hiện cả ghim thông thường</string>
     <string name="all_time_windows">Tất cả</string>
     <string name="all_time_windows_filter">Tất cả khung giờ</string>
     <string name="tagline">Giao hàng hôm nay nhẹ nhàng và chính xác</string>
@@ -59,6 +60,8 @@
     <string name="rotate">Xoay</string>
     <string name="marker_current_location">Vị trí hiện tại</string>
     <string name="marker_route_base_point">Điểm xuất phát tính tuyến đường</string>
+    <string name="poi_convenience_store">Cửa hàng tiện lợi</string>
+    <string name="poi_gas_station">Trạm xăng</string>
 
     <!-- Tiêu đề bảng điều khiển -->
     <string name="panel_delivery_list">Danh sách giao hàng</string>
@@ -96,6 +99,11 @@
     <string name="load_course_button">Tải tuyến %1$s vào giao hàng hôm nay</string>
     <string name="add_course_address_title">Thêm địa chỉ vào tuyến</string>
     <string name="clear_course_from_map_button">Xóa khỏi bản đồ</string>
+    <string name="course_cleared_from_map">Đã xóa tuyến %1$s khỏi bản đồ (%2$d mục)</string>
+    <string name="course_not_on_map">Tuyến %1$s chưa được tải lên bản đồ</string>
+    <string name="course_chip_label_loaded">Tuyến %1$s ✓Đã tải</string>
+    <string name="course_loaded_status">Đang tải: Tuyến %1$s</string>
+    <string name="course_loaded_status_none">Hiện không có tuyến nào được tải lên bản đồ</string>
 
     <!-- Sao lưu -->
     <string name="backup_data_title">Quản lý dữ liệu địa chỉ</string>
@@ -221,6 +229,21 @@
     <string name="premium_features_list">· Toàn bộ tính năng\n· Đăng ký không giới hạn\n· Hỗ trợ ưu tiên</string>
     <string name="subscribe_google_pay">Đăng ký Premium qua Google Pay</string>
     <string name="subscription_terms">2 tuần đầu miễn phí, sau đó ¥980/tháng（đã bao gồm thuế）. Hủy bất cứ lúc nào.</string>
+    <string name="free_trial_period_dynamic">Dùng thử %1$d ngày</string>
+    <string name="premium_price_dynamic">%1$s / tháng</string>
+    <string name="subscription_terms_dynamic">Miễn phí trong %1$s đầu tiên. Sau khi hết thời gian dùng thử, bạn sẽ tự động bị tính phí %2$s (đã bao gồm thuế) và gói sẽ tự động gia hạn hàng tháng qua Google Play cho đến khi hủy. Có thể hủy bất cứ lúc nào.</string>
+    <string name="manage_subscription_link">Quản lý hoặc hủy gói đăng ký trên Google Play</string>
+    <string name="price_loading">Đang kiểm tra giá…</string>
+    <string name="location_rationale_title">Về việc sử dụng vị trí</string>
+    <string name="location_rationale_body">Vị trí hiện tại của bạn được hiển thị trên bản đồ và dùng để dẫn đường đến điểm giao hàng cũng như tối ưu hóa tuyến đường. Vị trí chỉ được thu thập khi đang sử dụng ứng dụng, không thu thập ở chế độ nền. Bạn sẽ được yêu cầu cấp quyền ở màn hình tiếp theo.</string>
+    <string name="location_rationale_allow">Cho phép truy cập vị trí</string>
+    <string name="location_rationale_later">Để sau</string>
+    <string name="delete_account_title">Xóa hồ sơ và dữ liệu</string>
+    <string name="delete_account_description">Xóa toàn bộ dữ liệu lưu trên thiết bị này, bao gồm họ tên, thông tin liên hệ, hàng hóa, tuyến đường và thông báo, đồng thời đưa ứng dụng về trạng thái chưa đăng ký. Không thể hoàn tác. Để hủy gói đăng ký, vui lòng thực hiện riêng qua trang quản lý đăng ký của Google Play.</string>
+    <string name="delete_account_button">Xóa tất cả dữ liệu</string>
+    <string name="delete_account_confirm_title">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="delete_account_confirm_body">Toàn bộ dữ liệu lưu trên thiết bị — hồ sơ, hàng hóa, tuyến đường, thông báo và các dữ liệu khác — sẽ bị xóa. Không thể hoàn tác.</string>
+    <string name="delete_account_confirm_action">Xóa</string>
     <string name="subscribe_complete">Đã chuyển sang gói Premium thành công</string>
     <string name="billing_not_available">Không thể khởi động Google Play Billing</string>
     <string name="plan_not_found">Không tìm thấy gói（vui lòng kiểm tra cài đặt Play Console）</string>
@@ -332,11 +355,11 @@
     <string name="faq_q_10">Bao giờ thì hết thời gian dùng thử miễn phí?</string>
     <string name="faq_a_10">Thời gian miễn phí là 14 ngày kể từ ngày đăng ký.\n\nBạn có thể kiểm tra số ngày còn lại trên màn hình Tài khoản người dùng (menu bên → Thông tin tài khoản người dùng).\n\nKhông có khoản phí nào được tính trong thời gian miễn phí này. Nếu hết thời gian mà bạn chưa đăng ký Premium, chỉ tính năng đăng ký hàng hóa mới bị khóa (bạn vẫn có thể xem và chỉnh sửa dữ liệu hiện có miễn phí). Việc đăng ký Premium cần bạn tự thực hiện qua Google Play — sẽ không có khoản phí nào được tính tự động.</string>
     <string name="faq_q_11">Làm thế nào để hủy đăng ký?</string>
-    <string name="faq_a_11">Vào Google Play Store → Biểu tượng tài khoản → 「Đăng ký」→ HAKOBUN → 「Hủy đăng ký」.\n\nSau khi hủy, bạn vẫn có thể sử dụng đến cuối tháng hiện tại. Tính năng hủy trong ứng dụng đang được phát triển.</string>
+    <string name="faq_a_11">Vào Google Play Store → Biểu tượng tài khoản → 「Đăng ký」→ HAKOBUN → 「Hủy đăng ký」, hoặc dùng liên kết「Quản lý hoặc hủy gói đăng ký trên Google Play」trong màn hình tài khoản của ứng dụng.\n\nSau khi hủy, bạn vẫn có thể sử dụng đến hết chu kỳ thanh toán hiện tại.</string>
     <string name="faq_q_12">Thanh toán thất bại</string>
     <string name="faq_a_12">Vui lòng kiểm tra phương thức thanh toán trên Google Play.\n\nGoogle Play Store → Tài khoản → Thanh toán &amp; đăng ký → Phương thức thanh toán\n\nCó thể do thẻ hết hạn hoặc không đủ số dư. Vui lòng tham khảo thêm hỗ trợ của Google Play.</string>
     <string name="faq_q_13">Dữ liệu được lưu ở đâu?</string>
-    <string name="faq_a_13">Tất cả dữ liệu được lưu trong bộ nhớ được mã hóa trên điện thoại của bạn.\n\nKhông có dữ liệu nào được gửi lên máy chủ bên ngoài hay đồng bộ lên đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu.\n\nKhuyến nghị xuất dữ liệu quan trọng bằng tính năng Sao lưu (menu bên → Sao lưu).</string>
+    <string name="faq_a_13">Hồ sơ, hàng hóa, tuyến đường được lưu trong bộ nhớ mã hóa trên điện thoại của bạn và không đồng bộ lên đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu.\n\nTuy nhiên, địa chỉ, mã bưu điện, vị trí hiện tại và tọa độ điểm giao hàng được gửi đến Google và zipcloud (dịch vụ tra cứu mã bưu điện) để hiển thị bản đồ, tìm tuyến đường và tra cứu địa chỉ. Nhập liệu bằng giọng nói sử dụng dịch vụ nhận dạng giọng nói của thiết bị. Xem chi tiết trong Điều khoản &amp; Chính sách bảo mật.\n\nKhuyến nghị xuất dữ liệu quan trọng bằng tính năng Sao lưu (menu bên → Sao lưu).</string>
     <string name="faq_q_14">Đổi điện thoại có chuyển được dữ liệu không?</string>
     <string name="faq_a_14">Hiện chưa hỗ trợ chuyển dữ liệu tự động.\n\nTrước khi đổi máy, hãy xuất dữ liệu bằng tính năng Sao lưu (sao chép/chia sẻ), rồi nhập vào thiết bị mới.\n\nChức năng nhập: menu bên → Sao lưu → 「Khôi phục」</string>
     <string name="faq_q_15">Ứng dụng chậm hoặc bị treo</string>
@@ -350,18 +373,20 @@
     <string name="terms_header_title">Điều khoản dịch vụ &amp; Chính sách bảo mật HAKOBUN</string>
     <string name="terms_header_date">Cập nhật lần cuối: 19 tháng 7 năm 2026</string>
     <string name="terms_header_intro">Vui lòng đọc các điều khoản sau trước khi sử dụng ứng dụng. Khi bắt đầu sử dụng, bạn đồng ý với các điều khoản này.</string>
+    <string name="terms_web_link_label">Mở phiên bản web trên trình duyệt (để in/chia sẻ)</string>
+    <string name="terms_web_link_url" translatable="false">https://mnsvip-tech.github.io/hakobun-legal/</string>
     <string name="terms_s01_title">Điều 1　Tổng quan dịch vụ</string>
     <string name="terms_s01_body">HAKOBUN (sau đây gọi là「Ứng dụng」) là ứng dụng hỗ trợ quản lý giao hàng nhằm nâng cao hiệu quả công việc cho tài xế giao hàng. Cung cấp các tính năng như đăng ký hàng hóa, quản lý tuyến đường, ghi lại trạng thái giao hàng, đọc địa chỉ bằng OCR.\n\nỨng dụng là công cụ hỗ trợ nghiệp vụ. Việc tuân thủ pháp luật, lái xe an toàn và chấp hành quy định của công ty giao hàng trong công việc thực tế là trách nhiệm của người dùng.</string>
     <string name="terms_s02_title">Điều 2　Điều kiện sử dụng</string>
-    <string name="terms_s02_body">Ứng dụng dành cho người từ 18 tuổi trở lên đang làm việc trong lĩnh vực giao hàng hoặc quản lý nghiệp vụ.\n\nCó thể cần tài khoản Google để sử dụng ứng dụng. Cấm đăng ký bằng thông tin giả mạo.</string>
+    <string name="terms_s02_body">Ứng dụng dành cho người từ 18 tuổi trở lên đang làm việc trong lĩnh vực giao hàng hoặc quản lý nghiệp vụ.\n\nĐể sử dụng ứng dụng, bạn cần đăng ký hồ sơ trong ứng dụng (họ tên, cơ sở, liên hệ, email). Hồ sơ này chỉ được lưu trên thiết bị; không bắt buộc liên kết tài khoản Google hay xác thực bên ngoài. Cấm đăng ký bằng thông tin giả mạo.</string>
     <string name="terms_s03_title">Điều 3　Đăng ký gói &amp; Thanh toán</string>
-    <string name="terms_s03_body">[Thời gian miễn phí]\nToàn bộ tính năng của gói Premium được miễn phí trong 14 ngày kể từ ngày đăng ký tài khoản lần đầu. Không có khoản phí nào được tính tự động trong thời gian miễn phí này. Nếu muốn tiếp tục dùng Premium sau khi hết thời gian này, bạn cần tự đăng ký qua Google Play (không có việc tự động chuyển từ thời gian miễn phí sang gói có phí).\n\n[Gói có phí (Premium)]\nGiá: ¥980 / tháng (đã bao gồm thuế)\nThanh toán: Tự động gia hạn hàng tháng qua Google Play\nHủy: Có thể hủy bất kỳ lúc nào từ màn hình「Đăng ký」trên Google Play Store. Sau khi hủy vẫn sử dụng được đến cuối tháng.\n\n[Chính sách hoàn tiền]\nTheo chính sách hoàn tiền của Google Play. Hủy trong vòng 48 giờ sau khi mua vui lòng đăng ký qua Google Play.\n\n[Thay đổi giá]\nSẽ thông báo trước 30 ngày qua thông báo trong ứng dụng hoặc email khi có thay đổi giá.</string>
+    <string name="terms_s03_body">[Thời gian miễn phí]\nToàn bộ tính năng của gói Premium được dùng thử miễn phí trong 14 ngày kể từ ngày đăng ký hồ sơ lần đầu. Không có khoản phí nào được tính tự động trong thời gian miễn phí này. Nếu muốn tiếp tục dùng Premium sau khi hết thời gian này, bạn cần tự đăng ký qua Google Play (không có việc tự động chuyển từ thời gian miễn phí sang gói có phí).\n\n[Gói có phí (Premium)]\nGiá: Số tiền hiển thị trên màn hình mua hàng của Google Play (đã bao gồm thuế), thay đổi theo khu vực/loại tiền tệ.\nThanh toán: Tự động gia hạn hàng tháng qua Google Play\nHủy: Có thể hủy bất kỳ lúc nào từ màn hình「Đăng ký」trên Google Play Store, hoặc từ liên kết「Quản lý hoặc hủy gói đăng ký trên Google Play」trong màn hình tài khoản của ứng dụng. Sau khi hủy vẫn sử dụng được đến hết chu kỳ thanh toán hiện tại.\n\n[Chính sách hoàn tiền]\nTheo chính sách hoàn tiền của Google Play. Hủy trong vòng 48 giờ sau khi mua vui lòng đăng ký qua Google Play.\n\n[Thay đổi giá]\nSẽ thông báo trước 30 ngày qua thông báo trong ứng dụng khi có thay đổi giá.</string>
     <string name="terms_s04_title">Điều 4　Thông tin thu thập và mục đích sử dụng</string>
-    <string name="terms_s04_body">■ Vị trí (GPS)\nMục đích: Dẫn đường đến địa điểm giao hàng, hiển thị vị trí hiện tại, tối ưu hóa tuyến đường\nThời điểm thu thập: Chỉ khi đang sử dụng ứng dụng (không thu thập nền)\n\n■ Camera/Hình ảnh\nMục đích: Nhập địa chỉ tự động bằng OCR vận đơn\nLưu trữ: Chỉ trên thiết bị (không tải lên đám mây)\n\n■ Giọng nói (Microphone)\nMục đích: Chuyển đổi địa chỉ và ghi chú qua nhập liệu bằng giọng nói\nLưu trữ: Chỉ trên thiết bị\n\n■ Thông tin nhập (Họ tên, địa chỉ, điện thoại, email)\nMục đích: Quản lý nghiệp vụ giao hàng và thiết lập hồ sơ tài xế\nLưu trữ: Bộ nhớ mã hóa trên thiết bị (AES-256-GCM)\nGửi ra ngoài: Không</string>
+    <string name="terms_s04_body">■ Vị trí (GPS)\nMục đích: Dẫn đường đến địa điểm giao hàng, hiển thị vị trí hiện tại, tối ưu hóa tuyến đường\nThời điểm thu thập: Chỉ khi đang sử dụng ứng dụng (không thu thập nền)\nNơi gửi đến: Tọa độ vị trí hiện tại và điểm giao hàng được gửi đến Google Directions API để tìm tuyến đường.\n\n■ Camera/Hình ảnh\nMục đích: Nhập địa chỉ tự động bằng OCR vận đơn\nXử lý: Ảnh chụp được xử lý trên thiết bị bằng Google ML Kit, không tải lên máy chủ bên ngoài.\nLưu trữ: Ảnh tạm thời sẽ bị xóa ngay sau khi xử lý nhận dạng hoàn tất (dù thành công hay thất bại).\n\n■ Giọng nói (Microphone)\nMục đích: Chuyển đổi địa chỉ, ghi chú và thao tác trạng thái giao hàng qua nhập liệu bằng giọng nói\nXử lý: Ứng dụng không lưu trữ dữ liệu giọng nói. Sử dụng dịch vụ nhận dạng giọng nói được cài đặt trên thiết bị (mặc định hệ thống), có thể được xử lý từ xa tùy nhà cung cấp.\n\n■ Địa chỉ/Mã bưu điện\nMục đích: Chuyển đổi tọa độ (mã hóa địa lý) và tra cứu địa chỉ từ mã bưu điện\nNơi gửi đến: Địa chỉ bạn nhập được gửi đến Google Geocoding API; mã bưu điện được gửi đến zipcloud (dịch vụ tra cứu mã bưu điện của bên thứ ba).\n\n■ Thông tin nhập (Họ tên, điện thoại, email)\nMục đích: Quản lý nghiệp vụ giao hàng và thiết lập hồ sơ tài xế\nLưu trữ: Bộ nhớ mã hóa trên thiết bị (AES-256-GCM)\nGửi ra ngoài: Không (ngoại trừ địa chỉ/vị trí/giọng nói nêu trên)</string>
     <string name="terms_s05_title">Điều 5　Sử dụng dịch vụ bên thứ ba</string>
-    <string name="terms_s05_body">■ Google Maps Platform\nDùng để hiển thị bản đồ, dẫn đường và mã hóa địa lý. Chính sách bảo mật của Google (https://policies.google.com/privacy) được áp dụng.\n\n■ Google Play Billing\nDùng cho thanh toán đăng ký. Thông tin thanh toán do Google quản lý, ứng dụng không lưu trữ.\n\n■ Google ML Kit (Nhận dạng văn bản)\nXử lý OCR chỉ thực hiện trên thiết bị, không gửi dữ liệu lên máy chủ bên ngoài.\n\n■ Dịch vụ vị trí Google\nDùng để lấy vị trí GPS.</string>
+    <string name="terms_s05_body">■ Google Maps Platform (bao gồm Geocoding API, Directions API, Maps SDK for Android)\nDùng để hiển thị bản đồ, dẫn đường, mã hóa địa lý và tìm tuyến đường. Việc hiển thị/thao tác bản đồ có thể tự động gửi địa chỉ IP, thông tin thiết bị, cookie và các định danh khác đến Google. Chính sách bảo mật của Google (https://policies.google.com/privacy) được áp dụng.\n\n■ Google Play Billing\nDùng cho thanh toán đăng ký. Thông tin thanh toán do Google quản lý, ứng dụng không lưu trữ.\n\n■ Google ML Kit (Nhận dạng văn bản)\nBản thân việc xử lý OCR chỉ thực hiện trên thiết bị, dữ liệu hình ảnh không được tải lên. Tuy nhiên, trạng thái hoạt động của thư viện, thông tin thiết bị, số liệu sử dụng có thể được gửi đến Google cho mục đích chẩn đoán.\n\n■ Dịch vụ vị trí Google\nDùng để lấy vị trí GPS.\n\n■ Dịch vụ nhận dạng giọng nói của thiết bị\nDùng cho tính năng nhập bằng giọng nói. Nhà cung cấp và cách xử lý tùy thuộc vào cài đặt thiết bị.\n\n■ zipcloud (API tra cứu mã bưu điện)\nDùng để tra cứu địa chỉ từ mã bưu điện. Chỉ mã bưu điện bạn nhập được gửi đi. Áp dụng chính sách bảo mật riêng của nhà cung cấp.\n\n■ GitHub (thông báo)\nỨng dụng lấy tệp công khai từ GitHub để hiển thị thông báo trong ứng dụng. Không có thông tin cá nhân nào được gửi trong yêu cầu này.</string>
     <string name="terms_s06_title">Điều 6　Lưu trữ dữ liệu &amp; Bảo mật</string>
-    <string name="terms_s06_body">Thông tin cá nhân và dữ liệu nghiệp vụ bạn nhập được lưu trong bộ nhớ mã hóa trên thiết bị (Android EncryptedSharedPreferences / AES-256-GCM).\n\nKhông truyền dữ liệu lên máy chủ bên ngoài hay đồng bộ đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu khỏi thiết bị.\n\nKhi sử dụng tính năng Sao lưu, người dùng tự chịu trách nhiệm quản lý dữ liệu đã xuất.</string>
+    <string name="terms_s06_body">Thông tin cá nhân và dữ liệu nghiệp vụ bạn nhập được lưu trong bộ nhớ mã hóa trên thiết bị (Android EncryptedSharedPreferences / AES-256-GCM).\n\nNgoại trừ địa chỉ, mã bưu điện, vị trí và giọng nói nêu tại Điều 4, Điều 5, dữ liệu không được truyền lên máy chủ bên ngoài hay đồng bộ đám mây. Gỡ cài đặt ứng dụng sẽ xóa toàn bộ dữ liệu khỏi thiết bị.\n\nBạn có thể xóa toàn bộ dữ liệu đã lưu (hồ sơ, hàng hóa, tuyến đường, thông báo, v.v.) bất kỳ lúc nào từ màn hình tài khoản trong ứng dụng. Sau khi xóa, ứng dụng trở về trạng thái chưa đăng ký và không thể hoàn tác.\n\nKhi sử dụng tính năng Sao lưu, người dùng tự chịu trách nhiệm quản lý dữ liệu đã xuất.</string>
     <string name="terms_s07_title">Điều 7　Các hành vi bị cấm</string>
     <string name="terms_s07_body">Cấm các hành vi sau:\n\n· Dịch ngược, chỉnh sửa hoặc phân phối lại ứng dụng\n· Nhập hoặc sử dụng thông tin cá nhân của người khác mà không được phép\n· Sử dụng ứng dụng cho mục đích vi phạm pháp luật\n· Gây quá tải cho máy chủ hoặc cơ sở hạ tầng của ứng dụng\n· Đăng ký thông tin giả hoặc lạm dụng để tránh thanh toán</string>
     <string name="terms_s08_title">Điều 8　Miễn trừ trách nhiệm</string>

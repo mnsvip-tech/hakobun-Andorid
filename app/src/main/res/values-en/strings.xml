@@ -29,6 +29,7 @@
     <string name="notice">Notices</string>
     <string name="hide_summary">Hide Summary</string>
     <string name="show_summary">Show Summary</string>
+    <string name="show_normal_pins_with_course">Also show regular pins</string>
     <string name="all_time_windows">All</string>
     <string name="all_time_windows_filter">All Times</string>
     <string name="tagline">Make today\'s deliveries light and accurate</string>
@@ -59,6 +60,8 @@
     <string name="rotate">Rotate</string>
     <string name="marker_current_location">My Location</string>
     <string name="marker_route_base_point">Route calculation origin</string>
+    <string name="poi_convenience_store">Convenience</string>
+    <string name="poi_gas_station">Gas</string>
 
     <!-- Panel Titles -->
     <string name="panel_delivery_list">Delivery List</string>
@@ -96,6 +99,11 @@
     <string name="load_course_button">Load Route %1$s into Today\'s Deliveries</string>
     <string name="add_course_address_title">Add Address to Course</string>
     <string name="clear_course_from_map_button">Remove from Map</string>
+    <string name="course_cleared_from_map">Route %1$s removed from map (%2$d items)</string>
+    <string name="course_not_on_map">Route %1$s is not loaded on the map</string>
+    <string name="course_chip_label_loaded">Route %1$s ✓ Loaded</string>
+    <string name="course_loaded_status">Currently loaded: Route %1$s</string>
+    <string name="course_loaded_status_none">No route is currently loaded on the map</string>
 
     <!-- Backup -->
     <string name="backup_data_title">Address Data Management</string>
@@ -221,6 +229,21 @@
     <string name="premium_features_list">· All features\n· Unlimited registrations\n· Priority support</string>
     <string name="subscribe_google_pay">Subscribe via Google Pay</string>
     <string name="subscription_terms">First 2 weeks free, then ¥980/month (tax included). Cancel anytime.</string>
+    <string name="free_trial_period_dynamic">%1$d-day trial</string>
+    <string name="premium_price_dynamic">%1$s / month</string>
+    <string name="subscription_terms_dynamic">The first %1$s are free. After the trial ends, you\'ll automatically be charged %2$s (tax included) and the subscription will then auto-renew monthly through Google Play until cancelled. Cancel anytime.</string>
+    <string name="manage_subscription_link">Manage or cancel subscription on Google Play</string>
+    <string name="price_loading">Checking price…</string>
+    <string name="location_rationale_title">About Location Access</string>
+    <string name="location_rationale_body">Your current location is shown on the map and used to navigate to delivery destinations and optimize routes. Location is only accessed while the app is in use, never in the background. You\'ll be asked to grant permission on the next screen.</string>
+    <string name="location_rationale_allow">Allow Location</string>
+    <string name="location_rationale_later">Not Now</string>
+    <string name="delete_account_title">Delete Profile &amp; Data</string>
+    <string name="delete_account_description">Deletes all data stored on this device, including your name, contact info, packages, courses, and announcements, and returns the app to an unregistered state. This cannot be undone. To cancel your subscription itself, use Google Play\'s subscription management.</string>
+    <string name="delete_account_button">Delete All Data</string>
+    <string name="delete_account_confirm_title">Are you sure you want to delete everything?</string>
+    <string name="delete_account_confirm_body">All data stored on this device — profile, packages, courses, announcements, and more — will be deleted. This cannot be undone.</string>
+    <string name="delete_account_confirm_action">Delete</string>
     <string name="subscribe_complete">Successfully upgraded to Premium plan</string>
     <string name="billing_not_available">Unable to launch Google Play Billing</string>
     <string name="plan_not_found">Plan not found (please check Play Console settings)</string>
@@ -332,11 +355,11 @@
     <string name="faq_q_10">When does my free trial end?</string>
     <string name="faq_a_10">The free period lasts 14 days from the date you registered.\n\nCheck the remaining days on your User Account screen (side menu → User Account).\n\nNo charge occurs during this free period. If you haven\'t subscribed to Premium once it ends, only new package registration is locked (you can still view and edit existing data free of charge). Subscribing to Premium requires you to sign up yourself through Google Play — there is no automatic charge.</string>
     <string name="faq_q_11">How do I cancel my subscription?</string>
-    <string name="faq_a_11">Go to Google Play Store → Account icon → "Subscriptions" → HAKOBUN → "Cancel subscription."\n\nYou can continue using the app until the end of the current billing period. In-app cancellation is coming soon.</string>
+    <string name="faq_a_11">Go to Google Play Store → Account icon → "Subscriptions" → HAKOBUN → "Cancel subscription," or use the "Manage subscription on Google Play" link on the in-app account screen.\n\nYou can continue using the app until the end of your current billing period.</string>
     <string name="faq_q_12">My payment failed</string>
     <string name="faq_a_12">Please check your payment method in Google Play.\n\nGoogle Play Store → Account → Payments &amp; subscriptions → Payment methods\n\nExpired cards or insufficient funds are common causes. Please refer to Google Play support as well.</string>
     <string name="faq_q_13">Where is my data stored?</string>
-    <string name="faq_a_13">All data is stored in encrypted storage on your device.\n\nNo data is sent to external servers or synced to the cloud. Uninstalling the app will delete all data.\n\nWe recommend exporting important data using the Backup feature (side menu → Backup).</string>
+    <string name="faq_a_13">Your profile, packages, and courses are stored in encrypted storage on your device and are not synced to the cloud. Uninstalling the app will delete all data.\n\nHowever, addresses, postal codes, current location, and delivery destination coordinates are sent to Google and zipcloud (a postal code lookup service) for map display, route search, and address lookup. Voice input uses your device\'s voice recognition service. See the Terms &amp; Privacy Policy for details.\n\nWe recommend exporting important data using the Backup feature (side menu → Backup).</string>
     <string name="faq_q_14">Can I transfer data to a new device?</string>
     <string name="faq_a_14">Automatic data transfer is not currently supported.\n\nBefore switching devices, export your data using the Backup feature and import it on your new device.\n\nImport: side menu → Backup → "Restore."</string>
     <string name="faq_q_15">The app is slow or crashing</string>
@@ -350,18 +373,20 @@
     <string name="terms_header_title">HAKOBUN Terms of Service &amp; Privacy Policy</string>
     <string name="terms_header_date">Last updated: July 19, 2026</string>
     <string name="terms_header_intro">Please read the following terms before using this app. By starting to use the app, you agree to these terms.</string>
+    <string name="terms_web_link_label">Open web version in browser (for printing/sharing)</string>
+    <string name="terms_web_link_url" translatable="false">https://mnsvip-tech.github.io/hakobun-legal/</string>
     <string name="terms_s01_title">Article 1 – Service Overview</string>
     <string name="terms_s01_body">HAKOBUN ("the App") is a delivery management support application designed to improve the efficiency of delivery drivers. It provides features such as package registration, route management, delivery status tracking, and OCR address reading from shipping labels.\n\nThe App is an operational support tool. Compliance with applicable laws, safe driving, and adherence to your delivery company\'s regulations are solely the responsibility of the user.</string>
     <string name="terms_s02_title">Article 2 – Eligibility</string>
-    <string name="terms_s02_body">The App is intended for users aged 18 and over who are engaged in delivery operations or act as operations managers.\n\nA Google account may be required to use certain features. Registration with false information is prohibited.</string>
+    <string name="terms_s02_body">The App is intended for users aged 18 and over who are engaged in delivery operations or act as operations managers.\n\nUsing the App requires creating a profile inside the app (name, base, contact, email). This profile is stored locally on your device only; linking a Google account or external authentication is not required. Registration with false information is prohibited.</string>
     <string name="terms_s03_title">Article 3 – Subscription &amp; Billing</string>
-    <string name="terms_s03_body">[Free Period]\nAll Premium features are free for 14 days from your initial account registration date. No charge occurs automatically during this free period. If you\'d like to continue using Premium after it ends, you must subscribe yourself through Google Play (there is no automatic transition from the free period to a paid plan).\n\n[Paid Plan (Premium)]\nPrice: ¥980 / month (tax included)\nBilling: Monthly auto-renewal via Google Play\nCancellation: Cancel anytime from "Subscriptions" in the Google Play Store. Access continues until the end of the current billing period.\n\n[Refund Policy]\nRefunds follow Google Play\'s refund policy. For cancellations within 48 hours of purchase, please apply through Google Play.\n\n[Price Changes]\nYou will be notified at least 30 days in advance of any price changes via in-app notice or email.</string>
+    <string name="terms_s03_body">[Free Period]\nAll Premium features are free for 14 days from your initial profile registration date. No charge occurs automatically during this free period. If you\'d like to continue using Premium after it ends, you must subscribe yourself through Google Play (there is no automatic transition from the free period to a paid plan).\n\n[Paid Plan (Premium)]\nPrice: the amount shown on the Google Play purchase screen (tax included); amounts vary by region and currency.\nBilling: Monthly auto-renewal via Google Play\nCancellation: Cancel anytime from "Subscriptions" in the Google Play Store, or via the "Manage subscription on Google Play" link in the in-app account screen. Access continues until the end of the current billing period.\n\n[Refund Policy]\nRefunds follow Google Play\'s refund policy. For cancellations within 48 hours of purchase, please apply through Google Play.\n\n[Price Changes]\nYou will be notified at least 30 days in advance of any price changes via in-app notice.</string>
     <string name="terms_s04_title">Article 4 – Data Collected and How It Is Used</string>
-    <string name="terms_s04_body">■ Location (GPS)\nPurpose: Navigation to delivery destinations, current location display, route optimization\nCollection: Only while the app is in use (no background collection)\n\n■ Camera / Images\nPurpose: Automatic address entry via OCR of shipping labels\nStorage: On-device only (no cloud upload)\n\n■ Voice (Microphone)\nPurpose: Transcription of addresses and notes via voice input\nStorage: On-device only\n\n■ Input Data (name, address, phone, email)\nPurpose: Delivery management and driver profile setup\nStorage: Encrypted on-device storage (AES-256-GCM)\nExternal transmission: None</string>
+    <string name="terms_s04_body">■ Location (GPS)\nPurpose: Navigation to delivery destinations, current location display, route optimization\nCollection: Only while the app is in use (no background collection)\nTransmission: Your current location and delivery destination coordinates are sent to the Google Directions API for route search.\n\n■ Camera / Images\nPurpose: Automatic address entry via OCR of shipping labels\nProcessing: Photos are processed on-device with Google ML Kit and are not uploaded to external servers.\nStorage: Temporary images are deleted promptly once recognition completes, whether it succeeds or fails.\n\n■ Voice (Microphone)\nPurpose: Transcription of addresses, notes, and delivery status commands via voice input\nProcessing: The App does not store voice data itself. It uses the voice recognition service configured on your device (the system default), which may process voice data remotely depending on the provider.\n\n■ Address / Postal Code\nPurpose: Coordinate conversion (geocoding) and address lookup from a postal code\nTransmission: Addresses you enter are sent to the Google Geocoding API; postal codes are sent to zipcloud (a third-party postal code lookup service).\n\n■ Input Data (name, phone, email)\nPurpose: Delivery management and driver profile setup\nStorage: Encrypted on-device storage (AES-256-GCM)\nExternal transmission: None (except the address/location/voice data described above)</string>
     <string name="terms_s05_title">Article 5 – Third-Party Services</string>
-    <string name="terms_s05_body">■ Google Maps Platform\nUsed for map display, navigation, and address geocoding. Google\'s Privacy Policy (https://policies.google.com/privacy) applies.\n\n■ Google Play Billing\nUsed for subscription payments. Payment information is managed by Google; the App does not store it.\n\n■ Google ML Kit (Text Recognition)\nOCR is performed on-device only; no data is sent to external servers.\n\n■ Google Location Services\nUsed for GPS access.</string>
+    <string name="terms_s05_body">■ Google Maps Platform (including the Geocoding API, Directions API, and Maps SDK for Android)\nUsed for map display, navigation, address geocoding, and route search. Displaying and interacting with the map may automatically send your IP address, device information, and identifiers such as cookies to Google. Google\'s Privacy Policy (https://policies.google.com/privacy) applies.\n\n■ Google Play Billing\nUsed for subscription payments. Payment information is managed by Google; the App does not store it.\n\n■ Google ML Kit (Text Recognition)\nOCR itself runs on-device and image data is never uploaded. However, library diagnostics such as operation status, device information, and usage statistics may be sent to Google.\n\n■ Google Location Services\nUsed for GPS access.\n\n■ Your device\'s voice recognition service\nUsed for the voice input feature. The provider and processing method depend on your device settings.\n\n■ zipcloud (postal code lookup API)\nUsed to look up an address from a postal code. Only the postal code you enter is transmitted. The operator\'s own privacy policy applies.\n\n■ GitHub (announcements)\nThe App fetches a public file from GitHub to display in-app announcements. No personal data is transmitted in this request.</string>
     <string name="terms_s06_title">Article 6 – Data Storage &amp; Security</string>
-    <string name="terms_s06_body">Personal and operational data you enter is stored in encrypted on-device storage (Android EncryptedSharedPreferences / AES-256-GCM).\n\nNo data is transmitted to external servers or synced to the cloud. Uninstalling the App will remove all data from the device.\n\nIf you use the Backup feature, you are responsible for managing the exported data.</string>
+    <string name="terms_s06_body">Personal and operational data you enter is stored in encrypted on-device storage (Android EncryptedSharedPreferences / AES-256-GCM).\n\nExcept for the address, postal code, location, and voice data described in Articles 4 and 5, no data is transmitted to external servers or synced to the cloud. Uninstalling the App will remove all data from the device.\n\nYou can delete all saved data (profile, packages, courses, announcements, etc.) at any time from the in-app account screen. Deleting returns the App to an unregistered state and cannot be undone.\n\nIf you use the Backup feature, you are responsible for managing the exported data.</string>
     <string name="terms_s07_title">Article 7 – Prohibited Activities</string>
     <string name="terms_s07_body">The following activities are prohibited:\n\n· Reverse-engineering, tampering with, or redistributing the App\n· Entering or using another person\'s personal information without consent\n· Using the App for any purpose that violates applicable law\n· Placing excessive load on the App\'s servers or infrastructure\n· Fraudulent registration or misuse to circumvent billing</string>
     <string name="terms_s08_title">Article 8 – Disclaimer</string>
