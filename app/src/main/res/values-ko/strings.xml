@@ -38,6 +38,7 @@
     <string name="remaining">남은 건</string>
     <string name="completed">완료</string>
     <string name="absent">부재</string>
+    <string name="clear_filter">필터 해제</string>
 
     <!-- 사이드 메뉴 -->
     <string name="package_registration_menu">화물 등록</string>
@@ -131,6 +132,7 @@
     <string name="status_complete">완료</string>
     <string name="status_absent">부재</string>
     <string name="status_return">반송</string>
+    <string name="edit_package_detail">상세 편집</string>
     <string name="yes">있음</string>
     <string name="no">없음</string>
 
@@ -221,6 +223,9 @@
     <string name="free_trial_expired">프리미엄 미등록</string>
     <string name="free_trial_active_title">무료 체험 중 (남은 %1$d일)</string>
     <string name="trial_after_register">계정 등록일로부터 14일간 프리미엄 플랜의 모든 기능을 무료로 체험할 수 있습니다. 무료 기간 중에는 자동으로 결제되지 않습니다. 무료 기간 종료 후에도 프리미엄을 계속 이용하려면 Google Play를 통해 직접 구독 신청을 해야 합니다.</string>
+    <string name="subscribe_requires_registration">프리미엄 구독을 하려면 먼저 아래 양식에 드라이버 이름을 입력하고 "등록"을 눌러주세요.</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ 무료 체험이 내일 종료됩니다</string>
+    <string name="guest_not_registered">미등록(게스트)</string>
     <string name="free_plan_name">무료</string>
     <string name="free_trial_period">2주 체험</string>
     <string name="free_features">・전체 기능이 14일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
@@ -263,7 +268,8 @@
     <!-- 피드백 -->
     <string name="feedback_label">피드백 내용</string>
     <string name="feedback_placeholder">예) 지도 핀을 좀 더 크게 해주세요</string>
-    <string name="feedback_sent">전송 예정으로 저장되었습니다. API 연동 후 운영팀에 전송됩니다.</string>
+    <string name="feedback_sent">메일 앱이 열렸습니다. 내용을 확인 후 전송해 주세요.</string>
+    <string name="feedback_email_subject">HAKOBUN 피드백</string>
 
     <!-- 공지 상세 -->
     <string name="announcement_important">중요</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">권한 확인</string>
     <string name="voice_prompt">배송지 주소를 말씀해 주세요</string>
     <string name="voice_status_unrecognized">"%1$s"에서 배송 상태를 인식할 수 없습니다. 다시 시도해 주세요.</string>
+    <string name="voice_input_source">음성 입력</string>
+    <string name="default_sample_address">도쿄도 지요다구 마루노우치 1-1-1</string>
+    <string name="postal_search_source">우편번호 검색</string>
+    <string name="postal_match">일치</string>
+    <string name="postal_unconfirmed">미확인</string>
+    <string name="postal_error">오류</string>
+    <string name="postal_not_found">일치하는 주소를 찾을 수 없습니다</string>
+    <string name="postal_communication_error">통신 오류가 발생했습니다</string>
     <string name="voice_next_stop_none">다음 배송지를 찾을 수 없습니다.</string>
     <string name="memo_added_from_registration">화물 등록 화면에서 추가</string>
 

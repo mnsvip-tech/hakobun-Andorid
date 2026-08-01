@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- アプリ全般 -->
-    <string name="app_name">Hakobun</string>
+    <string name="app_name">HAKOBUN</string>
     <string name="back">← 戻る</string>
     <string name="close">閉じる</string>
     <string name="cancel">キャンセル</string>
@@ -38,6 +38,7 @@
     <string name="remaining">残り</string>
     <string name="completed">完了</string>
     <string name="absent">不在</string>
+    <string name="clear_filter">フィルター解除</string>
 
     <!-- サイドメニュー -->
     <string name="package_registration_menu">荷物登録</string>
@@ -126,6 +127,7 @@
     <string name="status_complete">完了</string>
     <string name="status_absent">不在</string>
     <string name="status_return">持戻り</string>
+    <string name="edit_package_detail">詳細を編集</string>
     <string name="yes">あり</string>
     <string name="no">なし</string>
 
@@ -224,6 +226,9 @@
     <string name="free_trial_expired">プレミアム未登録</string>
     <string name="free_trial_active_title">無料トライアル中（残り%1$d日）</string>
     <string name="trial_after_register">アカウント登録日から14日間、プレミアムプランの全機能を無料でお試しいただけます。無料期間中に自動的な課金は発生しません。無料期間終了後もプレミアムをご希望の場合は、Google Playを通じてお客様ご自身でお申し込みください。</string>
+    <string name="subscribe_requires_registration">プレミアム登録には、先に下のフォームでドライバー名を入力して「登録」を行ってください。</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ 無料トライアルは明日で終了します</string>
+    <string name="guest_not_registered">未登録(ゲスト)</string>
     <string name="free_plan_name">無料</string>
     <string name="free_trial_period">2週間トライアル</string>
     <string name="free_features">・全機能が14日間無料\n・期間終了後は新規登録のみロック\n・バックアップ</string>
@@ -263,7 +268,8 @@
     <!-- フィードバック -->
     <string name="feedback_label">フィードバック内容</string>
     <string name="feedback_placeholder">例）地図ピンをもう少し大きくしたい</string>
-    <string name="feedback_sent">送信予定として保存しました。API連携後に運営へ送信します。</string>
+    <string name="feedback_sent">メールアプリを開きました。内容を確認して送信してください。</string>
+    <string name="feedback_email_subject">HAKOBUNフィードバック</string>
 
     <!-- お知らせ詳細 -->
     <string name="announcement_important">重要</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">権限確認</string>
     <string name="voice_prompt">届け先住所を話してください</string>
     <string name="voice_status_unrecognized">「%1$s」からは配達状況を認識できませんでした。もう一度お試しください。</string>
+    <string name="voice_input_source">音声入力</string>
+    <string name="default_sample_address">東京都千代田区丸の内1-1-1</string>
+    <string name="postal_search_source">郵便番号検索</string>
+    <string name="postal_match">一致</string>
+    <string name="postal_unconfirmed">未確認</string>
+    <string name="postal_error">エラー</string>
+    <string name="postal_not_found">該当する住所が見つかりません</string>
+    <string name="postal_communication_error">通信エラーが発生しました</string>
     <string name="voice_next_stop_none">次の配達先が見つかりません。</string>
     <string name="memo_added_from_registration">荷物登録画面から追加</string>
 

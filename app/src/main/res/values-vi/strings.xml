@@ -38,6 +38,7 @@
     <string name="remaining">Còn lại</string>
     <string name="completed">Hoàn thành</string>
     <string name="absent">Vắng mặt</string>
+    <string name="clear_filter">Xóa bộ lọc</string>
 
     <!-- Menu bên -->
     <string name="package_registration_menu">Đăng ký hàng</string>
@@ -131,6 +132,7 @@
     <string name="status_complete">Hoàn thành</string>
     <string name="status_absent">Vắng mặt</string>
     <string name="status_return">Hoàn lại</string>
+    <string name="edit_package_detail">Chỉnh sửa chi tiết</string>
     <string name="yes">Có</string>
     <string name="no">Không</string>
 
@@ -221,6 +223,9 @@
     <string name="free_trial_expired">Chưa đăng ký Premium</string>
     <string name="free_trial_active_title">Đang dùng thử miễn phí (còn %1$d ngày)</string>
     <string name="trial_after_register">Toàn bộ tính năng của gói Premium được miễn phí trong 14 ngày kể từ ngày đăng ký tài khoản. Không có khoản phí nào được tính tự động trong thời gian miễn phí này. Nếu muốn tiếp tục dùng Premium sau khi hết thời gian này, bạn cần tự đăng ký qua Google Play.</string>
+    <string name="subscribe_requires_registration">Để đăng ký Premium, vui lòng nhập tên tài xế vào biểu mẫu bên dưới và nhấn "Đăng ký" trước.</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ Bản dùng thử miễn phí kết thúc vào ngày mai</string>
+    <string name="guest_not_registered">Chưa đăng ký (Khách)</string>
     <string name="free_plan_name">Miễn phí</string>
     <string name="free_trial_period">Dùng thử 2 tuần</string>
     <string name="free_features">・Tất cả tính năng đều miễn phí trong 14 ngày\n・Sau khi hết hạn, chỉ khóa đăng ký hàng mới\n・Sao lưu</string>
@@ -263,7 +268,8 @@
     <!-- Phản hồi -->
     <string name="feedback_label">Nội dung phản hồi</string>
     <string name="feedback_placeholder">VD: Muốn ghim bản đồ to hơn một chút</string>
-    <string name="feedback_sent">Đã lưu như đang chờ gửi. Sẽ gửi đến vận hành sau khi tích hợp API.</string>
+    <string name="feedback_sent">Đã mở ứng dụng email. Vui lòng kiểm tra và gửi.</string>
+    <string name="feedback_email_subject">Phản hồi HAKOBUN</string>
 
     <!-- Chi tiết thông báo -->
     <string name="announcement_important">Quan trọng</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">Xác nhận quyền</string>
     <string name="voice_prompt">Vui lòng đọc địa chỉ giao hàng</string>
     <string name="voice_status_unrecognized">Không thể nhận diện trạng thái giao hàng từ "%1$s". Vui lòng thử lại.</string>
+    <string name="voice_input_source">Nhập bằng giọng nói</string>
+    <string name="default_sample_address">1-1-1 Marunouchi, Chiyoda-ku, Tokyo</string>
+    <string name="postal_search_source">Tra cứu mã bưu điện</string>
+    <string name="postal_match">Khớp</string>
+    <string name="postal_unconfirmed">Chưa xác nhận</string>
+    <string name="postal_error">Lỗi</string>
+    <string name="postal_not_found">Không tìm thấy địa chỉ phù hợp</string>
+    <string name="postal_communication_error">Đã xảy ra lỗi giao tiếp</string>
     <string name="voice_next_stop_none">Không tìm thấy điểm giao hàng tiếp theo.</string>
     <string name="memo_added_from_registration">Thêm từ màn hình đăng ký hàng</string>
 

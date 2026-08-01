@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- General -->
-    <string name="app_name">Hakobun</string>
+    <string name="app_name">HAKOBUN</string>
     <string name="back">← Back</string>
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
@@ -38,6 +38,7 @@
     <string name="remaining">Remaining</string>
     <string name="completed">Completed</string>
     <string name="absent">Absent</string>
+    <string name="clear_filter">Clear filter</string>
 
     <!-- Side Menu -->
     <string name="package_registration_menu">Register Package</string>
@@ -131,6 +132,7 @@
     <string name="status_complete">Delivered</string>
     <string name="status_absent">Absent</string>
     <string name="status_return">Return</string>
+    <string name="edit_package_detail">Edit details</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -221,6 +223,9 @@
     <string name="free_trial_expired">Not Subscribed to Premium</string>
     <string name="free_trial_active_title">Free trial (%1$d days left)</string>
     <string name="trial_after_register">All Premium features are free for 14 days from your account registration date. No charge occurs automatically during this free period. If you\'d like to continue with Premium after it ends, you\'ll need to subscribe yourself through Google Play.</string>
+    <string name="subscribe_requires_registration">To subscribe to Premium, please enter your driver name in the form below and tap \"Register\" first.</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ Your free trial ends tomorrow</string>
+    <string name="guest_not_registered">Not registered (Guest)</string>
     <string name="free_plan_name">Free</string>
     <string name="free_trial_period">2-Week Trial</string>
     <string name="free_features">· All features free for 14 days\n· After the period ends, only new registrations are locked\n· Backup</string>
@@ -263,7 +268,8 @@
     <!-- Feedback -->
     <string name="feedback_label">Feedback</string>
     <string name="feedback_placeholder">e.g. I\'d like the map pins to be larger</string>
-    <string name="feedback_sent">Saved as pending. Will be sent to operations after API integration.</string>
+    <string name="feedback_sent">Opened your email app. Please review and send.</string>
+    <string name="feedback_email_subject">HAKOBUN Feedback</string>
 
     <!-- Announcements -->
     <string name="announcement_important">Important</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">Permission check</string>
     <string name="voice_prompt">Please say the delivery address</string>
     <string name="voice_status_unrecognized">Could not recognize a delivery status from "%1$s". Please try again.</string>
+    <string name="voice_input_source">Voice input</string>
+    <string name="default_sample_address">1-1-1 Marunouchi, Chiyoda-ku, Tokyo</string>
+    <string name="postal_search_source">Postal code search</string>
+    <string name="postal_match">Match</string>
+    <string name="postal_unconfirmed">Unconfirmed</string>
+    <string name="postal_error">Error</string>
+    <string name="postal_not_found">No matching address found</string>
+    <string name="postal_communication_error">A communication error occurred</string>
     <string name="voice_next_stop_none">No next delivery stop found.</string>
     <string name="memo_added_from_registration">Added from package registration screen</string>
 

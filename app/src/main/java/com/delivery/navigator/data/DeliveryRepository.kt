@@ -404,7 +404,8 @@ private fun prefectureFallback(address: String): Pair<Double, Double> {
         ?: Pair(35.69, 139.69)
 }
 
-suspend fun searchPostalCode(postalCode: String): AddressCandidate {
+suspend fun searchPostalCode(postalCode: String, context: android.content.Context): AddressCandidate {
+    val sourceLabel = context.getString(com.delivery.navigator.R.string.postal_search_source)
     return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         runCatching {
             val url = java.net.URL("https://zipcloud.ibsnet.co.jp/api/search?zipcode=$postalCode")
@@ -418,25 +419,25 @@ suspend fun searchPostalCode(postalCode: String): AddressCandidate {
                 val item = results.getJSONObject(0)
                 val address = "${item.optString("address1")}${item.optString("address2")}${item.optString("address3")}"
                 AddressCandidate(
-                    sourceLabel = "郵便番号検索",
+                    sourceLabel = sourceLabel,
                     postalCode = postalCode,
                     address = address,
-                    confidenceLabel = "一致"
+                    confidenceLabel = context.getString(com.delivery.navigator.R.string.postal_match)
                 )
             } else {
                 AddressCandidate(
-                    sourceLabel = "郵便番号検索",
+                    sourceLabel = sourceLabel,
                     postalCode = postalCode,
-                    address = "該当する住所が見つかりません",
-                    confidenceLabel = "未確認"
+                    address = context.getString(com.delivery.navigator.R.string.postal_not_found),
+                    confidenceLabel = context.getString(com.delivery.navigator.R.string.postal_unconfirmed)
                 )
             }
         }.getOrElse {
             AddressCandidate(
-                sourceLabel = "郵便番号検索",
+                sourceLabel = sourceLabel,
                 postalCode = postalCode,
-                address = "通信エラーが発生しました",
-                confidenceLabel = "エラー"
+                address = context.getString(com.delivery.navigator.R.string.postal_communication_error),
+                confidenceLabel = context.getString(com.delivery.navigator.R.string.postal_error)
             )
         }
     }

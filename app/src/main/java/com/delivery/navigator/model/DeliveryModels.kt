@@ -103,6 +103,15 @@ fun UserProfile.isFreeTrialExpired(nowMillis: Long = System.currentTimeMillis())
     return nowMillis >= trialEndMillis
 }
 
+/** 無料トライアルの残り日数(切り上げ)。Premiumまたは未登録・トライアル終了後は0。 */
+fun UserProfile.trialRemainingDays(nowMillis: Long = System.currentTimeMillis()): Int {
+    if (plan == MembershipPlan.Premium) return 0
+    if (!isRegistered || registeredAt <= 0L) return 0
+    if (isFreeTrialExpired(nowMillis)) return 0
+    val trialEndMillis = registeredAt + FREE_TRIAL_DAYS * 24L * 60L * 60L * 1000L
+    return kotlin.math.ceil((trialEndMillis - nowMillis) / (24.0 * 60 * 60 * 1000)).toInt().coerceAtLeast(0)
+}
+
 @Immutable
 data class Announcement(
     val id: String,

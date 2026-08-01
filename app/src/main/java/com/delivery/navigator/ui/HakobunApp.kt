@@ -129,6 +129,7 @@ import com.android.billingclient.api.queryPurchasesAsync
 import com.delivery.navigator.model.MembershipPlan
 import com.delivery.navigator.model.UserProfile
 import com.delivery.navigator.model.isFreeTrialExpired
+import com.delivery.navigator.model.trialRemainingDays
 import com.delivery.navigator.model.FREE_TRIAL_DAYS
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
@@ -278,6 +279,7 @@ fun HakobunApp() {
     var showNormalPinsWithCourse by remember { mutableStateOf(false) }
     val fixedRouteNumbers = remember { mutableStateMapOf<String, Int>() }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
+    var currentHeading by remember { mutableStateOf(0f) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var locationCallback by remember { mutableStateOf<com.google.android.gms.location.LocationCallback?>(null) }
 
@@ -288,13 +290,19 @@ fun HakobunApp() {
         else com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 
         fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
-            loc?.let { currentLocation = LatLng(it.latitude, it.longitude) }
+            loc?.let {
+                currentLocation = LatLng(it.latitude, it.longitude)
+                if (it.hasBearing() && it.speed > 0.5f) currentHeading = it.bearing
+            }
         }
         val request = com.google.android.gms.location.LocationRequest.Builder(priority, 5000L)
             .setMinUpdateIntervalMillis(2000L).build()
         val callback = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
-                result.lastLocation?.let { currentLocation = LatLng(it.latitude, it.longitude) }
+                result.lastLocation?.let {
+                    currentLocation = LatLng(it.latitude, it.longitude)
+                    if (it.hasBearing() && it.speed > 0.5f) currentHeading = it.bearing
+                }
             }
         }
         locationCallback = callback
@@ -354,8 +362,8 @@ fun HakobunApp() {
             addressCandidate = AddressCandidate(
                 sourceLabel = "OCR",
                 postalCode = "",
-                address = "画像を取得できませんでした",
-                confidenceLabel = "未取得"
+                address = context.getString(R.string.ocr_no_image),
+                confidenceLabel = context.getString(R.string.ocr_not_retrieved)
             )
             return@rememberLauncherForActivityResult
         }
@@ -366,8 +374,8 @@ fun HakobunApp() {
                 addressCandidate = AddressCandidate(
                     sourceLabel = "OCR",
                     postalCode = "",
-                    address = "住所を読み取れませんでした",
-                    confidenceLabel = "要確認"
+                    address = context.getString(R.string.ocr_failed),
+                    confidenceLabel = context.getString(R.string.ocr_needs_check)
                 )
             }
         )
@@ -379,10 +387,10 @@ fun HakobunApp() {
             cameraOcrLauncher.launch(null)
         } else {
             addressCandidate = AddressCandidate(
-                sourceLabel = "カメラ",
+                sourceLabel = context.getString(R.string.camera),
                 postalCode = "",
-                address = "カメラ権限が許可されていません",
-                confidenceLabel = "権限確認"
+                address = context.getString(R.string.camera_no_permission),
+                confidenceLabel = context.getString(R.string.camera_permission_check)
             )
         }
     }
@@ -394,7 +402,7 @@ fun HakobunApp() {
             ?.firstOrNull()
             .orEmpty()
         if (spokenAddress.isNotBlank()) {
-            addressCandidate = createAddressCandidateFromText("音声入力", spokenAddress)
+            addressCandidate = createAddressCandidateFromText(context.getString(R.string.voice_input_source), spokenAddress)
         }
     }
     LaunchedEffect(packages.size, packages.firstOrNull()?.trackingCode, packages.lastOrNull()?.trackingCode, currentLocation) {
@@ -445,7 +453,7 @@ fun HakobunApp() {
         }
     }
     val visibleMapPackages = visiblePackages
-        .filterNot { it.status.hidesMapPin() }
+        .filter { selectedSummaryFilter != null || !it.status.hidesMapPin() }
         .filter { selectedMapTimeWindow == TimeWindow.All || it.timeWindow == selectedMapTimeWindow }
     // 未選択(空文字)のときは登録順の先頭にフォールバックしない。
     // それをすると、地図上の最寄り①番ではなく登録順の荷物へルート線が引かれてしまうため、
@@ -712,7 +720,7 @@ fun HakobunApp() {
         if (isRegisteringPackage) {
             val registrationAddress = addressCandidate?.address
                 ?: selectedPackage?.address
-                ?: "東京都千代田区丸の内1-1-1"
+                ?: stringResource(R.string.default_sample_address)
             PackageRegistrationScreen(
                 initialAddress = registrationAddress,
                 onBack = { isRegisteringPackage = false },
@@ -743,7 +751,15 @@ fun HakobunApp() {
                     origin = currentLocation ?: LatLng(currentRouteOrigin().first, currentRouteOrigin().second),
                     onSelect = { selectedPackageCode = it },
                     onEditPackage = { code -> editingPackageCode = code },
+                    onUpdateStatus = { code, status ->
+                        val index = packages.indexOfFirst { it.trackingCode == code }
+                        if (index >= 0) {
+                            packages[index] = packages[index].copy(status = status)
+                            persistPackages()
+                        }
+                    },
                     currentLocation = currentLocation,
+                    currentHeading = currentHeading,
                     fusedLocationClient = fusedLocationClient,
                     onNavigate = {
                         context.startActivity(
@@ -776,9 +792,11 @@ fun HakobunApp() {
                     voiceNextStopHint = nextStopVoiceHint,
                     onFilterSelected = { filter ->
                         selectedSummaryFilter = if (selectedSummaryFilter == filter) null else filter
-                        homePanel = HomePanel.Packages
                     },
+                    onClearFilter = { selectedSummaryFilter = null },
                     onMapTimeWindowSelected = { selectedMapTimeWindow = it },
+                    trialEndingSoon = userProfile.trialRemainingDays() == 1,
+                    onOpenAccount = { activeMenuItem = AccountMenuItem.Account },
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
@@ -922,10 +940,10 @@ private fun assignFixedRouteNumbers(
     }
 }
 
-private enum class PackageSummaryFilter(val label: String) {
-    Remaining("残り"),
-    Completed("完了"),
-    Absent("不在");
+private enum class PackageSummaryFilter {
+    Remaining,
+    Completed,
+    Absent;
 
     fun matches(deliveryPackage: DeliveryPackage): Boolean {
         return when (this) {
@@ -936,6 +954,13 @@ private enum class PackageSummaryFilter(val label: String) {
             Absent -> deliveryPackage.status == DeliveryStatus.Absent
         }
     }
+}
+
+@Composable
+private fun PackageSummaryFilter.displayLabel(): String = when (this) {
+    PackageSummaryFilter.Remaining -> stringResource(R.string.remaining)
+    PackageSummaryFilter.Completed -> stringResource(R.string.completed)
+    PackageSummaryFilter.Absent -> stringResource(R.string.absent)
 }
 
 private enum class HomePanel {
@@ -959,9 +984,12 @@ private fun MapHomeChrome(
     onToggleMapControls: () -> Unit,
     onToggleNormalPinsWithCourse: () -> Unit,
     onFilterSelected: (PackageSummaryFilter) -> Unit,
+    onClearFilter: () -> Unit,
     onMapTimeWindowSelected: (TimeWindow) -> Unit,
     onVoiceNextStop: () -> Unit,
     voiceNextStopHint: String?,
+    trialEndingSoon: Boolean,
+    onOpenAccount: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val completed = packages.count { it.status == DeliveryStatus.Completed }
@@ -984,6 +1012,21 @@ private fun MapHomeChrome(
                     TextButton(onClick = onOpenSupport) { Text(stringResource(R.string.notice)) }
                     Button(onClick = onRegisterPackage, modifier = Modifier.height(38.dp)) { Text(stringResource(R.string.register)) }
                 }
+            }
+        }
+        if (trialEndingSoon) {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable { onOpenAccount() },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE53935)),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text(
+                    stringResource(R.string.trial_ending_tomorrow_banner),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
         }
         Row(
@@ -1032,6 +1075,22 @@ private fun MapHomeChrome(
                 }
                 CompactMetricCard(stringResource(R.string.absent), absent.toString(), selectedFilter == PackageSummaryFilter.Absent, Modifier.weight(1f)) {
                     onFilterSelected(PackageSummaryFilter.Absent)
+                }
+            }
+            if (selectedFilter != null) {
+                Card(
+                    modifier = Modifier.clickable { onClearFilter() },
+                    colors = CardDefaults.cardColors(containerColor = Color(0xEEFFFFFF)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("✕", color = Color(0xFFE53935), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.clear_filter), color = Color(0xFF20242C), style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
             Card(colors = CardDefaults.cardColors(containerColor = Color(0xEEFFFFFF)), shape = RoundedCornerShape(22.dp)) {
@@ -1196,7 +1255,9 @@ private fun FullScreenDeliveryMap(
     origin: LatLng,
     onSelect: (String) -> Unit,
     onEditPackage: (String) -> Unit,
+    onUpdateStatus: (String, DeliveryStatus) -> Unit,
     currentLocation: LatLng? = null,
+    currentHeading: Float = 0f,
     fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient? = null,
     onNavigate: (DeliveryPackage) -> Unit,
     modifier: Modifier = Modifier
@@ -1219,6 +1280,7 @@ private fun FullScreenDeliveryMap(
     var initialCameraMoved by remember { mutableStateOf(false) }
     var isFollowingLocation by remember { mutableStateOf(true) }
     var arrivalZoomedCode by remember { mutableStateOf<String?>(null) }
+    var statusBalloonCode by remember { mutableStateOf<String?>(null) }
     var showConvenienceStores by remember { mutableStateOf(false) }
     var showGasStations by remember { mutableStateOf(false) }
     var nearbyConvenienceStores by remember { mutableStateOf<List<com.delivery.navigator.data.NearbyPlace>>(emptyList()) }
@@ -1252,7 +1314,7 @@ private fun FullScreenDeliveryMap(
     // 移動中は現在地ポインターをMap中央に固定（フォローモード）。
     // ユーザーが手動でドラッグした場合はフォローを解除し、現在地ボタンで再度フォローに戻る。
     // 目的地の半径100m圏内に入った時点で一度だけ最大ズームに切り替える。
-    LaunchedEffect(currentLocation, isFollowingLocation, activeRouteDestination?.trackingCode) {
+    LaunchedEffect(currentLocation, currentHeading, isFollowingLocation, activeRouteDestination?.trackingCode) {
         if (!mapLoaded || !isFollowingLocation || !initialCameraMoved) return@LaunchedEffect
         val target = currentLocation ?: return@LaunchedEffect
         val destinationCode = activeRouteDestination?.trackingCode
@@ -1268,12 +1330,21 @@ private fun FullScreenDeliveryMap(
             )
             result[0] <= 100f
         } ?: false
+        // ナビモード: 進行方向(currentHeading)を常に画面上方向(縦ライン)に正立させる。
+        val navZoom = if (isNearDestination && arrivalZoomedCode != destinationCode) 20f else cameraPositionState.position.zoom
         if (isNearDestination && arrivalZoomedCode != destinationCode) {
             arrivalZoomedCode = destinationCode
-            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(target, 20f))
-        } else {
-            cameraPositionState.animate(CameraUpdateFactory.newLatLng(target))
         }
+        cameraPositionState.animate(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.builder()
+                    .target(target)
+                    .zoom(navZoom)
+                    .bearing(currentHeading)
+                    .tilt(cameraPositionState.position.tilt)
+                    .build()
+            )
+        )
     }
     LaunchedEffect(selectedPackage?.trackingCode) {
         if (mapLoaded) {
@@ -1355,8 +1426,8 @@ private fun FullScreenDeliveryMap(
                     anchor = Offset(0.5f, 1f),
                     onClick = {
                         onSelect(item.trackingCode)
-                        onEditPackage(item.trackingCode)
-                        false
+                        statusBalloonCode = item.trackingCode
+                        true
                     }
                 )
             }
@@ -1397,8 +1468,30 @@ private fun FullScreenDeliveryMap(
                     state = rememberUpdatedMarkerState(position = location),
                     icon = currentLocationMarkerIcon(),
                     anchor = Offset(0.5f, 0.5f),
+                    rotation = currentHeading,
                     flat = true,
                     zIndex = 10f
+                )
+            }
+        }
+        routeStops.firstOrNull { it.deliveryPackage.trackingCode == statusBalloonCode }?.let { stop ->
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 90.dp)
+            ) {
+                DeliveryStatusBalloon(
+                    deliveryPackage = stop.deliveryPackage,
+                    onStatusChange = { status ->
+                        onUpdateStatus(stop.deliveryPackage.trackingCode, status)
+                        statusBalloonCode = null
+                    },
+                    onOpenDetail = {
+                        statusBalloonCode = null
+                        onEditPackage(stop.deliveryPackage.trackingCode)
+                    },
+                    onDismiss = { statusBalloonCode = null }
                 )
             }
         }
@@ -1441,24 +1534,23 @@ private fun FullScreenDeliveryMap(
                 FloatingMapButton(stringResource(R.string.navi)) { onNavigate(item) }
             }
         }
-        Row(
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .navigationBarsPadding()
-                .padding(end = 14.dp, bottom = 18.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(end = 14.dp, bottom = 18.dp)
+                .width(62.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MapZoomButton("+") {
-                    if (mapLoaded) coroutineScope.launch {
-                        cameraPositionState.animate(CameraUpdateFactory.zoomIn())
-                    }
+            MapZoomButton("+") {
+                if (mapLoaded) coroutineScope.launch {
+                    cameraPositionState.animate(CameraUpdateFactory.zoomIn())
                 }
-                MapZoomButton("−") {
-                    if (mapLoaded) coroutineScope.launch {
-                        cameraPositionState.animate(CameraUpdateFactory.zoomOut())
-                    }
+            }
+            MapZoomButton("−") {
+                if (mapLoaded) coroutineScope.launch {
+                    cameraPositionState.animate(CameraUpdateFactory.zoomOut())
                 }
             }
             MiniCompass(
@@ -1658,7 +1750,7 @@ private fun SummaryFilteredPackagePanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(stringResource(R.string.summary_list_title, filter.label), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.summary_list_title, filter.displayLabel()), fontWeight = FontWeight.Bold)
                 Text(stringResource(R.string.showing_count, packages.size), color = MutedText)
             }
             TextButton(onClick = onClear) { Text(stringResource(R.string.close)) }
@@ -1809,10 +1901,7 @@ private fun UserAccountScreen(
 
     val isPremium = userProfile.plan == MembershipPlan.Premium
     val isFreeExpired = !isPremium && userProfile.isFreeTrialExpired()
-    val trialRemainingDays = if (!isPremium && !isFreeExpired && userProfile.registeredAt > 0L) {
-        val trialEndMillis = userProfile.registeredAt + FREE_TRIAL_DAYS * 24L * 60L * 60L * 1000L
-        kotlin.math.ceil((trialEndMillis - System.currentTimeMillis()) / (24.0 * 60 * 60 * 1000)).toInt().coerceAtLeast(0)
-    } else 0
+    val trialRemainingDays = userProfile.trialRemainingDays()
 
     // 購入画面に表示する価格・請求周期・無料期間は、実際に選択するオファーと一致させるため
     // 画面表示前にProductDetailsを取得しておき、購入フロー(launchSubscription)でも同じインスタンスを使う。
@@ -1957,17 +2046,17 @@ private fun UserAccountScreen(
                     Box(
                         modifier = Modifier.fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isFreeExpired) Color(0xFFFFEEEE) else Color(0xFFF6F7F9))
+                            .background(if (!userProfile.isRegistered || isFreeExpired) Color(0xFFFFEEEE) else Color(0xFFF6F7F9))
                             .padding(12.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                if (isFreeExpired) {
-                                    stringResource(R.string.free_trial_expired)
-                                } else {
-                                    stringResource(R.string.free_trial_active_title, trialRemainingDays)
+                                when {
+                                    !userProfile.isRegistered -> stringResource(R.string.guest_not_registered)
+                                    isFreeExpired -> stringResource(R.string.free_trial_expired)
+                                    else -> stringResource(R.string.free_trial_active_title, trialRemainingDays)
                                 },
-                                color = if (isFreeExpired) Color(0xFFE53935) else BrandBlue,
+                                color = if (!userProfile.isRegistered || isFreeExpired) Color(0xFFE53935) else BrandBlue,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)
@@ -2001,9 +2090,16 @@ private fun UserAccountScreen(
                             }
                         }
                     }
+                    if (!userProfile.isRegistered) {
+                        Text(
+                            stringResource(R.string.subscribe_requires_registration),
+                            color = Color(0xFFE53935),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                     Button(
                         onClick = { launchSubscription() },
-                        enabled = subscriptionProductDetails != null,
+                        enabled = userProfile.isRegistered && subscriptionProductDetails != null,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8))
                     ) {
@@ -2238,20 +2334,40 @@ private fun FaqContent() {
 
 private fun currentLocationMarkerIcon(): com.google.android.gms.maps.model.BitmapDescriptor {
     val density = android.content.res.Resources.getSystem().displayMetrics.density
-    val size = (34f * density).toInt()
+    val size = (64f * density).toInt()
     val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = AndroidCanvas(bitmap)
     val cx = size / 2f
     val cy = size / 2f
+    val dotRadius = size * 0.17f
+    // 進行方向を示す赤い三角形（ドットの上、Marker の rotation で全体が回転する）
+    val arrowOutlinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.WHITE
+        style = Paint.Style.STROKE
+        strokeWidth = size * 0.045f
+        strokeJoin = Paint.Join.ROUND
+    }
+    val arrowFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.RED }
+    val arrowPath = android.graphics.Path().apply {
+        val tipY = cy - dotRadius - size * 0.32f
+        val baseY = cy - dotRadius * 0.5f
+        val halfWidth = size * 0.19f
+        moveTo(cx, tipY)
+        lineTo(cx - halfWidth, baseY)
+        lineTo(cx + halfWidth, baseY)
+        close()
+    }
+    canvas.drawPath(arrowPath, arrowFillPaint)
+    canvas.drawPath(arrowPath, arrowOutlinePaint)
     // 外側の淡いハロー
     val haloPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x332457D6 }
-    canvas.drawCircle(cx, cy, size / 2f, haloPaint)
+    canvas.drawCircle(cx, cy, dotRadius * 1.55f, haloPaint)
     // 白い縁取り
     val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE }
-    canvas.drawCircle(cx, cy, size * 0.34f, borderPaint)
+    canvas.drawCircle(cx, cy, dotRadius * 1.26f, borderPaint)
     // 現在地本体（ブランドブルー）
     val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2457D6.toInt() }
-    canvas.drawCircle(cx, cy, size * 0.27f, dotPaint)
+    canvas.drawCircle(cx, cy, dotRadius, dotPaint)
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
@@ -2659,7 +2775,16 @@ private fun AccountMenuDetailScreen(
                             minLines = 4
                         )
                         Button(
-                            onClick = { feedbackSubmitted = true },
+                            onClick = {
+                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("mailto:")
+                                    putExtra(Intent.EXTRA_EMAIL, arrayOf("hakobun.support@gmail.com"))
+                                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.feedback_email_subject))
+                                    putExtra(Intent.EXTRA_TEXT, feedbackText)
+                                }
+                                runCatching { context.startActivity(emailIntent) }
+                                feedbackSubmitted = true
+                            },
                             enabled = feedbackText.isNotBlank(),
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(stringResource(R.string.send_to_ops)) }
@@ -2984,11 +3109,10 @@ private fun RegularCourseScreen(
                 onClick = {
                     postalSearchJob?.cancel()
                     postalSearchJob = scope.launch {
-                        val result = searchPostalCode(postalCode)
+                        val result = searchPostalCode(postalCode, context)
                         candidate = result
                         val isValid = result.address.isNotBlank() &&
-                            !result.address.contains("見つかりません") &&
-                            !result.address.contains("エラー")
+                            result.confidenceLabel == context.getString(R.string.postal_match)
                         if (isValid) newAddress = result.address
                     }
                 },
@@ -3289,11 +3413,10 @@ private fun RegularCoursePanel(
                 onClick = {
                     postalSearchJob?.cancel()
                     postalSearchJob = scope.launch {
-                        val result = searchPostalCode(postalCode)
+                        val result = searchPostalCode(postalCode, context)
                         candidate = result
                         val isValid = result.address.isNotBlank() &&
-                            !result.address.contains("見つかりません") &&
-                            !result.address.contains("エラー")
+                            result.confidenceLabel == context.getString(R.string.postal_match)
                         if (isValid) newAddress = result.address
                     }
                 },
@@ -3619,6 +3742,56 @@ private fun DeliveryGoogleMap(
             }
             routeStops.firstOrNull()?.deliveryPackage?.let {
                 Text(stringResource(R.string.next_candidate, it.recipient, it.deliveryTimeWindow.label), color = MutedText)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeliveryStatusBalloon(
+    deliveryPackage: DeliveryPackage,
+    onStatusChange: (DeliveryStatus) -> Unit,
+    onOpenDetail: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Surface(
+        color = Color.White,
+        shape = RoundedCornerShape(10.dp),
+        shadowElevation = 4.dp,
+        modifier = Modifier.widthIn(min = 220.dp, max = 260.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(deliveryPackage.recipient, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = onDismiss, contentPadding = PaddingValues(4.dp)) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+            Text(deliveryPackage.address, color = MutedText, style = MaterialTheme.typography.bodySmall)
+            StatusPill(deliveryPackage.status)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Button(
+                    onClick = { onStatusChange(DeliveryStatus.Completed) },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                ) { Text(stringResource(R.string.status_complete), style = MaterialTheme.typography.labelSmall) }
+                Button(
+                    onClick = { onStatusChange(DeliveryStatus.Absent) },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                ) { Text(stringResource(R.string.status_absent), style = MaterialTheme.typography.labelSmall) }
+                Button(
+                    onClick = { onStatusChange(DeliveryStatus.ReturnToCompany) },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                ) { Text(stringResource(R.string.status_return), style = MaterialTheme.typography.labelSmall) }
+            }
+            TextButton(onClick = onOpenDetail, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.edit_package_detail))
             }
         }
     }
@@ -4161,11 +4334,10 @@ private fun PackageRegistrationScreen(
                                 onClick = {
                                     postalSearchJob?.cancel()
                                     postalSearchJob = scope.launch {
-                                        val result = searchPostalCode(postalCode)
+                                        val result = searchPostalCode(postalCode, context)
                                         candidate = result
                                         val isValid = result.address.isNotBlank() &&
-                                            !result.address.contains("見つかりません") &&
-                                            !result.address.contains("エラー")
+                                            result.confidenceLabel == context.getString(R.string.postal_match)
                                         if (isValid) manualInput = result.address
                                     }
                                 },
@@ -4633,14 +4805,20 @@ private fun TimeWindow.markerHue(): Float = when (this) {
 }
 
 private fun deliveryMarkerIcon(routeNumber: Int, deliveryPackage: DeliveryPackage) = when {
-    deliveryPackage.timeWindow == TimeWindow.Unspecified -> {
-        standardPinMarkerIcon(routeNumber.toString(), android.graphics.Color.BLACK)
-    }
     deliveryPackage.status == DeliveryStatus.Absent -> {
         standardPinMarkerIcon("不", AbsentMarkerArgb)
     }
     deliveryPackage.status == DeliveryStatus.Redelivery -> {
         standardPinMarkerIcon("再", RedeliveryMarkerArgb)
+    }
+    deliveryPackage.status == DeliveryStatus.Completed -> {
+        standardPinMarkerIcon("済", CompletedMarkerArgb)
+    }
+    deliveryPackage.status == DeliveryStatus.ReturnToCompany -> {
+        standardPinMarkerIcon("戻", ReturnMarkerArgb)
+    }
+    deliveryPackage.timeWindow == TimeWindow.Unspecified -> {
+        standardPinMarkerIcon(routeNumber.toString(), android.graphics.Color.BLACK)
     }
     else -> standardPinMarkerIcon(routeNumber.toString(), deliveryPackage.timeWindow.markerArgb())
 }
@@ -4709,7 +4887,21 @@ private fun recognizeAddressFromBitmap(
         }
 }
 
-private fun createAddressCandidateFromText(sourceLabel: String, sourceText: String): AddressCandidate {
+/**
+ * OCR誤検出によるノイズ行(記号のみ・制御文字・全角/半角の揺れ)を除去し、
+ * 後段の住所/氏名抽出の精度を上げる。
+ */
+private fun cleanOcrText(rawText: String): String {
+    val noiseOnlyLine = Regex("""^[\s\p{Punct}・()\[\]{}<>「」『』【】〜~ー_=+*#※★☆○●◯△▲▽▼◇◆□■×/\\|]+$""")
+    return java.text.Normalizer.normalize(rawText, java.text.Normalizer.Form.NFKC)
+        .lineSequence()
+        .map { line -> line.trim() }
+        .filter { it.isNotBlank() && !noiseOnlyLine.matches(it) && it.length > 1 }
+        .joinToString("\n")
+}
+
+private fun createAddressCandidateFromText(sourceLabel: String, sourceTextRaw: String): AddressCandidate {
+    val sourceText = cleanOcrText(sourceTextRaw)
     val postalCode = Regex("""\d{3}[-\s]?\d{4}""")
         .find(sourceText)
         ?.value
@@ -4843,6 +5035,8 @@ private val AbsentGray = Color(0xFF7A8491)
 private val AbsentMarkerArgb = android.graphics.Color.rgb(122, 132, 145)
 private val RedeliveryGreen = Color(0xFF00897B)
 private val RedeliveryMarkerArgb = android.graphics.Color.rgb(0, 137, 123)
+private val CompletedMarkerArgb = android.graphics.Color.rgb(23, 114, 69)
+private val ReturnMarkerArgb = android.graphics.Color.rgb(158, 42, 43)
 
 @androidx.compose.ui.tooling.preview.Preview(
     showBackground = true,

@@ -38,6 +38,7 @@
     <string name="remaining">Pendentes</string>
     <string name="completed">Concluídas</string>
     <string name="absent">Ausente</string>
+    <string name="clear_filter">Limpar filtro</string>
 
     <!-- Menu lateral -->
     <string name="package_registration_menu">Registrar pacote</string>
@@ -131,6 +132,7 @@
     <string name="status_complete">Entregue</string>
     <string name="status_absent">Ausente</string>
     <string name="status_return">Devolvido</string>
+    <string name="edit_package_detail">Editar detalhes</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
 
@@ -221,6 +223,9 @@
     <string name="free_trial_expired">Não Assinado ao Premium</string>
     <string name="free_trial_active_title">Teste gratuito (restam %1$d dias)</string>
     <string name="trial_after_register">Todos os recursos do plano Premium são gratuitos por 14 dias a partir da data de cadastro da conta. Nenhuma cobrança ocorre automaticamente durante esse período gratuito. Se quiser continuar com o Premium depois que esse período terminar, você precisará assinar por conta própria pelo Google Play.</string>
+    <string name="subscribe_requires_registration">Para assinar o Premium, primeiro insira o nome do motorista no formulário abaixo e toque em "Registrar".</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ Seu teste gratuito termina amanhã</string>
+    <string name="guest_not_registered">Não registrado (Convidado)</string>
     <string name="free_plan_name">Gratuito</string>
     <string name="free_trial_period">Teste de 2 semanas</string>
     <string name="free_features">· Todos os recursos gratuitos por 14 dias\n· Após o período, apenas novos cadastros ficam bloqueados\n· Backup</string>
@@ -263,7 +268,8 @@
     <!-- Feedback -->
     <string name="feedback_label">Conteúdo do feedback</string>
     <string name="feedback_placeholder">Ex: Gostaria que os alfinetes do mapa fossem maiores</string>
-    <string name="feedback_sent">Salvo como pendente. Será enviado às operações após integração com API.</string>
+    <string name="feedback_sent">Seu aplicativo de e-mail foi aberto. Revise e envie.</string>
+    <string name="feedback_email_subject">Feedback do HAKOBUN</string>
 
     <!-- Detalhes dos avisos -->
     <string name="announcement_important">Importante</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">Verificação de permissão</string>
     <string name="voice_prompt">Por favor, diga o endereço de entrega</string>
     <string name="voice_status_unrecognized">Não foi possível reconhecer o status de entrega em "%1$s". Tente novamente.</string>
+    <string name="voice_input_source">Entrada por voz</string>
+    <string name="default_sample_address">1-1-1 Marunouchi, Chiyoda-ku, Tóquio</string>
+    <string name="postal_search_source">Busca por CEP</string>
+    <string name="postal_match">Correspondência</string>
+    <string name="postal_unconfirmed">Não confirmado</string>
+    <string name="postal_error">Erro</string>
+    <string name="postal_not_found">Nenhum endereço correspondente encontrado</string>
+    <string name="postal_communication_error">Ocorreu um erro de comunicação</string>
     <string name="voice_next_stop_none">Nenhuma próxima entrega encontrada.</string>
     <string name="memo_added_from_registration">Adicionado pela tela de registro de pacotes</string>
 

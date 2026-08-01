@@ -38,6 +38,7 @@
     <string name="remaining">剩余</string>
     <string name="completed">已完成</string>
     <string name="absent">不在家</string>
+    <string name="clear_filter">清除筛选</string>
 
     <!-- 侧边菜单 -->
     <string name="package_registration_menu">注册包裹</string>
@@ -131,6 +132,7 @@
     <string name="status_complete">已完成</string>
     <string name="status_absent">不在家</string>
     <string name="status_return">退回</string>
+    <string name="edit_package_detail">编辑详情</string>
     <string name="yes">有</string>
     <string name="no">无</string>
 
@@ -221,6 +223,9 @@
     <string name="free_trial_expired">未订阅高级版</string>
     <string name="free_trial_active_title">免费试用中（剩余%1$d天）</string>
     <string name="trial_after_register">自账户注册之日起14天内，可免费使用高级套餐的全部功能。免费期间不会自动产生任何费用。免费期结束后如需继续使用高级套餐，需通过 Google Play 自行订阅。</string>
+    <string name="subscribe_requires_registration">订阅高级套餐前，请先在下方表单中输入司机姓名并点击"注册"。</string>
+    <string name="trial_ending_tomorrow_banner">⚠️ 免费试用将于明天结束</string>
+    <string name="guest_not_registered">未注册(访客)</string>
     <string name="free_plan_name">免费</string>
     <string name="free_trial_period">2周试用</string>
     <string name="free_features">・全部功能14天内免费\n・试用期结束后仅新登记功能被锁定\n・备份</string>
@@ -263,7 +268,8 @@
     <!-- 反馈 -->
     <string name="feedback_label">反馈内容</string>
     <string name="feedback_placeholder">例）希望地图图钉更大一些</string>
-    <string name="feedback_sent">已保存为待发送。API集成后将发送给运营。</string>
+    <string name="feedback_sent">已打开邮件应用，请确认内容后发送。</string>
+    <string name="feedback_email_subject">HAKOBUN意见反馈</string>
 
     <!-- 公告详情 -->
     <string name="announcement_important">重要</string>
@@ -309,6 +315,14 @@
     <string name="camera_permission_check">权限确认</string>
     <string name="voice_prompt">请说出收件地址</string>
     <string name="voice_status_unrecognized">无法从「%1$s」识别配送状态，请重试。</string>
+    <string name="voice_input_source">语音输入</string>
+    <string name="default_sample_address">东京都千代田区丸之内1-1-1</string>
+    <string name="postal_search_source">邮政编码搜索</string>
+    <string name="postal_match">匹配</string>
+    <string name="postal_unconfirmed">未确认</string>
+    <string name="postal_error">错误</string>
+    <string name="postal_not_found">未找到匹配的地址</string>
+    <string name="postal_communication_error">发生通信错误</string>
     <string name="voice_next_stop_none">未找到下一个配送地点。</string>
     <string name="memo_added_from_registration">从包裹注册画面添加</string>
 
