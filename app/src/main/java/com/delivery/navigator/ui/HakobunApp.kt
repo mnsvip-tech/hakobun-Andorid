@@ -4900,20 +4900,33 @@ private fun cleanOcrText(rawText: String): String {
         .joinToString("\n")
 }
 
+/** 都道府県・市区町村・丁目/番地/号など、日本の住所表記に典型的な単位を含むかどうかの簡易判定。 */
+private val ADDRESS_UNIT_REGEX = Regex("""[都道府県市区町村]|丁目|番地|号""")
+
+/**
+ * 「和文の地名らしき文字列＋番地数字(ハイフン区切り可)」という日本の住所特有のパターン。
+ * バーコード文字列(英数字)やUI文言等のノイズは和文文字を含まないため除外され、
+ * 住所部分だけを荷札全体のテキストから部分一致で抜き出せる。
+ */
+private val ADDRESS_SEGMENT_REGEX = Regex(
+    """[一-鿿぀-ゟ゠-ヿ　 ]{2,25}[0-9]{1,4}(?:-[0-9]{1,4}){0,3}"""
+)
+
 private fun createAddressCandidateFromText(sourceLabel: String, sourceTextRaw: String): AddressCandidate {
     val sourceText = cleanOcrText(sourceTextRaw)
-    val postalCode = Regex("""\d{3}[-\s]?\d{4}""")
-        .find(sourceText)
-        ?.value
-        ?.filter(Char::isDigit)
-        .orEmpty()
-    val address = extractLikelyAddress(sourceText)
-    val recipientName = extractLikelyName(sourceText)
+    val postalMatch = Regex("""\d{3}[-\s]?\d{4}""").find(sourceText)
+    val postalCode = postalMatch?.value?.filter(Char::isDigit).orEmpty()
 
-    val fallback = sourceText
+    val lines = sourceText
         .lineSequence()
         .map { it.trim() }
         .filter { it.isNotBlank() }
+        .toList()
+
+    val recipientName = extractLikelyName(lines, postalMatch?.value)
+    val address = extractLikelyAddress(lines, recipientName, postalMatch?.value)
+
+    val fallback = lines
         .joinToString(" ")
         .replace(Regex("""\d{3}[-\s]?\d{4}"""), "")
         .trim()
@@ -4926,18 +4939,25 @@ private fun createAddressCandidateFromText(sourceLabel: String, sourceTextRaw: S
     )
 }
 
-private fun extractLikelyName(sourceText: String): String {
-    val lines = sourceText
-        .lineSequence()
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .toList()
-
+private fun extractLikelyName(lines: List<String>, postalValue: String?): String {
     val honorificSuffixes = listOf("様", "殿", "御中")
-    lines.firstOrNull { line -> honorificSuffixes.any { line.endsWith(it) } }?.let { line ->
-        var name = line
+    val nameLineIndex = lines.indexOfLast { line ->
+        honorificSuffixes.any { line.endsWith(it) } &&
+            (postalValue == null || !line.contains(postalValue))
+    }
+    if (nameLineIndex >= 0) {
+        var name = lines[nameLineIndex]
         honorificSuffixes.forEach { name = name.removeSuffix(it) }
         name = name.trim().trim('　', ' ')
+
+        // 宛名がOCRで2行に分割され(例:「種子」「強様」)、氏名行だけでは名字が欠落することがある。
+        // 直前の行が短く・住所単位や数字を含まない場合は名前の続きとみなして連結する。
+        if (name.length in 1..2 && nameLineIndex > 0) {
+            val prevLine = lines[nameLineIndex - 1]
+            if (prevLine.length <= 6 && prevLine.none(Char::isDigit) && !ADDRESS_UNIT_REGEX.containsMatchIn(prevLine)) {
+                name = prevLine + name
+            }
+        }
         if (name.isNotBlank()) return name
     }
 
@@ -4947,32 +4967,33 @@ private fun extractLikelyName(sourceText: String): String {
     return ""
 }
 
-private fun extractLikelyAddress(sourceText: String): String {
-    val prefectures = listOf(
-        "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-        "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-        "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
-        "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
-        "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-        "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
-        "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
-    )
-    val lines = sourceText
-        .lineSequence()
-        .map { it.trim().replace("〒", "").replace(" ", "").replace("　", "") }
-        .filter { it.isNotBlank() }
-        .toList()
-    val addressIndex = lines.indexOfFirst { line ->
-        prefectures.any { line.contains(it) }
-    }
-    if (addressIndex < 0) return ""
+private fun extractLikelyAddress(lines: List<String>, recipientName: String, postalValue: String?): String {
+    val honorificSuffixes = listOf("様", "殿", "御中")
+    val candidateLines = lines
+        .map { it.replace("〒", "") }
+        .filterNot { line ->
+            (postalValue != null && line.contains(postalValue)) ||
+                (recipientName.isNotBlank() && honorificSuffixes.any { line.endsWith(it) })
+        }
 
-    return lines
-        .drop(addressIndex)
-        .take(3)
-        .joinToString("")
-        .replace(Regex("""\d{3}[-\s]?\d{4}"""), "")
-        .trim()
+    // 撮影対象が書類やスクリーンショットの場合、UI文言(スタイル名・アクセシビリティ表示など)が
+    // 一緒に写り込みOCRされてしまうことがある。都道府県・市区町村を含み、かつ数字(番地)を伴う行を
+    // 「住所らしい行」として優先的に抽出し、それ以外の雑多な行は住所から除外する。
+    val addressLikeLines = candidateLines.filter { line ->
+        ADDRESS_UNIT_REGEX.containsMatchIn(line) && line.any(Char::isDigit)
+    }
+    val addressLines = addressLikeLines.ifEmpty { candidateLines }
+    val joinedCandidateText = addressLines.joinToString(separator = "")
+
+    // 配送ラベルは1行の中に住所・バーコード文字列・お届け日時などが混在してOCRされることが多いため、
+    // 行単位ではなく「和文＋番地数字」というパターンで住所らしい部分文字列だけを抜き出す。
+    // 該当パターンが複数見つかった場合は最も長い(=情報量が多い)ものを住所とみなす。
+    return ADDRESS_SEGMENT_REGEX.findAll(joinedCandidateText)
+        .maxByOrNull { it.value.length }
+        ?.value
+        ?.replace(Regex("""[　\s]"""), "")
+        ?.takeIf { it.isNotBlank() }
+        .orEmpty()
 }
 
 private fun createVoiceAddressIntent(): Intent {
