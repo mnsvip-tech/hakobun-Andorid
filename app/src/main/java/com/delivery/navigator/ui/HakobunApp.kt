@@ -4976,24 +4976,29 @@ private fun extractLikelyAddress(lines: List<String>, recipientName: String, pos
                 (recipientName.isNotBlank() && honorificSuffixes.any { line.endsWith(it) })
         }
 
-    // 撮影対象が書類やスクリーンショットの場合、UI文言(スタイル名・アクセシビリティ表示など)が
-    // 一緒に写り込みOCRされてしまうことがある。都道府県・市区町村を含み、かつ数字(番地)を伴う行を
-    // 「住所らしい行」として優先的に抽出し、それ以外の雑多な行は住所から除外する。
-    val addressLikeLines = candidateLines.filter { line ->
-        ADDRESS_UNIT_REGEX.containsMatchIn(line) && line.any(Char::isDigit)
+    // 住所は都道府県・市区町村などの単位語を含む行から始まるが、番地の数字は
+    // OCRで別行に分かれることが多い(例:「東京都渋谷区神南」「1-1-1」)ため、
+    // 単位語を含む最初の行を起点に後続の数行もまとめて住所候補とする
+    // (単位語と数字が同一行にあることは求めない)。
+    val addressStartIndex = candidateLines.indexOfFirst { ADDRESS_UNIT_REGEX.containsMatchIn(it) }
+    val addressLines = if (addressStartIndex >= 0) {
+        candidateLines.drop(addressStartIndex).take(4)
+    } else {
+        candidateLines
     }
-    val addressLines = addressLikeLines.ifEmpty { candidateLines }
     val joinedCandidateText = addressLines.joinToString(separator = "")
 
     // 配送ラベルは1行の中に住所・バーコード文字列・お届け日時などが混在してOCRされることが多いため、
-    // 行単位ではなく「和文＋番地数字」というパターンで住所らしい部分文字列だけを抜き出す。
-    // 該当パターンが複数見つかった場合は最も長い(=情報量が多い)ものを住所とみなす。
-    return ADDRESS_SEGMENT_REGEX.findAll(joinedCandidateText)
+    // 「和文＋番地数字」というパターンで住所らしい部分文字列だけを抜き出しノイズを除去する。
+    // 該当パターンが複数見つかった場合は最も長い(=情報量が多い)ものを住所とみなし、
+    // パターンに一致しなかった場合は連結した行そのものを住所として扱う(取りこぼし防止)。
+    val extractedAddress = ADDRESS_SEGMENT_REGEX.findAll(joinedCandidateText)
         .maxByOrNull { it.value.length }
         ?.value
         ?.replace(Regex("""[　\s]"""), "")
         ?.takeIf { it.isNotBlank() }
-        .orEmpty()
+
+    return extractedAddress ?: joinedCandidateText.trim()
 }
 
 private fun createVoiceAddressIntent(): Intent {
