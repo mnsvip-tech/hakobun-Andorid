@@ -2798,7 +2798,7 @@ private fun AccountMenuDetailScreen(
                             InfoRow(stringResource(R.string.announcement_update), stringResource(R.string.announcement_update_text))
                         } else {
                             announcements.forEach { announcement ->
-                                InfoRow(announcement.title, announcement.body)
+                                AnnouncementRow(announcement.title, announcement.body)
                             }
                         }
                         InfoRow(stringResource(R.string.announcement_guide), stringResource(R.string.announcement_guide_text))
@@ -4657,6 +4657,21 @@ private fun InfoRow(label: String, value: String) {
     ) {
         Text(label, color = BrandBlue, fontWeight = FontWeight.Bold)
         Text(value, color = Color(0xFF445064), modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun AnnouncementRow(title: String, body: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFFF6F7F9))
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(title, color = BrandBlue, fontWeight = FontWeight.Bold)
+        Text(body, color = Color(0xFF445064))
     }
 }
 
