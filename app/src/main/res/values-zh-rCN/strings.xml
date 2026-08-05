@@ -114,6 +114,7 @@
     <string name="backup_data_title">地址数据管理</string>
     <string name="backup_data_desc">可备份和导入固定路线以外的地址。</string>
     <string name="create_backup">创建备份</string>
+    <string name="backup_no_data">没有可备份的包裹数据。</string>
     <string name="share_title">HAKOBUN 地址备份</string>
     <string name="share_chooser">分享备份</string>
     <string name="import_data_label">导入数据</string>

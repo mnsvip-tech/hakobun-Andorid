@@ -114,6 +114,7 @@
     <string name="backup_data_title">Quản lý dữ liệu địa chỉ</string>
     <string name="backup_data_desc">Có thể sao lưu và nhập địa chỉ ngoài tuyến cố định.</string>
     <string name="create_backup">Tạo bản sao lưu</string>
+    <string name="backup_no_data">Không có dữ liệu kiện hàng để sao lưu.</string>
     <string name="share_title">HAKOBUN Sao lưu địa chỉ</string>
     <string name="share_chooser">Chia sẻ bản sao lưu</string>
     <string name="import_data_label">Dữ liệu nhập</string>

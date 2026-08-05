@@ -811,6 +811,10 @@ fun HakobunApp() {
                         selectedCode = selectedPackage?.trackingCode,
                         backupText = backupText,
                         importText = importText,
+                        isLoggedIn = isLoggedIn,
+                        isFreeExpired = isFreeExpired,
+                        onRequireLogin = { activeMenuItem = AccountMenuItem.Account },
+                        onShowPaywall = { showPaywallDialog = true },
                         onClose = { homePanel = null },
                         onSelectPackage = onPackageSelected,
                         onEditPackage = { code ->
@@ -1219,6 +1223,10 @@ private fun HomePanelSheet(
     selectedCode: String?,
     backupText: String,
     importText: String,
+    isLoggedIn: Boolean,
+    isFreeExpired: Boolean,
+    onRequireLogin: () -> Unit,
+    onShowPaywall: () -> Unit,
     onClose: () -> Unit,
     onSelectPackage: (String) -> Unit,
     onEditPackage: (String) -> Unit,
@@ -1251,7 +1259,16 @@ private fun HomePanelSheet(
             }
             when (panel) {
                 HomePanel.Packages -> PackageList(packages, routeNumberMap, selectedCode, onSelectPackage, onEditPackage)
-                HomePanel.Courses -> RegularCoursePanel(courses, onLoadCourse, onClearCourseFromMap, onAddCourseAddress)
+                HomePanel.Courses -> RegularCoursePanel(
+                    courses,
+                    isLoggedIn,
+                    isFreeExpired,
+                    onRequireLogin,
+                    onShowPaywall,
+                    onLoadCourse,
+                    onClearCourseFromMap,
+                    onAddCourseAddress
+                )
                 HomePanel.Backup -> AddressBackupPanel(backupText, importText, onExport, onImportTextChange, onImport, onClearBackup, onClose)
             }
         }
@@ -2057,128 +2074,24 @@ private fun UserAccountScreen(
                 }
             }
 
-            // プランカード
-            WhiteCard {
-                Text(stringResource(R.string.plan_billing_title), fontWeight = FontWeight.Bold)
-                if (isPremium) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFEAF0FF))
-                            .padding(12.dp)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(stringResource(R.string.premium_plan), color = BrandBlue, fontWeight = FontWeight.Bold)
-                            Text(stringResource(R.string.premium_features), color = MutedText, style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (!userProfile.isRegistered || isFreeExpired) Color(0xFFFFEEEE) else Color(0xFFF6F7F9))
-                            .padding(12.dp)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                when {
-                                    !userProfile.isRegistered -> stringResource(R.string.guest_not_registered)
-                                    isFreeExpired -> stringResource(R.string.free_trial_expired)
-                                    else -> stringResource(R.string.free_trial_active_title, trialRemainingDays)
-                                },
-                                color = if (!userProfile.isRegistered || isFreeExpired) Color(0xFFE53935) else BrandBlue,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(stringResource(R.string.trial_after_register), color = MutedText, style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(
-                            modifier = Modifier.weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .border(2.dp, BrandPurple, RoundedCornerShape(8.dp))
-                                .background(Color(0xFFF5F0FF))
-                                .padding(12.dp)
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(stringResource(R.string.free_plan_name), fontWeight = FontWeight.Bold)
-                                Text(freeTrialLabel ?: stringResource(R.string.price_loading), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                                Text(stringResource(R.string.free_features), style = MaterialTheme.typography.labelSmall, color = MutedText)
-                            }
-                        }
-                        Box(
-                            modifier = Modifier.weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .border(2.dp, Color(0xFFE2E7EF), RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                                .padding(12.dp)
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(stringResource(R.string.premium_plan_name), fontWeight = FontWeight.Bold)
-                                Text(priceLabel ?: stringResource(R.string.price_loading), color = BrandPurple, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                                Text(stringResource(R.string.premium_features_list), style = MaterialTheme.typography.labelSmall, color = MutedText)
-                            }
-                        }
-                    }
-                    if (!userProfile.isRegistered) {
-                        Text(
-                            stringResource(R.string.subscribe_requires_registration),
-                            color = Color(0xFFE53935),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Button(
-                        onClick = { launchSubscription() },
-                        enabled = userProfile.isRegistered && subscriptionProductDetails != null,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8))
-                    ) {
-                        Text(stringResource(R.string.subscribe_google_pay), color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-                    Text(
-                        if (freeTrialLabel != null && priceLabel != null) {
-                            stringResource(R.string.subscription_terms_dynamic, freeTrialLabel, priceLabel)
-                        } else {
-                            stringResource(R.string.price_loading)
-                        },
-                        color = MutedText,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
-                TextButton(
-                    onClick = { openManageSubscription() },
-                    modifier = Modifier.fillMaxWidth()
-                ) { Text(stringResource(R.string.manage_subscription_link)) }
-                if (subscribeMessage.isNotBlank()) {
-                    Text(
-                        subscribeMessage,
-                        color = if (subscribeMessage.contains("完了")) SuccessGreen else Color(0xFFE53935)
-                    )
-                }
-                if (com.delivery.navigator.BuildConfig.DEBUG && userProfile.isRegistered) {
-                    Text(stringResource(R.string.debug_section_title), color = MutedText, style = MaterialTheme.typography.labelSmall)
-                    if (isPremium) {
-                        OutlinedButton(
-                            onClick = { onSaveProfile(userProfile.copy(plan = MembershipPlan.Free)) },
-                            modifier = Modifier.fillMaxWidth()
-                        ) { Text(stringResource(R.string.debug_expire_trial_button)) }
-                    } else {
-                        OutlinedButton(
-                            onClick = { onSaveProfile(userProfile.copy(plan = MembershipPlan.Premium)) },
-                            modifier = Modifier.fillMaxWidth()
-                        ) { Text(stringResource(R.string.debug_reset_trial_button)) }
-                    }
-                    OutlinedButton(
-                        onClick = onSeedTestData,
-                        modifier = Modifier.fillMaxWidth()
-                    ) { Text("実機テスト用ダミーデータ200件を投入") }
-                    OutlinedButton(
-                        onClick = onClearTestData,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFE53935))
-                    ) { Text("テストデータを全件クリア") }
-                }
-            }
+            // プランカード本体はPlanBillingCard.ktに切り出し済み(2026-08-06)。
+            // 他修正の際に誤って書き換わる事故を防ぐため、このカードを触るときのみ
+            // PlanBillingCard.ktを開くこと。
+            PlanBillingCard(
+                userProfile = userProfile,
+                isPremium = isPremium,
+                isFreeExpired = isFreeExpired,
+                trialRemainingDays = trialRemainingDays,
+                freeTrialLabel = freeTrialLabel,
+                priceLabel = priceLabel,
+                subscriptionProductDetails = subscriptionProductDetails,
+                subscribeMessage = subscribeMessage,
+                onSubscribe = { launchSubscription() },
+                onManageSubscription = { openManageSubscription() },
+                onSaveProfile = onSaveProfile,
+                onSeedTestData = onSeedTestData,
+                onClearTestData = onClearTestData
+            )
 
             if (userProfile.isRegistered) {
                 WhiteCard {
@@ -3253,6 +3166,10 @@ private fun CourseAddressItem(
 @Composable
 private fun RegularCoursePanel(
     courses: List<RegularCourse>,
+    isLoggedIn: Boolean,
+    isFreeExpired: Boolean,
+    onRequireLogin: () -> Unit,
+    onShowPaywall: () -> Unit,
     onLoadCourse: (RegularCourse) -> Unit,
     onClearCourseFromMap: (RegularCourse) -> Unit,
     onAddCourseAddress: (String, String, String, TimeWindow, String) -> Unit
@@ -3358,7 +3275,13 @@ private fun RegularCoursePanel(
             Text(stringResource(R.string.course_summary, course.displayName, course.addresses.size), fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
-                    onClick = { onLoadCourse(course) },
+                    onClick = {
+                        when {
+                            !isLoggedIn -> onRequireLogin()
+                            isFreeExpired -> onShowPaywall()
+                            else -> onLoadCourse(course)
+                        }
+                    },
                     enabled = course.addresses.isNotEmpty(),
                     modifier = Modifier.weight(1f)
                 ) {
@@ -3497,10 +3420,24 @@ private fun AddressBackupPanel(
     val clipboard = remember {
         context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
     }
+    var exportAttempted by remember { mutableStateOf(false) }
     WhiteCard {
         Text(stringResource(R.string.backup_data_title), fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.backup_data_desc), color = MutedText)
-        Button(onClick = onExport, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.create_backup)) }
+        Button(
+            onClick = {
+                exportAttempted = true
+                onExport()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) { Text(stringResource(R.string.create_backup)) }
+        if (exportAttempted && backupText.isBlank()) {
+            Text(
+                stringResource(R.string.backup_no_data),
+                color = Color(0xFFE53935),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         if (backupText.isNotBlank()) {
             TextBox(backupText)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -4660,7 +4597,7 @@ private fun <T> SegmentedRow(items: List<T>, selected: T, label: (T) -> String, 
 }
 
 @Composable
-private fun WhiteCard(content: @Composable ColumnScope.() -> Unit) {
+internal fun WhiteCard(content: @Composable ColumnScope.() -> Unit) {
     Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(8.dp)) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
     }
@@ -5098,10 +5035,10 @@ private fun isNextDeliveryCommand(spoken: String): Boolean {
 
 private fun yesNo(value: Boolean): String = if (value) "あり" else "なし"
 
-private val BrandBlue = Color(0xFF2457D6)
-private val BrandPurple = Color(0xFF6D55B3)
-private val MutedText = Color(0xFF637083)
-private val SuccessGreen = Color(0xFF177245)
+internal val BrandBlue = Color(0xFF2457D6)
+internal val BrandPurple = Color(0xFF6D55B3)
+internal val MutedText = Color(0xFF637083)
+internal val SuccessGreen = Color(0xFF177245)
 private val AbsentGray = Color(0xFF7A8491)
 private val AbsentMarkerArgb = android.graphics.Color.rgb(122, 132, 145)
 private val RedeliveryGreen = Color(0xFF00897B)

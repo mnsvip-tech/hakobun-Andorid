@@ -114,6 +114,7 @@
     <string name="backup_data_title">Address Data Management</string>
     <string name="backup_data_desc">Back up and import addresses outside regular routes.</string>
     <string name="create_backup">Create Backup</string>
+    <string name="backup_no_data">There is no package data to back up.</string>
     <string name="share_title">HAKOBUN Address Backup</string>
     <string name="share_chooser">Share Backup</string>
     <string name="import_data_label">Import Data</string>
