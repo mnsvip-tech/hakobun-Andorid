@@ -53,6 +53,10 @@
     <string name="account_desc">View driver name, base, and contact info</string>
     <string name="support_menu">Notices / End of Day</string>
     <string name="support_desc">Support and calendar export here</string>
+    <string name="share_menu">Invite a friend</string>
+    <string name="share_desc">Share this app</string>
+    <string name="share_app_subject">Check out HAKOBUN</string>
+    <string name="share_app_message">Try HAKOBUN, the app that makes managing delivery routes easy!\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">Map is full screen. Access functions from the left menu as needed.</string>
 
     <!-- Map Buttons -->
@@ -227,6 +231,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ Your free trial ends tomorrow</string>
     <string name="guest_not_registered">Not registered (Guest)</string>
     <string name="free_plan_name">Free</string>
+    <string name="free_plan_name_label">Free Plan</string>
     <string name="free_trial_period">2-Week Trial</string>
     <string name="free_features">· All features free for 14 days\n· After the period ends, only new registrations are locked\n· Backup</string>
     <string name="premium_plan_name">Premium</string>

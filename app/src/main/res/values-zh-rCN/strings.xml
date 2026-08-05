@@ -53,6 +53,10 @@
     <string name="account_desc">查看司机姓名、基地和联系方式</string>
     <string name="support_menu">通知 / 结束处理</string>
     <string name="support_desc">支持和日历记录在这里</string>
+    <string name="share_menu">邀请好友</string>
+    <string name="share_desc">分享此应用</string>
+    <string name="share_app_subject">推荐HAKOBUN</string>
+    <string name="share_app_message">试试让配送路线管理更轻松的应用「HAKOBUN」吧！\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">地图全屏显示。所需操作请从左侧菜单调用。</string>
 
     <!-- 地图按钮 -->
@@ -227,6 +231,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ 免费试用将于明天结束</string>
     <string name="guest_not_registered">未注册(访客)</string>
     <string name="free_plan_name">免费</string>
+    <string name="free_plan_name_label">免费方案</string>
     <string name="free_trial_period">2周试用</string>
     <string name="free_features">・全部功能14天内免费\n・试用期结束后仅新登记功能被锁定\n・备份</string>
     <string name="premium_plan_name">高级版</string>

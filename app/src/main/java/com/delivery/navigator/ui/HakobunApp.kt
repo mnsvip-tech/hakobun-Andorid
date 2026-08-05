@@ -527,7 +527,7 @@ fun HakobunApp() {
                     },
                     onSeedTestData = {
                         packages.clear()
-                        packages.addAll(generateDebugTestPackages(100))
+                        packages.addAll(generateDebugTestPackages(50))
                         persistPackages()
                         activeMenuItem = null
                     },
@@ -1142,6 +1142,7 @@ private fun HomeSideMenu(
     onOpenAccount: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Surface(modifier = modifier, color = Color.White) {
         Column(
             modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(16.dp),
@@ -1167,6 +1168,16 @@ private fun HomeSideMenu(
             SideMenuCard(stringResource(R.string.backup_menu), stringResource(R.string.backup_desc), "↻") { onOpenPanel(HomePanel.Backup) }
             SideMenuCard(stringResource(R.string.account_menu), stringResource(R.string.account_desc), "👤") { onOpenAccount() }
             SideMenuCard(stringResource(R.string.support_menu), stringResource(R.string.support_desc), "i") { onOpenSupport() }
+            SideMenuCard(stringResource(R.string.share_menu), stringResource(R.string.share_desc), "📤") {
+                val subject = context.getString(R.string.share_app_subject)
+                val message = context.getString(R.string.share_app_message)
+                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, subject)
+                    putExtra(Intent.EXTRA_TEXT, message)
+                }
+                context.startActivity(Intent.createChooser(sendIntent, subject))
+            }
             Spacer(modifier = Modifier.weight(1f))
             Text(stringResource(R.string.fullscreen_map_hint), color = MutedText, style = MaterialTheme.typography.bodySmall)
         }
@@ -1364,12 +1375,19 @@ private fun FullScreenDeliveryMap(
     }
     // origin(現在地確定前はTokyo仮値、確定後はGPS座標)もキーに含めることで、
     // 起動直後にTokyo仮値でルート取得した後、実際のGPS位置が確定した際に再取得する。
-    LaunchedEffect(activeRouteDestination?.trackingCode, effectiveOrigin) {
+    // GPSは2〜5秒間隔で微小に揺れるため、生座標をそのままキーにすると
+    // Directions API呼び出し(最大16秒)が完了する前に毎回キャンセル・再起動され、
+    // 直線表示が続く問題があった。約100m単位に丸めた座標をキーにすることで防ぐ。
+    val routeFetchOrigin = remember(effectiveOrigin) {
+        Math.round(effectiveOrigin.latitude / ROUTE_FETCH_GRID_DEGREES) * ROUTE_FETCH_GRID_DEGREES to
+            Math.round(effectiveOrigin.longitude / ROUTE_FETCH_GRID_DEGREES) * ROUTE_FETCH_GRID_DEGREES
+    }
+    LaunchedEffect(activeRouteDestination?.trackingCode, routeFetchOrigin) {
         drivingRoutePoints = activeRouteDestination
             ?.let {
                 fetchDrivingRoutePointsCached(
                     context = context,
-                    origin = effectiveOrigin.latitude to effectiveOrigin.longitude,
+                    origin = routeFetchOrigin,
                     destination = it.latitude to it.longitude
                 ).map { point -> LatLng(point.first, point.second) }
             }
@@ -1862,6 +1880,10 @@ private fun AccountMenuPanel(
 
 private const val SUBSCRIPTION_PRODUCT_ID = "hakobun_monthly_premium"
 
+// 緯度経度0.001度(日本付近で約100m)単位に丸めるグリッド幅。
+// ルート取得のLaunchedEffectキーに使い、GPSの微小な揺れでの再取得キャンセル連鎖を防ぐ。
+private const val ROUTE_FETCH_GRID_DEGREES = 0.001
+
 // ISO 8601 duration("P14D"等)をおおよその日数に変換する。無料期間表示をProductDetailsの
 // 実際のオファーと一致させるために使用する。
 private fun billingPeriodToDays(isoPeriod: String): Int? {
@@ -2005,13 +2027,21 @@ private fun UserAccountScreen(
                     LabeledField(stringResource(R.string.email_label), stringResource(R.string.email_placeholder), email) { email = it }
                     Button(
                         onClick = {
+                            val registeredAt = if (userProfile.registeredAt > 0L) {
+                                userProfile.registeredAt
+                            } else {
+                                com.delivery.navigator.data.TrialGuard.resolveTrialStartMillis(
+                                    context,
+                                    System.currentTimeMillis()
+                                )
+                            }
                             onSaveProfile(userProfile.copy(
                                 driverName = driverName,
                                 base = base,
                                 contact = contact,
                                 email = email,
                                 isRegistered = true,
-                                registeredAt = if (userProfile.registeredAt > 0L) userProfile.registeredAt else System.currentTimeMillis()
+                                registeredAt = registeredAt
                             ))
                             isEditing = false
                         },

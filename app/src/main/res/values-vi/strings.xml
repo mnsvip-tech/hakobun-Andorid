@@ -53,6 +53,10 @@
     <string name="account_desc">Xem tên tài xế·trạm·liên hệ</string>
     <string name="support_menu">Thông báo / Kết thúc ngày</string>
     <string name="support_desc">Hỗ trợ và ghi lịch tại đây</string>
+    <string name="share_menu">Mời bạn bè</string>
+    <string name="share_desc">Chia sẻ ứng dụng này</string>
+    <string name="share_app_subject">Giới thiệu HAKOBUN</string>
+    <string name="share_app_message">Hãy thử dùng HAKOBUN, ứng dụng giúp quản lý tuyến giao hàng dễ dàng hơn!\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">Bản đồ hiển thị toàn màn hình. Gọi các thao tác cần thiết từ menu bên trái.</string>
 
     <!-- Nút bản đồ -->
@@ -227,6 +231,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ Bản dùng thử miễn phí kết thúc vào ngày mai</string>
     <string name="guest_not_registered">Chưa đăng ký (Khách)</string>
     <string name="free_plan_name">Miễn phí</string>
+    <string name="free_plan_name_label">Gói miễn phí</string>
     <string name="free_trial_period">Dùng thử 2 tuần</string>
     <string name="free_features">・Tất cả tính năng đều miễn phí trong 14 ngày\n・Sau khi hết hạn, chỉ khóa đăng ký hàng mới\n・Sao lưu</string>
     <string name="premium_plan_name">Premium</string>

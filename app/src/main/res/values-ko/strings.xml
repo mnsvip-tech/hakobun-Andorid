@@ -53,6 +53,10 @@
     <string name="account_desc">배송원 이름·거점·연락처 확인</string>
     <string name="support_menu">공지 / 마감 처리</string>
     <string name="support_desc">지원 및 캘린더 기록은 여기서</string>
+    <string name="share_menu">친구에게 알리기</string>
+    <string name="share_desc">앱을 공유하기</string>
+    <string name="share_app_subject">HAKOBUN 소개</string>
+    <string name="share_app_message">배송 경로 관리가 편해지는 앱 「HAKOBUN」을 사용해 보세요!\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">지도는 전체 화면 표시. 필요한 작업은 왼쪽 메뉴에서 호출합니다.</string>
 
     <!-- 지도 버튼 -->
@@ -227,6 +231,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ 무료 체험이 내일 종료됩니다</string>
     <string name="guest_not_registered">미등록(게스트)</string>
     <string name="free_plan_name">무료</string>
+    <string name="free_plan_name_label">무료 플랜</string>
     <string name="free_trial_period">2주 체험</string>
     <string name="free_features">・전체 기능이 14일간 무료\n・기간 종료 후에는 신규 등록만 잠김\n・백업</string>
     <string name="premium_plan_name">프리미엄</string>

@@ -53,6 +53,10 @@
     <string name="account_desc">Ver nome do entregador·base·contato</string>
     <string name="support_menu">Avisos / Encerramento do dia</string>
     <string name="support_desc">Suporte e exportação para calendário aqui</string>
+    <string name="share_menu">Convidar um amigo</string>
+    <string name="share_desc">Compartilhar este app</string>
+    <string name="share_app_subject">Conheça o HAKOBUN</string>
+    <string name="share_app_message">Experimente o HAKOBUN, o app que facilita o gerenciamento de rotas de entrega!\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">O mapa é exibido em tela cheia. Acesse as funções pelo menu à esquerda.</string>
 
     <!-- Botões do mapa -->
@@ -227,6 +231,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ Seu teste gratuito termina amanhã</string>
     <string name="guest_not_registered">Não registrado (Convidado)</string>
     <string name="free_plan_name">Gratuito</string>
+    <string name="free_plan_name_label">Plano Gratuito</string>
     <string name="free_trial_period">Teste de 2 semanas</string>
     <string name="free_features">· Todos os recursos gratuitos por 14 dias\n· Após o período, apenas novos cadastros ficam bloqueados\n· Backup</string>
     <string name="premium_plan_name">Premium</string>

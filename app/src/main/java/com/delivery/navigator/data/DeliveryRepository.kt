@@ -585,7 +585,10 @@ suspend fun fetchDrivingRoutePoints(
     return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         runCatching {
             val apiKey = com.delivery.navigator.BuildConfig.MAPS_API_KEY
-            if (apiKey.isBlank()) return@runCatching emptyList()
+            if (apiKey.isBlank()) {
+                android.util.Log.w("DrivingRoute", "MAPS_API_KEY is blank")
+                return@runCatching emptyList()
+            }
             val url = java.net.URL(
                 "https://maps.googleapis.com/maps/api/directions/json" +
                     "?origin=${origin.first},${origin.second}" +
@@ -602,6 +605,13 @@ suspend fun fetchDrivingRoutePoints(
                 connection.disconnect()
             }
             val root = org.json.JSONObject(json)
+            val apiStatus = root.optString("status")
+            if (apiStatus != "OK") {
+                android.util.Log.w(
+                    "DrivingRoute",
+                    "Directions API status=$apiStatus message=${root.optString("error_message")}"
+                )
+            }
             val encoded = root.optJSONArray("routes")
                 ?.takeIf { it.length() > 0 }
                 ?.optJSONObject(0)
@@ -609,7 +619,10 @@ suspend fun fetchDrivingRoutePoints(
                 ?.optString("points")
                 .orEmpty()
             if (encoded.isNotBlank()) decodePolyline(encoded) else emptyList()
-        }.getOrElse { emptyList() }
+        }.getOrElse {
+            android.util.Log.w("DrivingRoute", "Directions API取得失敗", it)
+            emptyList()
+        }
     }
 }
 

@@ -53,6 +53,10 @@
     <string name="account_desc">ドライバー名・拠点・連絡先を確認</string>
     <string name="support_menu">お知らせ / 終了処理</string>
     <string name="support_desc">サポートとカレンダー転記はこちら</string>
+    <string name="share_menu">友達に教える</string>
+    <string name="share_desc">アプリをシェアする</string>
+    <string name="share_app_subject">HAKOBUNのご紹介</string>
+    <string name="share_app_message">配達ルートの管理がラクになるアプリ「HAKOBUN」を使ってみませんか？\nhttps://play.google.com/store/apps/details?id=com.delivery.navigator</string>
     <string name="fullscreen_map_hint">地図は全画面表示。必要な操作だけ左メニューから呼び出します。</string>
 
     <!-- 地図ボタン -->
@@ -230,6 +234,7 @@
     <string name="trial_ending_tomorrow_banner">⚠️ 無料トライアルは明日で終了します</string>
     <string name="guest_not_registered">未登録(ゲスト)</string>
     <string name="free_plan_name">無料</string>
+    <string name="free_plan_name_label">無料プラン</string>
     <string name="free_trial_period">2週間トライアル</string>
     <string name="free_features">・全機能が14日間無料\n・期間終了後は新規登録のみロック\n・バックアップ</string>
     <string name="premium_plan_name">プレミアム</string>
