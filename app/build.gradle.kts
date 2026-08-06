@@ -59,16 +59,18 @@ android {
         create("standard") {
             dimension = "testMode"
         }
-        // 実機テスト用: 課金照会をスキップしプレミアム状態を強制する。applicationIdは変更しないため、
-        // standard/premiumOffと同時にはインストールできない(上書きされる)が、ビルド成果物(APK)は別名で残る。
+        // 実機テスト用: 課金照会をスキップしプレミアム状態を強制する。applicationIdSuffixにより
+        // standard/premiumOffとは別パッケージ扱いとなり、実機に3フレーバー同時にインストールできる。
         create("premiumOn") {
             dimension = "testMode"
+            applicationIdSuffix = ".premiumon"
             versionNameSuffix = "-premium-on"
             buildConfigField("String", "FORCE_PLAN", "\"PREMIUM\"")
         }
         // 実機テスト用: 課金照会をスキップし無料(トライアル切れ)状態を強制する。
         create("premiumOff") {
             dimension = "testMode"
+            applicationIdSuffix = ".premiumoff"
             versionNameSuffix = "-premium-off"
             buildConfigField("String", "FORCE_PLAN", "\"FREE\"")
         }
