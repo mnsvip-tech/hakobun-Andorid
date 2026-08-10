@@ -37,8 +37,8 @@ android {
         applicationId = "com.delivery.navigator"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.3.1"
+        versionCode = 6
+        versionName = "0.4.1"
         val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
             ?: providers.gradleProperty("MAPS_API_KEY").orNull
             ?: providers.environmentVariable("MAPS_API_KEY").orNull
